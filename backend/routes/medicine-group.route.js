@@ -2,11 +2,11 @@ const express = require("express");
 
 const router = express.Router();
 
-const nhomThuocController = require("../controllers/nhom-thuoc.controller");
+const medicineGroup = require("../controllers/medicine-group.controller");
 
-router.get("/", nhomThuocController.layDanhSachNhomThuoc);
-router.post("/", nhomThuocController.taoNhomThuoc);
-router.put("/:id", nhomThuocController.capNhatNhomThuoc);
-router.delete("/:id", nhomThuocController.xoaNhomThuoc);
+router.get("/", medicineGroup.layDanhSachNhomThuoc);
+router.post("/", medicineGroup.taoNhomThuoc);
+router.put("/:id", medicineGroup.capNhatNhomThuoc);
+router.delete("/:id", medicineGroup.xoaNhomThuoc);
 
 module.exports = router;

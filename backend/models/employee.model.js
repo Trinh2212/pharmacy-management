@@ -7,6 +7,10 @@ class Employee extends Model {
       foreignKey: "employeeId",
       as: "accountInfo",
     });
+
+    Employee.hasMany(models.WarehouseReceipt, {
+      foreignKey: "employeeId",
+    });
   }
 }
 

@@ -1,7 +1,24 @@
 const { Model, DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
-class WarehouseReceipt extends Model {}
+class WarehouseReceipt extends Model {
+  static associate(models){
+    WarehouseReceipt.belongsTo(models.Employee, {
+      foreignKey: "employeeId",
+      as: "employeeInfo"
+    });
+
+    WarehouseReceipt.belongsTo(models.Supplier, {
+      foreignKey: "supplierId",
+      as: "supplierInfo"
+    });
+
+    WarehouseReceipt.hasMany(models.WarehouseReceiptDetail, {
+      foreignKey: "receiptId",
+      as: "detailInfo"
+    });
+  } 
+}
 
 WarehouseReceipt.init(
   {

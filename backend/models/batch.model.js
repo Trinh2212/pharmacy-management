@@ -1,7 +1,19 @@
 const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require("../config/database");
 
-class Batch extends Model {}
+class Batch extends Model {
+  static associate(models){
+    Batch.belongsTo(models.Medicine, {
+      foreignKey: "medicineId",
+      as: "medicineInfo"
+    });
+
+    Batch.hasMany(models.WarehouseReceiptDetail, {
+      foreignKey: "batchId",
+      as: "detailInfo"
+    });
+  }
+}
 
 Batch.init(
   {
@@ -60,7 +72,7 @@ Batch.init(
 
     validate: {
       validateExpiryDate() {
-        if (this.expiryDate <= this.productionDate) {
+        if (new Date (this.expiryDate) <= new Date(this.productionDate)) {
           throw new Error("expiry date must be after production date");
         }
       },

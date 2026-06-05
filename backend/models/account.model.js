@@ -35,7 +35,7 @@ Account.init(
     avatarUrl: {
       type: DataTypes.TEXT,
       field: "avatar_url",
-    },
+    }, 
     role: {
       type: DataTypes.ENUM(
         "admin",
@@ -54,7 +54,7 @@ Account.init(
       type: DataTypes.INTEGER,
       unique: true,
       allowNull: false,
-      field: "id",
+      field: "employee_id",
       references: {
         model: "employees",
         key: "id",

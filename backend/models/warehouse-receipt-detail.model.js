@@ -1,7 +1,20 @@
 const { Model, DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
-class WarehouseReceiptDetail extends Model {}
+class WarehouseReceiptDetail extends Model {
+  static associate(models) {
+    WarehouseReceiptDetail.belongsTo(models.WarehouseReceipt, {
+      foreignKey: "receiptId",
+      as: "receiptInfo"
+    });
+
+    WarehouseReceiptDetail.belongsTo(models.Batch, {
+      foreignKey: "batchId",
+      as: "batchInfo",
+    });
+    
+  }
+}
 
 WarehouseReceiptDetail.init(
   {

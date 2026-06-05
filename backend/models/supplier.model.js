@@ -1,7 +1,13 @@
 const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require("../config/database");
 
-class Supplier extends Model {}
+class Supplier extends Model {
+  static associate(models){
+    Supplier.hasMany(models.WarehouseReceipt, {
+      foreignKey: "supplierId",
+    });
+  }
+}
 
 Supplier.init(
   {

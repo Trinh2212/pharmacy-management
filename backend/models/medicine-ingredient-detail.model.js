@@ -1,7 +1,19 @@
 const { Model, DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
-class MedicineIngredientDetail extends Model {}
+class MedicineIngredientDetail extends Model {
+  static associate(models) {
+    MedicineIngredientDetail.belongsTo(models.Medicine, {
+      foreignKey: "medicineId",
+      as: "medicineInfo",
+    });
+
+    MedicineIngredientDetail.belongsTo(models.ActiveIngredient, {
+      foreignKey: "ingredientId",
+      as: "ingredientInfo",
+    });
+  }
+}
 
 MedicineIngredientDetail.init(
   {

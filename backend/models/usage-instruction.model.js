@@ -1,7 +1,14 @@
 const { Model, DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
-class UsageInstruction extends Model {}
+class UsageInstruction extends Model {
+  static associate(models){
+    UsageInstruction.belongsTo(models.Medicine, {
+      foreignKey: "medicineId",
+      as: "medicineInfo"
+    });
+  }
+}
 
 UsageInstruction.init(
   {

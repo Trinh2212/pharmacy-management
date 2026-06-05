@@ -1,7 +1,16 @@
 const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require("../config/database");
 
-class MedicineGroup extends Model {}
+class MedicineGroup extends Model {
+  static associate(models) {
+    MedicineGroup.belongsToMany(models.Medicine, {
+      through: "medicine_group_medicines",
+      foreignKey: "groupId",
+      otherKey: "medicineId",
+      as: "medicineInfo",
+    });
+  }
+}
 
 MedicineGroup.init(
   {
