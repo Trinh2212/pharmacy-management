@@ -1,12 +1,19 @@
 const express = require("express");
-
 const router = express.Router();
 
-const medicineGroup = require("../controllers/medicine-group.controller");
+const {
+  getMedicineGroup,
+  getMedicineGroupById,
+  insertMedicineGroup,
+  updateMedicineGroup,
+  deleteMedicineGroup,
+} = require("../controllers/medicine-group.controller");
 
-router.get("/", medicineGroup.layDanhSachNhomThuoc);
-router.post("/", medicineGroup.taoNhomThuoc);
-router.put("/:id", medicineGroup.capNhatNhomThuoc);
-router.delete("/:id", medicineGroup.xoaNhomThuoc);
+// http://localhost:5000/api/medicine-groups
+router.get("/", getMedicineGroup);
+router.get("/:id", getMedicineGroupById);
+router.post("/", insertMedicineGroup);
+router.put("/:id", updateMedicineGroup);
+router.delete("/:id", deleteMedicineGroup);
 
 module.exports = router;

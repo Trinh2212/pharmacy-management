@@ -1,3 +1,5 @@
+const {sequelize} = require("../config/database");
+
 const employee = require("./employee.model");
 const account = require("./account.model");
 const activeIngredient = require("./active-ingredient.model");
@@ -11,17 +13,17 @@ const warehouseReceipt = require("./warehouse-receipt.model");
 const warehouseReceiptDetail = require("./warehouse-receipt-detail.model");
 
 const models = {
-  employee,
-  account,
-  activeIngredient,
-  batch,
-  medicineGroup,
-  medicine,
-  medicineIngredientDetail,
-  supplier,
-  usageInstruction,
-  warehouseReceipt,
-  warehouseReceiptDetail,
+  Employee: employee,
+  Account: account,
+  ActiveIngredient: activeIngredient,
+  Batch: batch,
+  MedicineGroup: medicineGroup,
+  Medicine: medicine,
+  MedicineIngredientDetail: medicineIngredientDetail,
+  Supplier: supplier,
+  UsageInstruction: usageInstruction,
+  WarehouseReceipt: warehouseReceipt,
+  WarehouseReceiptDetail: warehouseReceiptDetail,
 };
 
 Object.keys(models).forEach((modelName) => {
@@ -29,3 +31,6 @@ Object.keys(models).forEach((modelName) => {
         models[modelName].associate(models);
     }
 })
+models.sequelize = sequelize;
+
+module.exports = models;
