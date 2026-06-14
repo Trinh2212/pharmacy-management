@@ -13,10 +13,10 @@ CREATE TABLE medicine_groups (
 
 CREATE TABLE suppliers (
     supplier_id     INT AUTO_INCREMENT PRIMARY KEY,
-    supplier_name   VARCHAR(50) NOT NULL,
-    address         VARCHAR(255),
-    email           VARCHAR(100),
-    phone_number    VARCHAR(10),
+    supplier_name   VARCHAR(50) NOT NULL UNIQUE,
+    address         VARCHAR(255) ,
+    email           VARCHAR(100) NOT NULL,
+    phone_number    VARCHAR(10) NOT NULL,
 
     created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -25,7 +25,7 @@ CREATE TABLE suppliers (
 
 CREATE TABLE active_ingredients (
     ingredient_id   INT AUTO_INCREMENT PRIMARY KEY,
-    ingredient_name VARCHAR(100) NOT NULL,
+    ingredient_name VARCHAR(100) NOT NULL UNIQUE,
 
     created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -37,33 +37,19 @@ CREATE TABLE employees (
     employee_code   VARCHAR(10)  NOT NULL UNIQUE,    
     full_name       VARCHAR(50)  NOT NULL,
     dob             DATE,
-    gender          ENUM('nam', 'nữ', 'khác'),
+    gender          ENUM('nam', 'nữ', 'khác') NOT NULL DEFAULT 'khác',
     address         VARCHAR(100),
-    phone_number    VARCHAR(10)  NOT NULL,
+    phone_number    VARCHAR(10)  NOT NULL UNIQUE,
+    email           VARCHAR(100) NOT NULL UNIQUE,
+    password        VARCHAR(255) NOT NULL,
+    avatar_url      TEXT,
+    role            ENUM('admin', 'employee') NOT NULL DEFAULT 'employee',
+    status          ENUM('active', 'locked') NOT NULL DEFAULT 'active',
     hire_date       DATE,
-
+    
     created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at      TIMESTAMP   NULL DEFAULT NULL
-);
-
-CREATE TABLE accounts (
-    account_id      INT AUTO_INCREMENT PRIMARY KEY,
-    user_name        VARCHAR(100) NOT NULL UNIQUE,
-    password        VARCHAR(255) NOT NULL,              
-    email           VARCHAR(100) UNIQUE,
-    avatar_url      TEXT,
-    role            ENUM('admin', 'nhân viên kho', 'nhân viên quản lý sản phẩm')
-                        NOT NULL DEFAULT 'nhân viên quản lý sản phẩm',
-    status          ENUM('hoạt động', 'bị khóa')    NOT NULL DEFAULT 'hoạt động',
-    id              INT UNIQUE NOT NULL,                
-
-    created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at      TIMESTAMP   NULL DEFAULT NULL,
-
-    CONSTRAINT fk_accounts_employees FOREIGN KEY (id)   REFERENCES employees(id)    
-        ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 -- sl của thuốc thì tính tổng sl tồn kho của thuốc với tất cả batch của thuốc đó
@@ -78,14 +64,21 @@ CREATE TABLE medicines (
     price           DECIMAL(12,2) NOT NULL CHECK (price >= 0),
     registration_number VARCHAR(50)   NOT NULL UNIQUE,
     unit            ENUM('Viên','Vỉ','Hộp','Chai','Lọ','Tuýp','Gói','Ống','Bình xịt','Miếng dán')   NOT NULL,
-    group_id        INT,                            
+    -- group_id        INT,                            
 
     created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at      TIMESTAMP   NULL DEFAULT NULL,
+    deleted_at      TIMESTAMP   NULL DEFAULT NULL
+);
 
-    CONSTRAINT fk_medicines_groups FOREIGN KEY (group_id)   REFERENCES medicine_groups(group_id)
-        ON UPDATE CASCADE ON DELETE SET NULL
+CREATE TABLE medicine_group_medicines (
+    group_id INT NOT NULL,
+    medicine_id INT NOT NULL,
+
+    PRIMARY KEY (group_id, medicine_id),
+
+    FOREIGN KEY (group_id) REFERENCES medicine_groups(group_id),
+    FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id)
 );
 
 CREATE TABLE medicine_ingredient_details (
@@ -174,19 +167,5 @@ CREATE TABLE warehouse_receipt_details (
         ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
-
-DELIMITER $$
-
-CREATE TRIGGER generate_employee_code
-BEFORE INSERT ON employees
-FOR EACH ROW
-BEGIN
-    DECLARE new_code INT;
-    SELECT AUTO_INCREMENT INTO new_code
-    FROM information_schema.TABLES
-    WHERE TABLE_SCHEMA = 'pharmacy_management'
-      AND TABLE_NAME = 'employees';
-    SET NEW.employee_code = CONCAT('NV', LPAD(new_code, 3, '0'));
-END$$
-
-DELIMITER ;
+--tes
+SELECT * FROM medicines;
