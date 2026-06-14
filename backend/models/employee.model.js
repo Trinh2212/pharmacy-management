@@ -3,11 +3,6 @@ const { sequelize } = require("../config/database");
 
 class Employee extends Model {
   static associate(models) {
-    Employee.hasOne(models.Account, {
-      foreignKey: "employeeId",
-      as: "accountInfo",
-    });
-
     Employee.hasMany(models.WarehouseReceipt, {
       foreignKey: "employeeId",
     });
@@ -38,6 +33,8 @@ Employee.init(
     },
     gender: {
       type: DataTypes.ENUM("nam", "nữ", "khác"),
+      allowNull: false,
+      defaultValue: "khác",
     },
     address: {
       type: DataTypes.STRING(100),
@@ -45,7 +42,31 @@ Employee.init(
     phoneNumber: {
       type: DataTypes.STRING(10),
       allowNull: false,
+      unique: true,
       field: "phone_number",
+    },
+    email: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      unique: true,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    avatarUrl: {
+      type: DataTypes.TEXT,
+      field: "avatar_url",
+    },
+    role: {
+      type: DataTypes.ENUM("admin", "employee"),
+      allowNull: false,
+      defaultValue: "employee",
+    },
+    status: {
+      type: DataTypes.ENUM("active", "locked"),
+      allowNull: false,
+      defaultValue: "active",
     },
     hireDate: {
       type: DataTypes.DATEONLY,

@@ -1,6 +1,5 @@
 const {sequelize} = require("../config/database");
 const db = require("../models/index.model");
-const {schema} = require("../validations/requests/insertMedicineRequest");
 
 const getMedicine = async (req, res) => {
   res.status(200).json({
@@ -21,7 +20,7 @@ const getMedicineByName = async (req, res) => {
 };
 
 const insertMedicine = async (req, res) => {
-  const medicine = await db.Medicine.create(req.body)
+  const medicine = await db.Medicine.create(req.body);
   return res.status(201).json({
     message: "thêm thuốc mới thành công",
     data: medicine

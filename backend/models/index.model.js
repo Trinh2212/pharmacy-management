@@ -1,7 +1,6 @@
 const {sequelize} = require("../config/database");
 
 const employee = require("./employee.model");
-const account = require("./account.model");
 const activeIngredient = require("./active-ingredient.model");
 const batch = require("./batch.model");
 const medicineGroup = require("./medicine-group.model");
@@ -14,7 +13,6 @@ const warehouseReceiptDetail = require("./warehouse-receipt-detail.model");
 
 const models = {
   Employee: employee,
-  Account: account,
   ActiveIngredient: activeIngredient,
   Batch: batch,
   MedicineGroup: medicineGroup,

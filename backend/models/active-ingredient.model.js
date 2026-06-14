@@ -21,6 +21,7 @@ ActiveIngredient.init(
     ingredientName: {
       type: DataTypes.STRING(100),
       allowNull: false,
+      unique: true,
       field: "ingredient_name",
     },
   },

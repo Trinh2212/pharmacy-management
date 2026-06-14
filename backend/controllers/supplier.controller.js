@@ -1,37 +1,113 @@
-const supplier = require("../models/supplier.model");
+const db = require("../models/index.model");
+const { Op } = require("sequelize");
 
 const getSupplier = async (req, res) => {
-  res.status(200).json({
+  const { search = "" } = req.query;
+  const keyword = search.trim();
+  let filter = {};
+  if (keyword !== "") {
+    filter = {
+      supplierName: { [Op.like]: `%${keyword}%` },
+    };
+  }
+
+  const supplierList = await db.Supplier.findAll({
+    where: filter,
+    order: [["supplierName", "ASC"]],
+  });
+
+  return res.status(200).json({
     message: "Lấy danh sách nhà cung cấp thành công",
+    data: supplierList,
   });
 };
 
 const getSupplierById = async (req, res) => {
-  res.status(200).json({
-    message: "Lấy thông tin nhà cung cấp thành công theo id",
-  });
-};
+  const { id } = req.params;
 
-const getSupplierByName = async (req, res) => {
-  res.status(200).json({
-    message: "Lấy thông tin nhà cung cấp thành công theo tên",
+  const supplier = await db.Supplier.findByPk(id);
+  if (!supplier) {
+    return res.status(404).json({
+      message: "không tìm thấy nhà cung cấp",
+    });
+  }
+  return res.status(200).json({
+    message: "Lấy thông tin nhà cung cấp thành công",
+    data: supplier
   });
 };
 
 const insertSupplier = async (req, res) => {
-  res.status(200).json({
+  const { supplierName } = req.body;
+
+  const existed = await db.Supplier.findOne({
+    where: {
+      supplierName,
+    },
+  });
+
+  if (existed) {
+    return res.status(409).json({
+      message: "nhà cung cấp đã tồn tại",
+    });
+  }
+  const supplier = await db.Supplier.create(req.body);
+
+  return res.status(200).json({
     message: "Thêm nhà cung cấp mới thành công",
+    data: supplier,
   });
 };
 
 const updateSupplier = async (req, res) => {
-  res.status(200).json({
+  const {id} = req.params;
+  const {supplierName} = req.body;
+
+  const supplier = await db.Supplier.findByPk(id);
+
+  if (!supplier){
+    return res.status(404).json({
+      message: "không tìm thấy nhà cung cấp"
+    })
+  }
+  
+  if (supplierName) {
+    const existed = await db.Supplier.findOne({
+      where: {
+        supplierName
+      }
+    })
+  
+    if (existed && existed.supplierId !== supplier.supplierId) {
+      return res.status(409).json({
+        message: "nhà cung cấp đã tồn tại"
+      })
+    }
+    
+  }
+
+  await supplier.update(req.body);
+
+  return res.status(200).json({
     message: "Cập nhật nhà cung cấp thành công",
+    data: supplier
   });
 };
 
 const deleteSupplier = async (req, res) => {
-  res.status(200).json({
+  const {id} = req.params;
+
+  const supplier = await db.Supplier.findByPk(id);
+
+  if (!supplier) {
+    return res.status(404).json({
+      message: "không tìm thấy nhà cung cấp"
+    })
+  }
+
+  await supplier.destroy();
+
+  return res.status(200).json({
     message: "Xóa nhà cung cấp thành công",
   });
 };
@@ -39,7 +115,6 @@ const deleteSupplier = async (req, res) => {
 module.exports = {
   getSupplier,
   getSupplierById,
-  getSupplierByName,
   insertSupplier,
   updateSupplier,
   deleteSupplier,

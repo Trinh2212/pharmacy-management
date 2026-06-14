@@ -1,4 +1,5 @@
-const employee = require("../models/employee.model");
+const {sequelize} = require("../config/database");
+const db = require("../models/index.model");
 
 const getEmployee = async (req, res) => {
   res.status(200).json({

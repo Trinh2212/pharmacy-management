@@ -20,6 +20,7 @@ Supplier.init(
     supplierName: {
       type: DataTypes.STRING(50),
       allowNull: false,
+      unique: true,
       field: "supplier_name",
     },
     address: {
@@ -27,10 +28,12 @@ Supplier.init(
     },
     email: {
       type: DataTypes.STRING(100),
+      allowNull: false,
     },
     phoneNumber: {
       type: DataTypes.STRING(10),
       field: "phone_number",
+      allowNull: false,
     },
   },
   {
