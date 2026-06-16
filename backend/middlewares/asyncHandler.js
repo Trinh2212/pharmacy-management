@@ -13,4 +13,3 @@ const asyncHandler = (fn) => {
   };
 };
 module.exports = asyncHandler;
-// bắt các lỗi  chưa được xử lý ở controller 

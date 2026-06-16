@@ -63,10 +63,11 @@ Employee.init(
       allowNull: false,
       defaultValue: "employee",
     },
-    status: {
-      type: DataTypes.ENUM("active", "locked"),
+    isLocked: {
+      type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: "active",
+      defaultValue: false,
+      field: "is_locked"
     },
     hireDate: {
       type: DataTypes.DATEONLY,
