@@ -44,7 +44,7 @@ CREATE TABLE employees (
     password        VARCHAR(255) NOT NULL,
     avatar_url      TEXT,
     role            ENUM('admin', 'employee') NOT NULL DEFAULT 'employee',
-    status          ENUM('active', 'locked') NOT NULL DEFAULT 'active',
+    is_locked       BOOLEAN NOT NULL DEFAULT false,
     hire_date       DATE,
     
     created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,

@@ -1,26 +1,28 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  getMedicineGroup,
-  getMedicineGroupById,
-  insertMedicineGroup,
-  updateMedicineGroup,
-  deleteMedicineGroup,
-} = require("../controllers/medicine-group.controller");
-const {
-  insertMGRequest,
-  updateMGRequest,
-} = require("../validations/requests/medicineGroup.validation");
+const medicineGroupControllers = require("../controllers/medicine-group.controller");
+const medicineGValidations = require("../validations/requests/medicineGroup.validation");
 
 const validate = require("../middlewares/validate");
 const asyncHandler = require("../middlewares/asyncHandler");
 
 // http://localhost:5000/api/medicine-groups
-router.get("/", asyncHandler(getMedicineGroup));
-router.get("/:id", asyncHandler(getMedicineGroupById));
-router.post("/", validate(insertMGRequest), asyncHandler(insertMedicineGroup));
-router.put("/:id", validate(updateMGRequest), asyncHandler(updateMedicineGroup));
-router.delete("/:id", asyncHandler(deleteMedicineGroup));
+router.get("/", asyncHandler(medicineGroupControllers.getMedicineGroup));
+router.get("/:id", asyncHandler(medicineGroupControllers.getMedicineGroupById));
+router.post(
+  "/",
+  validate(medicineGValidations.createGroup),
+  asyncHandler(medicineGroupControllers.createMedicineGroup),
+);
+router.put(
+  "/:id",
+  validate(medicineGValidations.updateGroup),
+  asyncHandler(medicineGroupControllers.updateMedicineGroup),
+);
+router.delete(
+  "/:id",
+  asyncHandler(medicineGroupControllers.deleteMedicineGroup),
+);
 
 module.exports = router;

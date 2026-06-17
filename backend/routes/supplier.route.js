@@ -1,27 +1,26 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  getSupplier,
-  getSupplierById,
-  insertSupplier,
-  updateSupplier,
-  deleteSupplier,
-} = require("../controllers/supplier.controller");
+const supplierControllers = require("../controllers/supplier.controller");
 
-const {
-  insertSupplierReq,
-  updateSupplierReq
-} = require("../validations/requests/supplier.validation");
+const supplierValidations = require("../validations/requests/supplier.validation");
 
 const validate = require("../middlewares/validate");
 const asyncHandler = require("../middlewares/asyncHandler")
 
 // http://localhost:5000/api/suppliers
-router.get("/", asyncHandler(getSupplier));
-router.get("/:id", asyncHandler(getSupplierById));
-router.post("/", validate(insertSupplierReq), asyncHandler(insertSupplier));
-router.put("/:id", validate(updateSupplierReq), asyncHandler(updateSupplier));
-router.delete("/:id", asyncHandler(deleteSupplier));
+router.get("/", asyncHandler(supplierControllers.getSupplier));
+router.get("/:id", asyncHandler(supplierControllers.getSupplierById));
+router.post(
+  "/",
+  validate(supplierValidations.createSupplier),
+  asyncHandler(supplierControllers.createSupplier),
+);
+router.put(
+  "/:id",
+  validate(supplierValidations.updateSupplier),
+  asyncHandler(supplierControllers.updateSupplier),
+);
+router.delete("/:id", asyncHandler(supplierControllers.deleteSupplier));
 
 module.exports = router;

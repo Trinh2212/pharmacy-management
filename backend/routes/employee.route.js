@@ -9,7 +9,7 @@ const { verifyToken, verifyAdmin } = require("../middlewares/verifyToken");
 const validate = require("../middlewares/validate");
 const asyncHandler = require("../middlewares/asyncHandler");
 
-const storagePath = "upload/avatars/";
+const storagePath = "uploads/avatars/";
 if (!fs.existsSync(storagePath)) {
   fs.mkdirSync(storagePath, { recursive: true });
 }

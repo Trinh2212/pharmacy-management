@@ -19,10 +19,17 @@ class Medicine extends Model {
     });
 
     Medicine.belongsToMany(models.MedicineGroup, {
-      through: "medicine_group_medicines",
+      through: {
+        model: "medicine_group_medicines",
+        timestamps: false,
+      },
       foreignKey: "medicineId",
-      otherKey: "groupId",
+      otherKey: {
+        name: "groupId",
+        field: "group_id",
+      },
       as: "medicineGroupInfo",
+      timestamps: false,
     });
   }
 }
@@ -86,16 +93,6 @@ Medicine.init(
       ),
       allowNull: false,
     },
-    // groupId: {
-    //   type: DataTypes.INTEGER,
-    //   references: {
-    //     model: "medicine_groups",
-    //     key: "group_id", //tên cột trong database
-    //   },
-    //   onUpdate: "CASCADE",
-    //   onDelete: "SET NULL",
-    //   field: "group_id",
-    // },
   },
   {
     sequelize,

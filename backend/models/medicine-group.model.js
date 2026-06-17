@@ -4,10 +4,17 @@ const { sequelize } = require("../config/database");
 class MedicineGroup extends Model {
   static associate(models) {
     MedicineGroup.belongsToMany(models.Medicine, {
-      through: "medicine_group_medicines",
+      through: {
+        model: "medicine_group_medicines",
+        timestamps: false,
+      },
       foreignKey: "groupId",
-      otherKey: "medicineId",
+      otherKey: {
+        name: "medicineId",
+        field: "medicine_id",
+      },
       as: "medicineInfo",
+      timestamps: false,
     });
   }
 }

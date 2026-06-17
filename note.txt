@@ -1,0 +1,37 @@
+khi viết cho 1 cái gì đó cần:
++ đã đăng ký route và tạo file controller có các hàm r chưa có nội dung (từ từ)
++ viết validation cho request từ client (kiểm tra dữ liệu hợp lệ);
++ viết CRUD cơ bản 
++ sửa file route để thêm validation và middleware xử lý exception
++ viết các chức năng nghiệp vụ
+
+* medicine-groups:
++ xóa nhóm (xóa mềm)
++ cập nhật nhóm thuốc
+14/6
++ xong medicine-groups (controller cơ bản); .
++ supplier .
++ active-ingredient .
++ gội account va employee bỏ account
+(admin sẽ cấp tài khoản)
+15/6
++ employee va auth
++ medicines
+
+(admin: 
+login.
+updateProfile.
+getAllEmployees.
+createEmployeeByAdmin.
+
+updateEmployeeByAdmin
+deleteUser
+toggleLockUser
+toggleUnLockUser
+)
+
+(nhân viên:
+getProfile
+updateProfile
+changePassword
+)
