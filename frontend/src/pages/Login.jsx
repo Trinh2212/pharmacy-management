@@ -64,7 +64,7 @@ export default function Login() {
           <div className="mb-8 flex flex-col items-center">
             <div
               className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg overflow-hidden"
-              onClick={() => navigate("/homepage")}
+              onClick={() => navigate("/")}
             >
               <img
                 src="/img/logo.png"

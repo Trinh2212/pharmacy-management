@@ -2,9 +2,8 @@ import { FaEnvelope, FaPhoneAlt, FaMapMarkerAlt } from "react-icons/fa";
 
 export default function Footer() {
   return (
-    <footer className="mt-24 bg-slate-900 text-slate-100">
+    <footer className="mt-24 rounded-t-xl bg-slate-900 text-slate-100">
       <div className="mx-auto max-w-7xl px-4 py-14 grid gap-10 md:grid-cols-3">
-        {/* Cột 1: Giới thiệu */}
         <div>
           <div className="flex items-center gap-2 mb-4">
             <div className="h-10 w-10 overflow-hidden rounded-xl shadow-md bg-white">
@@ -33,7 +32,6 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* Cột 2: Miễn trừ trách nhiệm */}
         <div>
           <h4 className="text-white font-semibold mb-4">
             Miễn trừ trách nhiệm
@@ -41,11 +39,11 @@ export default function Footer() {
 
           <p className="text-sm opacity-75 leading-relaxed text-justify">
             Website này là đồ án môn học. Mọi thông tin chỉ mang tính chất tham
-            khảo, chưa qua kiểm chứng thông tin và không có giá trị áp dụng thực tế.
+            khảo, chưa qua kiểm chứng thông tin và không có giá trị áp dụng thực
+            tế.
           </p>
         </div>
 
-        {/* Cột 3: Liên hệ */}
         <div>
           <h4 className="text-white font-semibold mb-4">Liên hệ</h4>
 
