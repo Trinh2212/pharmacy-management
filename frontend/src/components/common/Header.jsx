@@ -1,8 +1,24 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FaSearch, FaUser, FaBars, FaHandHoldingHeart, FaHandsHelping, FaBriefcaseMedical, FaShieldAlt } from "react-icons/fa";
 
 function DesktopHeader() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [text, setText] = useState(searchParams.get("search") || "");
+
+  useEffect(() => {
+    setText(searchParams.get("search") || "");
+  }, [searchParams]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (!text.trim()) {
+      navigate(`/medicines`);
+      return;
+    }
+    navigate(`/medicines?search=${encodeURIComponent(text.trim())}`);
+  };
   return (
     <div className="hidden md:block">
       {/* MAIN BAR */}
@@ -17,7 +33,7 @@ function DesktopHeader() {
             />
           </div>
           <div className="leading-tight hidden sm:block">
-            <div className="font-extrabold text-slate-900 text-lg">
+            <div className="font-extrabold text-slate-900 text-2xl">
               CareMind Pharma
             </div>
             <div className="text-[10px] text-slate-500 uppercase font-medium">
@@ -27,19 +43,24 @@ function DesktopHeader() {
         </Link>
 
         {/* Search */}
-        <div className="flex-1 flex">
+        <form onSubmit={handleSearch} className="flex-1 flex">
           <div className="w-full flex items-center bg-slate-100 rounded-full pl-5 pr-1.5 py-1.5 focus-within:ring-2 focus-within:ring-blue-500 transition border border-transparent focus-within:bg-white focus-within:border-blue-500">
             <FaSearch className="h-4 w-4 text-slate-500" />
             <input
               type="text"
-              placeholder="Tìm kiếm theo tên thuốc, nhóm thuốc, hoạt chất, ..."
+              placeholder="Tìm kiếm theo tên thuốc..."
+              value={text} 
+              onChange={(e) => setText(e.target.value)} 
               className="flex-1 bg-transparent px-3 py-1.5 text-sm outline-none text-slate-900 placeholder-slate-500"
             />
-            <button className="rounded-full bg-blue-600 text-white px-4 py-1.5 text-sm font-medium hover:bg-blue-700 transition-colors">
+            <button
+              type="submit" 
+              className="rounded-full bg-blue-600 text-white px-4 py-1.5 text-sm font-medium hover:bg-blue-700 transition-colors"
+            >
               Tìm kiếm
             </button>
           </div>
-        </div>
+        </form>
 
         {/* User */}
         <div className="flex items-center gap-2">
@@ -55,7 +76,7 @@ function DesktopHeader() {
 
       {/* thanh NAV */}
       <nav>
-        <div className="mx-auto max-w-7xl px-4 py-2 flex justify-center gap-2 text-sm">
+        <div className="mx-auto max-w-7xl px-4 py-2 flex justify-center gap-2 text-lg">
           {[
             { to: "/", label: "Trang chủ" },
             { to: "/medicines", label: "Thuốc" },
@@ -79,7 +100,23 @@ function DesktopHeader() {
 
 function MobileHeader() {
   const [openMenu, setOpenMenu] = useState(false);
+  const [searchParams] = useSearchParams();
 
+  const [text, setText] = useState(searchParams.get("search") || "");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setText(searchParams.get("search") || "");
+  }, [searchParams]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (!text.trim()) {
+      navigate(`/medicines`);
+      return;
+    }
+    navigate(`/medicines?search=${encodeURIComponent(text.trim())}`);
+  };
   return (
     <div className="md:hidden">
       {/* Main Bar */}
@@ -104,7 +141,7 @@ function MobileHeader() {
             />
           </div>
           <div className="leading-tight flex flex-col justify-center">
-            <div className="font-bold text-slate-900 text-[16px]">
+            <div className="font-bold text-slate-900 text-2xl">
               CareMind{" "}
             </div>
             <div className="text-[9px] text-slate-500 uppercase tracking-wider font-medium">
@@ -122,23 +159,28 @@ function MobileHeader() {
       </div>
 
       {/* thanh search */}
-      <div className="px-3 py-2">
+      <form onSubmit={handleSearch} className="px-3 py-2">
         <div className="flex items-center bg-slate-100 rounded-full px-3 py-2 shadow-inner border border-transparent focus-within:bg-white focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500 transition">
           <FaSearch className="text-slate-500" />
           <input
             type="text"
             placeholder="Tìm theo tên thuốc..."
+            value={text} 
+            onChange={(e) => setText(e.target.value)}
             className="flex-1 px-2 text-sm outline-none bg-transparent text-slate-900 placeholder-slate-500"
           />
+          <button type="submit" className="hidden">
+            Tìm
+          </button>{" "}
         </div>
-      </div>
+      </form>
 
       {/* Dropdown Menu */}
       {openMenu && (
-        <div className="bg-white/95 backdrop-blur-md px-4 py-3 space-y-2 text-sm shadow-xl absolute w-full left-0 z-50 border-t border-slate-200">
+        <div className="bg-white/95 backdrop-blur-md px-4 py-3 space-y-2 text-lg shadow-xl absolute w-full left-0 z-50 border-t border-slate-200">
           {[
             { to: "/", label: "Trang chủ" },
-            { to: "/products", label: "Sản phẩm" },
+            { to: "/medicines", label: "Sản phẩm" },
             { to: "/ingredients", label: "Hoạt chất" },
             { to: "/about", label: "Giới thiệu" },
             { to: "/contact", label: "Liên hệ" },
@@ -163,7 +205,7 @@ export default function Header() {
     <>
       <div className="hidden md:block bg-slate-800 text-white border-b border-white/10 relative z-50">
         <div className="mx-auto max-w-7xl px-4 h-8 flex items-center justify-center text-sm">
-          <div className="flex items-center justify-center gap-6 font-semibold uppercase tracking-wide text-[13px]">
+          <div className="flex items-center justify-center gap-6 font-semibold uppercase tracking-wide text-base">
             <span className="flex items-center gap-1">
               <FaHandHoldingHeart className="text-yellow-300" />
               <span>Chăm sóc tận tâm</span>

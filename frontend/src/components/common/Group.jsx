@@ -23,6 +23,27 @@ const UI_STYLES = [
       "https://cdn.nhathuoclongchau.com.vn/unsafe/96x0/filters:quality(90):format(webp)/smalls/Ho_tro_tieu_hoa_ed4a57d578.png",
     bgColorClass: "bg-orange-50",
   },
+  {
+    imageUrl:
+      "  https://cdn.nhathuoclongchau.com.vn/unsafe/96x0/filters:quality(90):format(webp)/smalls/Tang_suc_de_khang_mien_dich_9926e39ba8.png",
+    bgColorClass: "bg-blue-50",
+  },
+
+  {
+    imageUrl:
+      "https://cdn.nhathuoclongchau.com.vn/unsafe/96x0/filters:quality(90):format(webp)/smalls/1_Can_Mua_Thuoc_48x48_a5fde193bc.png",
+    bgColorClass: "bg-green-50",
+  },
+  {
+    imageUrl:
+      "https://cdn.nhathuoclongchau.com.vn/unsafe/96x0/filters:quality(90):format(webp)/smalls/Icon_cat_lvl2_Giai_phap_lan_da_db544098c9.png",
+    bgColorClass: "bg-rose-50",
+  },
+  {
+    imageUrl:
+      "https://cdn.nhathuoclongchau.com.vn/unsafe/96x0/filters:quality(90):format(webp)/smalls/Sua_d4a041e21d.png",
+    bgColorClass: "bg-orange-50",
+  },
 ];
 
 export function Group() {
@@ -76,11 +97,11 @@ export function Group() {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
         {groups.slice(0, 8).map((group, index) => {
-          
           const style = UI_STYLES[index % UI_STYLES.length];
 
           return (
-            <button
+            <Link
+              to={`/medicines?groupId=${group.groupId}`}
               key={group.groupId}
               className="group bg-white border border-slate-200 rounded-2xl p-4 flex flex-col items-center text-center hover:shadow-lg hover:border-blue-400 hover:-translate-y-0.5 transition-all duration-300"
               title={group.description}
@@ -98,7 +119,7 @@ export function Group() {
               <div className="mt-3 font-semibold text-sm text-slate-800 line-clamp-2">
                 {group.groupName}
               </div>
-            </button>
+            </Link>
           );
         })}
       </div>
