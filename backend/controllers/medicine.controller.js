@@ -261,46 +261,19 @@ const medicineControllers = {
       });
     }
 
-    // Ảnh hiển thị thuốc
     let imageUrl = "default-medicine.jpg";
     if (req.files?.medicine?.[0]) {
       imageUrl = `/uploads/medicines/${req.files.medicine[0].filename}`;
     }
 
-    // Ảnh tờ hướng dẫn để OCR
-    let documentUrl = null;
-    if (req.files?.document?.[0]) {
-      documentUrl = `/uploads/medicines/${req.files.document[0].filename}`;
-    }
-
-    // OCR: nếu có ảnh tờ hướng dẫn và chưa có usageData thì tự động OCR
+    let documentUrl =
+      req.body.documentPath ||
+      (req.files?.document?.[0]
+        ? `/uploads/medicines/${req.files.document[0].filename}`
+        : null);
+    
     let finalUsageData = usageData || null;
-    if (req.files?.document?.[0] && !finalUsageData) {
-      try {
-        const docFile = req.files.document[0];
-        const ocrResult = await ocrMedicine(
-          docFile.path,
-          docFile.originalname,
-          docFile.mimetype,
-        );
-        finalUsageData = {
-          dosageForm: ocrResult.dosage_form || null,
-          packaging: ocrResult.packaging || null,
-          uses: ocrResult.uses || null,
-          indications: ocrResult.indications || null,
-          contraindications: ocrResult.contraindications || null,
-          sideEffects: ocrResult.side_effects || null,
-          dosage: ocrResult.dosage || null,
-          administration: ocrResult.administration || null,
-          storageCondition: ocrResult.storage_condition || null,
-          warning: ocrResult.warning || null,
-        };
-      } catch (ocrError) {
-        console.error("OCR thất bại:", ocrError.message);
-        // vẫn tiếp tục tạo thuốc dù OCR lỗi
-      }
-    }
-
+    
     const result = await db.sequelize.transaction(async (t) => {
       const newMedicine = await db.Medicine.create(
         { ...medicineData, imageUrl },

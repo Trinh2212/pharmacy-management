@@ -33,7 +33,7 @@ const medicineValidations = {
       .min(1)
       .required(),
     usageData: Joi.object({
-      dosageForm: Joi.string().max(100),
+      dosageForm: Joi.string(),
       packaging: Joi.string(),
       uses: Joi.string(),
       indications: Joi.string(),
@@ -44,6 +44,7 @@ const medicineValidations = {
       storageCondition: Joi.string(),
       warning: Joi.string(),
     }),
+    documentPath: Joi.string()
   }).unknown(false),
 
   updateMedicine: Joi.object({
