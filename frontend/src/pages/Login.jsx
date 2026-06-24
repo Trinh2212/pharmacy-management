@@ -1,4 +1,4 @@
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { MdLock } from "react-icons/md";
 import { FaUserAstronaut } from "react-icons/fa";
 import { TbLockOpenOff, TbLockOpen } from "react-icons/tb";
@@ -24,19 +24,12 @@ export default function Login() {
   };
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
-      console.log(formData);
-
       const response = await axiosClient.post("/auth/login", formData);
-
-      const { accessToken, user } = response.data;
+      const { accessToken, employee: user } = response.data;
       localStorage.setItem("user", JSON.stringify(user));
-
       localStorage.setItem("accessToken", accessToken);
-
       login(user);
-
       navigate("/admin");
     } catch (error) {
       setErrorMsg(error.response?.data?.message || "Lỗi kết nối đến máy chủ");
@@ -46,12 +39,7 @@ export default function Login() {
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-50">
       <div className="absolute inset-0 bg-sky-950/50">
-        <img
-          src="/img/loginbg.jpg"
-          alt="Pharmacy"
-          className="h-full w-full object-cover blur-sm opacity-90"
-        />
-
+        <img src="/img/loginbg.jpg" alt="Pharmacy" className="h-full w-full object-cover blur-sm opacity-90"/>
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
@@ -62,20 +50,12 @@ export default function Login() {
         >
           {/* Logo */}
           <div className="mb-8 flex flex-col items-center">
-            <div
-              className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg overflow-hidden"
-              onClick={() => navigate("/")}
-            >
-              <img
-                src="/img/logo.png"
-                alt="Logo Nhà Thuốc"
-                className="h-full w-full object-cover"
-              />
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg overflow-hidden"
+              onClick={() => navigate("/")} >
+              <img src="/img/logo.png" alt="Logo Nhà Thuốc" className="h-full w-full object-cover" />
             </div>
 
-            <h1 className="mt-4 text-2xl font-bold text-slate-800">
-              CareMind Pharma
-            </h1>
+            <h1 className="mt-4 text-2xl font-bold text-slate-800"> CareMind Pharma </h1>
 
             <p className="mt-2 text-sm text-slate-500">Đăng nhập để tiếp tục</p>
           </div>
@@ -145,7 +125,6 @@ export default function Login() {
           {errorMsg && (
             <p className="mt-3 text-center text-sm text-red-500">{errorMsg}</p>
           )}
-
           <p className="mt-3 text-center text-sm text-slate-500">
             Trang này chỉ dành riêng cho nhân viên nhà thuốc của chúng tôi
           </p>

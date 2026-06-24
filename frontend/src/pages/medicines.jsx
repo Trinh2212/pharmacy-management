@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { useSearchParams } from "react-router-dom";
-import CommonLayout from "../layouts/CommonLayout";
 import { MedicineCard } from "../components/common/MedicineCard";
 import axiosClient from "../api/axiosClient";
 
@@ -77,7 +76,7 @@ export default function Medicines() {
   };
 
   return (
-    <CommonLayout>
+    <>
       {/* Tiêu đề */}
       <div className="bg-gray-50 border-b border-gray-200">
         <div className="mx-auto max-w-7xl px-4 py-8 md:py-10">
@@ -196,6 +195,6 @@ export default function Medicines() {
           )}
         </div>
       </div>
-    </CommonLayout>
+    </>
   );
 }

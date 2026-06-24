@@ -1,8 +1,7 @@
 import { FiTarget, FiHeart, FiShield } from "react-icons/fi";
-import CommonLayout from "../layouts/CommonLayout";
 export default function About() {
   return (
-    <CommonLayout>
+    <>
       <div className="w-full bg-gradient-to-br from-blue-50 to-indigo-50 font-sans min-h-screen pb-20">
         <div
           className="relative min-h-fit pt-28 pb-16 md:pt-36 md:pb-20 flex items-center justify-center text-center text-white rounded-b-3xl shadow-lg overflow-hidden bg-cover bg-center"
@@ -101,6 +100,6 @@ export default function About() {
           </section>
         </div>
       </div>
-    </CommonLayout>
+    </>
   );
 }

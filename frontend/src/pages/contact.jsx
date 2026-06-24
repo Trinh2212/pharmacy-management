@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FiMapPin, FiPhone, FiMail, FiClock } from "react-icons/fi";
-import CommonLayout from "../layouts/CommonLayout";
 import Swal from "sweetalert2";
 import emailjs from "@emailjs/browser";
 
@@ -56,7 +55,7 @@ export default function Contact() {
   };
 
   return (
-    <CommonLayout>
+    <>
       <div className="min-h-screen bg-blue-50 font-sans pb-20">
         <div
           className="relative min-h-fit pt-28 pb-16 md:pt-36 md:pb-20 flex items-center justify-center text-center text-white rounded-b-3xl shadow-lg overflow-hidden bg-cover bg-center"
@@ -210,6 +209,6 @@ export default function Contact() {
           ></iframe>
         </div>
       </div>
-    </CommonLayout>
+    </>
   );
 }

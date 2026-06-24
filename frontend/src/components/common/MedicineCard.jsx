@@ -8,7 +8,11 @@ export function MedicineCard({ p }) {
       <div className="relative aspect-square bg-gray-50 overflow-hidden flex items-center justify-center p-4">
         <img
           src={
-            p.imageUrl || "/img/default/default-medicine-not-found.jpg"
+            p.imageUrl
+              ? p.imageUrl.startsWith("/uploads")
+                ? `http://localhost:5000${p.imageUrl}`
+                : p.imageUrl
+              : "/img/default/default-medicine-not-found.jpg"
           }
           alt={p.brandName}
           loading="lazy"
