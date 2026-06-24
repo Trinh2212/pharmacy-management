@@ -5,6 +5,7 @@ const verifyToken = (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (authHeader) {
         const token = authHeader.split(" ")[1];
+        // console.log(req.headers.authorization);
         jwt.verify(token, process.env.JWT_ACCESS_KEY, (err, employee) => {
             if(err) 
                 return res.status(403).json("Token không hợp lệ hoặc đã hết hạn ")

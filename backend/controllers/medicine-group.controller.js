@@ -4,10 +4,8 @@ const { Op } = require("sequelize");
 
 const medicineGroupControllers = {
   getMedicineGroup : async (req, res) => {
-    const { search = "", page = 1 } = req.query;
+    const { search = ""} = req.query;
     const keyword = search.trim();
-    const pageSize = 5;
-    const offset = (parseInt(page, 10) - 1) * pageSize;
   
     let filter = {};
   
@@ -20,20 +18,14 @@ const medicineGroupControllers = {
       };
     }
   
-    const { count, rows } = await db.MedicineGroup.findAndCountAll({
+    const medicineGroup = await db.MedicineGroup.findAll({
       where: filter,
-      limit: pageSize,
-      offset,
-  
       order: [["groupName", "ASC"]],
     });
   
     return res.status(200).json({
       message: "lấy danh sách nhóm thuốc thành công", 
-      data: rows,
-      currentPage: parseInt(page, 10),
-      totalPages: Math.ceil(count / pageSize),
-      totalGroups: count,
+      data: medicineGroup,
     });
   },
   

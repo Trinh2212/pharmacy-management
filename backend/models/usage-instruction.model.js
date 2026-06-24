@@ -62,6 +62,9 @@ UsageInstruction.init(
     warning: {
       type: DataTypes.TEXT,
     },
+    document: {
+      type: DataTypes.TEXT,
+    },
   },
   {
     sequelize,

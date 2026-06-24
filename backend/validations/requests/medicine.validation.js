@@ -6,9 +6,10 @@ const medicineValidations = {
     medicineCode: Joi.string().max(50).required(),
     brandName: Joi.string().max(100).required(),
     origin: Joi.string().max(50).allow(null, "").optional(),
-    // status: Joi.string().valid("đang cung cấp", "ngừng cung cấp", "hết hàng"),
+    status: Joi.string().valid("đang cung cấp", "ngừng cung cấp", "hết hàng"),
     price: Joi.number().positive().precision(2).required(),
     registrationNumber: Joi.string().max(50).required(),
+    imageUrl: "",
     unit: Joi.string().valid(
       "Viên",
       "Vỉ",

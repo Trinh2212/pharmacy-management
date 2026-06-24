@@ -12,6 +12,7 @@ const activeIngredientRoute = require("./routes/active-ingredient.route");
 const warehouseReceiptRoute = require("./routes/warehouse-receipt.route");
 const employeeRoute = require("./routes/employee.route");
 const authRoute = require("./routes/auth.route");
+const ocrRoute = require("./routes/ocr.route");
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use("/api/suppliers", supplierRoute);
 app.use("/api/active-ingredients", activeIngredientRoute);
 app.use("/api/warehouse-receipts", warehouseReceiptRoute);
 app.use("/api/employees", employeeRoute);
+app.use("/api/ocr", ocrRoute);
 
 const PORT = process.env.PORT || 5000;
 

@@ -20,17 +20,20 @@ const storage = multer.diskStorage({
     cb(null, storagePath);
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
+    cb(null, file.originalname);
   },
 });
 const upload = multer({ storage });
 
 router.get("/", asyncHandler(medicineControllers.getAllMedicines));
-router.get("/:id", asyncHandler(medicineControllers.getMedicineById));
+router.get("/medicineDetail/:id", asyncHandler(medicineControllers.getMedicineById));
 router.post(
   "/",
-  verifyToken,
-  upload.single("medicine"),
+  // verifyToken,
+  upload.fields([
+    { name: "medicine", maxCount: 1 }, // ảnh hiển thị thuốc
+    { name: "document", maxCount: 1 }, // ảnh tờ hướng dẫn để OCR
+  ]),
   parse,
   validate(medicineValidations.createMedicine),
   asyncHandler(medicineControllers.createMedicine),
@@ -55,3 +58,4 @@ router.put(
 );
 
 module.exports = router;
+// ocr - upload - imgInstruction sau - .... auto
