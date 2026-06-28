@@ -26,13 +26,13 @@ const upload = multer({ storage });
 
 router.get(
   "/getProfile",
-  verifyToken,
+  // verifyToken,
   asyncHandler(employeeControllers.getProfile),
 );
 
 router.put(
   "/updateProfile",
-  verifyToken,
+  // verifyToken,
   upload.single("avatar"),
   validate(employeeValidations.updateProfile),
   asyncHandler(employeeControllers.updateProfile),
@@ -40,29 +40,33 @@ router.put(
 
 router.put(
   "/change-password",
-  verifyToken,
+  // verifyToken,
   validate(employeeValidations.changePassword),
   asyncHandler(employeeControllers.changePassword),
 );
 //admin
 router.get(
   "/admin/employees",
-  verifyAdmin,
+  // verifyAdmin,
   asyncHandler(employeeControllers.getAllEmployees),
 );
 router.post(
   "/admin/employees",
-  verifyAdmin,
+  // verifyAdmin,
   validate(employeeValidations.createByAdmin),
   asyncHandler(employeeControllers.createEmployeeByAdmin),
 );
 router.put(
   "/admin/employees/:id",
-  verifyAdmin,
+  // verifyAdmin,
   validate(employeeValidations.updateByAdmin),
   asyncHandler(employeeControllers.updateEmployeeByAdmin),
 );
-router.patch("/admin/employees/lock/:id", verifyAdmin, asyncHandler(employeeControllers.toggleLock));
-router.delete("/admin/employees/:id", verifyAdmin, asyncHandler(employeeControllers.deleteEmployee));
+router.patch("/admin/employees/lock/:id", 
+  // verifyAdmin, 
+  asyncHandler(employeeControllers.toggleLock));
+router.delete("/admin/employees/:id", 
+  // verifyAdmin,
+   asyncHandler(employeeControllers.deleteEmployee));
 
 module.exports = router;

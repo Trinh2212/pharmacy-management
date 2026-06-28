@@ -6,7 +6,7 @@ const medicineValidations = {
     medicineCode: Joi.string().max(50).required(),
     brandName: Joi.string().max(100).required(),
     origin: Joi.string().max(50).allow(null, "").optional(),
-    status: Joi.string().valid("đang cung cấp", "ngừng cung cấp", "hết hàng"),
+    status: Joi.string().valid("đang cung cấp", "ngừng cung cấp"),
     price: Joi.number().positive().precision(2).required(),
     registrationNumber: Joi.string().max(50).required(),
     imageUrl: "",
@@ -36,22 +36,19 @@ const medicineValidations = {
       dosageForm: Joi.string(),
       packaging: Joi.string(),
       uses: Joi.string(),
-      indications: Joi.string(),
       contraindications: Joi.string(),
       sideEffects: Joi.string(),
-      dosage: Joi.string(),
-      administration: Joi.string(),
+      dosageAdministration: Joi.string(),
       storageCondition: Joi.string(),
       warning: Joi.string(),
     }),
-    documentPath: Joi.string()
+    documentPath: Joi.string(),
   }).unknown(false),
 
   updateMedicine: Joi.object({
     medicineCode: Joi.string().max(50),
     brandName: Joi.string().max(100),
     origin: Joi.string().max(50).allow(null, ""),
-    // status: Joi.string().valid("đang cung cấp", "ngừng cung cấp", "hết hàng"),
     price: Joi.number().positive().precision(2),
     registrationNumber: Joi.string().max(50),
     unit: Joi.string().valid(
@@ -77,18 +74,16 @@ const medicineValidations = {
       dosageForm: Joi.string().max(100),
       packaging: Joi.string(),
       uses: Joi.string(),
-      indications: Joi.string(),
       contraindications: Joi.string(),
       sideEffects: Joi.string(),
-      dosage: Joi.string(),
-      administration: Joi.string(),
+      dosageAdministration: Joi.string(),
       storageCondition: Joi.string(),
       warning: Joi.string(),
     }),
   }).unknown(false),
 
   changeStatus: Joi.object({
-    status: Joi.string().valid("đang cung cấp", "ngừng cung cấp", "hết hàng"),
+    status: Joi.string().valid("đang cung cấp", "ngừng cung cấp"),
   }).unknown(false),
 };
 

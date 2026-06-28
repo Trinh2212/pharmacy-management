@@ -63,7 +63,7 @@ WarehouseReceipt.init(
     },
     employeeId: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       field: "employee_id",
       references: {
         model: "employees",

@@ -61,7 +61,7 @@ Medicine.init(
       type: DataTypes.STRING(50),
     },
     status: {
-      type: DataTypes.ENUM("đang cung cấp", "ngừng cung cấp", "hết hàng"),
+      type: DataTypes.ENUM("đang cung cấp", "ngừng cung cấp"),
       defaultValue: "đang cung cấp",
       allowNull: false,
     },

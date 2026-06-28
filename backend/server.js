@@ -27,7 +27,7 @@ app.use("/api/medicines", medicineRoute);
 app.use("/api/suppliers", supplierRoute);
 app.use("/api/active-ingredients", activeIngredientRoute);
 app.use("/api/warehouse-receipts", warehouseReceiptRoute);
-app.use("/api/employees", employeeRoute);
+app.use("/api/", employeeRoute);
 app.use("/api/ocr", ocrRoute);
 
 const PORT = process.env.PORT || 5000;

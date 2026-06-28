@@ -29,6 +29,7 @@ MedicineGroup.init(
     },
     groupName: {
       type: DataTypes.STRING(50),
+      unique: true,
       allowNull: false,
       field: "group_name",
     },

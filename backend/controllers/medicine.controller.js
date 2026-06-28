@@ -294,7 +294,6 @@ const medicineControllers = {
         transaction: t,
       });
 
-      // Tạo UsageInstruction nếu có finalUsageData hoặc có ảnh tờ hướng dẫn
       if (finalUsageData || documentUrl) {
         await db.UsageInstruction.create(
           {

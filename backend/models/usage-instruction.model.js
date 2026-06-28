@@ -21,6 +21,7 @@ UsageInstruction.init(
     medicineId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      unique: true,
       field: "medicine_id",
       references: {
         model: "medicines",
@@ -30,16 +31,13 @@ UsageInstruction.init(
       onDelete: "CASCADE",
     },
     dosageForm: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.TEXT,
       field: "dosage_form",
     },
     packaging: {
       type: DataTypes.TEXT,
     },
     uses: {
-      type: DataTypes.TEXT,
-    },
-    indications: {
       type: DataTypes.TEXT,
     },
     contraindications: {
@@ -49,11 +47,9 @@ UsageInstruction.init(
       type: DataTypes.TEXT,
       field: "side_effects",
     },
-    dosage: {
+    dosageAdministration: {
       type: DataTypes.TEXT,
-    },
-    administration: {
-      type: DataTypes.TEXT,
+      field: "dosage_administration",
     },
     storageCondition: {
       type: DataTypes.TEXT,

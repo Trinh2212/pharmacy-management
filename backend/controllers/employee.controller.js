@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 
 const employeeControllers = {
+  
   getProfile: async (req, res) => {
     const employeeId = req.employee.employeeId;
 

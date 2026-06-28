@@ -10,6 +10,7 @@ const extractMedicineInfo = async (req, res) => {
     req.file.originalname,
     req.file.mimetype,
   );
+  console.log(result);
 
   return res.status(200).json({
     ...result,

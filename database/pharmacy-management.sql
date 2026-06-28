@@ -3,7 +3,7 @@ USE pharmacy_management;
 
 CREATE TABLE medicine_groups (
     group_id        INT AUTO_INCREMENT PRIMARY KEY,
-    group_name      VARCHAR(50) NOT NULL,
+    group_name      VARCHAR(50) NOT NULL UNIQUE,
     description     VARCHAR(255),
 
     created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
@@ -56,15 +56,14 @@ CREATE TABLE employees (
 CREATE TABLE medicines (
     medicine_id     INT AUTO_INCREMENT PRIMARY KEY,
     medicine_code   VARCHAR(50) NOT NULL UNIQUE,  -- mã nội bộ để hiển thị
-    brand_name      VARCHAR(100)    NOT NULL,
+    brand_name      VARCHAR(100)  NOT NULL,
     image_url       TEXT,                   -- lưu đường dẫn ảnh
     origin          VARCHAR(50),
-    status          ENUM('đang cung cấp', 'ngừng cung cấp', 'hết hàng')
+    status          ENUM('đang cung cấp', 'ngừng cung cấp')
                         NOT NULL DEFAULT 'đang cung cấp',
     price           DECIMAL(12,2) NOT NULL CHECK (price >= 0),
     registration_number VARCHAR(50)   NOT NULL UNIQUE,
-    unit            ENUM('Viên','Vỉ','Hộp','Chai','Lọ','Tuýp','Gói','Ống','Bình xịt','Miếng dán')   NOT NULL,
-    -- group_id        INT,                            
+    unit            ENUM('Viên','Vỉ','Hộp','Chai','Lọ','Tuýp','Gói','Ống','Bình xịt','Miếng dán')   NOT NULL,                        
 
     created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -97,18 +96,17 @@ CREATE TABLE medicine_ingredient_details (
 
 CREATE TABLE usage_instructions (
     instruction_id  INT AUTO_INCREMENT PRIMARY KEY,
-    medicine_id     INT NOT NULL,   
+    medicine_id     INT NOT NULL UNIQUE,   
 
-    dosage_form     VARCHAR(100), -- dạng bào chế 
+    dosage_form     TEXT, -- dạng bào chế
     packaging       TEXT, -- quy cách đóng gói 
     uses            TEXT, -- công dụng
-    indications     TEXT, -- chỉ định 
     contraindications    TEXT, -- chống chỉ định 
     side_effects    TEXT, -- tác dụng phụ 
-    dosage          TEXT, -- liều dùng 
-    administration  TEXT,   -- cách dùng 
+    dosage_administration          TEXT, -- liều dùng & cách dùng 
     storage_condition    TEXT, -- bảo quản 
-    warning         TEXT, -- cảnh báo
+    warning         TEXT, -- cảnh báo - thận trọng 
+    document        TEXT,
 
     CONSTRAINT fk_ui_medicines FOREIGN KEY (medicine_id)
         REFERENCES medicines(medicine_id)
@@ -130,7 +128,8 @@ CREATE TABLE batches (
     CONSTRAINT fk_batches_medicines    FOREIGN KEY (medicine_id)
         REFERENCES medicines(medicine_id)
         ON UPDATE CASCADE ON DELETE RESTRICT,
-    CONSTRAINT chk_expiry_date CHECK (expiry_date > production_date)
+    CONSTRAINT chk_expiry_date CHECK (expiry_date > production_date),
+    CONSTRAINT unique_med_batch UNIQUE (medicine_id, batch_number)
 );
 
 CREATE TABLE warehouse_receipts (
@@ -139,7 +138,7 @@ CREATE TABLE warehouse_receipts (
     receipt_date    DATE          NOT NULL DEFAULT (CURRENT_DATE),
     total_price     DECIMAL(15,2) NOT NULL DEFAULT 0 CHECK (total_price >= 0),
     supplier_id     INT           NOT NULL,       
-    employee_id     INT,                            
+    employee_id     INT NOT NULL,                            
 
     created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -166,6 +165,3 @@ CREATE TABLE warehouse_receipt_details (
         REFERENCES batches(batch_id)
         ON UPDATE CASCADE ON DELETE RESTRICT
 );
-
---tes
-SELECT * FROM medicines;

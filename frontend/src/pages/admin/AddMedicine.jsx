@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axiosClient from "../../api/axiosClient";
-import { FiArrowRight, FiArrowLeft, FiSearch, FiCheckCircle, FiUploadCloud, FiBox, FiFileText } from "react-icons/fi";
+import { FiArrowRight, FiArrowLeft, FiSearch, FiCheckCircle, FiUploadCloud, FiFileText } from "react-icons/fi";
+import SearchMultiSelect from "../../components/admin/search";
 
-const INITIAL_BASIC = {
+const initMedicine = {
   medicineCode: "",
   brandName: "",
   origin: "",
@@ -12,15 +13,13 @@ const INITIAL_BASIC = {
   unit: "Viên",
 };
 
-const INITIAL_OCR = {
+const init_usage = {
   dosageForm: "",
   packaging: "",
   uses: "",
-  indications: "",
   contraindications: "",
   sideEffects: "",
-  dosage: "",
-  administration: "",
+  dosageAdministration: "",
   storageCondition: "",
   warning: "",
 };
@@ -30,80 +29,36 @@ const labelClass = "block text-sm font-bold text-slate-700 mb-2";
 
 const AddMedicine = () => {
   const [step, setStep] = useState(1);
-  const [basicForm, setBasicForm] = useState(INITIAL_BASIC);
-  const [ocrForm, setOcrForm] = useState(INITIAL_OCR);
+  const [basicForm, setBasicForm] = useState(initMedicine);
+  const [ocrForm, setOcrForm] = useState(init_usage);
 
-  // Tách riêng 2 ảnh
-  const [medicineImageFile, setMedicineImageFile] = useState(null); // ảnh hiển thị thuốc
+  const [medicineImageFile, setMedicineImageFile] = useState(null);
   const [medicinePreview, setMedicinePreview] = useState(null);
-  const [documentFile, setDocumentFile] = useState(null); // ảnh tờ hướng dẫn OCR
+  const [documentFile, setDocumentFile] = useState(null);
   const [documentPreview, setDocumentPreview] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(false);
-  const [medicineGroups, setMedicineGroups] = useState([]);
-  const [groupIds, setGroupIds] = useState([]);
-  const [activeIngredients, setActiveIngredients] = useState([]);
-  const [selectedIngredients, setSelectedIngredients] = useState({});
+
+  const [selectedGroups, setSelectedGroups] = useState([]); 
+  const [selectedIngredients, setSelectedIngredients] = useState([]);
   const [documentPath, setDocumentPath] = useState(null);
-
-  useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        const res = await axiosClient.get("/medicine-groups");
-        setMedicineGroups(res.data?.data || res.data || []);
-      } catch (error) {
-        console.error(
-          "Lấy nhóm thuốc lỗi:",
-          error.response?.data || error.message,
-        );
-      }
-    };
-    const fetchIngredients = async () => {
-      try {
-        const res = await axiosClient.get("/active-ingredients");
-        setActiveIngredients(res.data?.data || res.data || []);
-      } catch (error) {
-        console.error(
-          "Lấy hoạt chất lỗi:",
-          error.response?.data || error.message,
-        );
-      }
-    };
-    fetchGroups();
-    fetchIngredients();
-  }, []);
-
-  const toggleGroup = (groupId) => {
-    setGroupIds((prev) =>
-      prev.includes(groupId)
-        ? prev.filter((id) => id !== groupId)
-        : [...prev, groupId],
-    );
-  };
-
-  const toggleIngredient = (ingredientId) => {
-    setSelectedIngredients((prev) => {
-      const next = { ...prev };
-      if (ingredientId in next) delete next[ingredientId];
-      else next[ingredientId] = "";
-      return next;
-    });
-  };
-
-  const handleStrengthChange = (ingredientId, value) => {
-    setSelectedIngredients((prev) => ({ ...prev, [ingredientId]: value }));
-  };
 
   const handleBasicChange = (e) => {
     setBasicForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handlePriceChange = (e) => {
+    const raw = e.target.value;
+    if (raw === "" || /^\d+$/.test(raw)) {
+      setBasicForm((prev) => ({ ...prev, price: raw }));
+    }
   };
 
   const handleOcrChange = (e) => {
     setOcrForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // Ảnh hiển thị thuốc
   const handleMedicineImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -111,7 +66,6 @@ const AddMedicine = () => {
     setMedicinePreview(URL.createObjectURL(file));
   };
 
-  // Ảnh tờ hướng dẫn để OCR
   const handleDocumentChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -119,7 +73,6 @@ const AddMedicine = () => {
     setDocumentPreview(URL.createObjectURL(file));
   };
 
-  // Gọi OCR riêng để xem trước kết quả, người dùng có thể sửa trước khi lưu
   const handleOCR = async () => {
     if (!documentFile) return alert("Vui lòng chọn ảnh tờ hướng dẫn!");
     setOcrLoading(true);
@@ -131,16 +84,14 @@ const AddMedicine = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setDocumentPath(res.data.documentPath);
-      
+
       setOcrForm({
         dosageForm: res.data.dosage_form || "",
         packaging: res.data.packaging || "",
         uses: res.data.uses || "",
-        indications: res.data.indications || "",
         contraindications: res.data.contraindications || "",
         sideEffects: res.data.side_effects || "",
-        dosage: res.data.dosage || "",
-        administration: res.data.administration || "",
+        dosageAdministration: res.data.dosage_administration || "",
         storageCondition: res.data.storage_condition || "",
         warning: res.data.warning || "",
       });
@@ -152,47 +103,40 @@ const AddMedicine = () => {
     }
   };
 
-  // Submit: gửi FormData vì có file
   const handleSubmit = async () => {
-    if (groupIds.length === 0)
+    if (selectedGroups.length === 0)
       return alert("Vui lòng chọn ít nhất 1 nhóm thuốc!");
 
-    const ingredientIds = Object.keys(selectedIngredients);
-    if (ingredientIds.length === 0)
+    if (selectedIngredients.length === 0)
       return alert("Vui lòng chọn ít nhất 1 hoạt chất!");
-    if (ingredientIds.some((id) => !selectedIngredients[id].trim())) {
+    if (selectedIngredients.some((i) => !i.strength?.trim())) {
       return alert("Vui lòng nhập hàm lượng cho tất cả hoạt chất đã chọn!");
     }
 
-    const ingredients = ingredientIds.map((id) => ({
-      ingredientId: Number(id),
-      strength: selectedIngredients[id].trim(),
+    const groupIds = selectedGroups.map((g) => g.groupId);
+    const ingredients = selectedIngredients.map((i) => ({
+      ingredientId: Number(i.ingredientId),
+      strength: i.strength.trim(),
     }));
 
     setLoading(true);
     try {
       const formData = new FormData();
 
-      // Thông tin cơ bản
       Object.entries({ ...basicForm, price: Number(basicForm.price) }).forEach(
         ([key, value]) => formData.append(key, value),
       );
 
-      // groupIds và ingredients phải stringify vì FormData không hỗ trợ array/object
       formData.append("groupIds", JSON.stringify(groupIds));
       formData.append("ingredients", JSON.stringify(ingredients));
-
-      // usageData người dùng đã xem/sửa sau OCR
       formData.append("usageData", JSON.stringify(ocrForm));
 
-      // Ảnh hiển thị thuốc
-      if (medicineImageFile) {
-        formData.append("medicine", medicineImageFile);
-      }
+      if (medicineImageFile) formData.append("medicine", medicineImageFile);
 
-      // Ảnh tờ hướng dẫn
       if (documentPath) {
-        formData.append("documentPath", documentPath);
+        formData.append("documentPath", documentPath); 
+      } else if (documentFile) {
+        formData.append("document", documentFile); 
       }
 
       await axiosClient.post("/medicines", formData, {
@@ -201,10 +145,10 @@ const AddMedicine = () => {
 
       alert("Thêm thuốc thành công!");
       setStep(1);
-      setBasicForm(INITIAL_BASIC);
-      setOcrForm(INITIAL_OCR);
-      setGroupIds([]);
-      setSelectedIngredients({});
+      setBasicForm(initMedicine);
+      setOcrForm(init_usage);
+      setSelectedGroups([]);
+      setSelectedIngredients([]);
       setMedicineImageFile(null);
       setMedicinePreview(null);
       setDocumentFile(null);
@@ -227,7 +171,8 @@ const AddMedicine = () => {
         {/* Header & Stepper */}
         <div className="bg-slate-900 text-white p-8">
           <h2 className="text-3xl font-extrabold mb-6 tracking-tight">
-            Thêm Thuốc Mới
+            {" "}
+            Thêm Thuốc Mới{" "}
           </h2>
           <div className="flex items-center gap-4 text-sm font-medium">
             <div
@@ -236,7 +181,7 @@ const AddMedicine = () => {
               <div className="w-8 h-8 rounded-full border-2 flex items-center justify-center border-current">
                 1
               </div>
-              <span>Thông tin cơ bản</span>
+              <span>Thông tin thuốc</span>
             </div>
             <div className="w-12 h-px bg-slate-700"></div>
             <div
@@ -245,23 +190,20 @@ const AddMedicine = () => {
               <div className="w-8 h-8 rounded-full border-2 flex items-center justify-center border-current">
                 2
               </div>
-              <span>Quét OCR & Chi tiết</span>
+              <span>Quét OCR & Hướng dẫn sử dụng</span>
             </div>
           </div>
         </div>
 
         <div className="p-8 md:p-10">
-          {/* BƯỚC 1 */}
           {step === 1 && (
             <div className="animate-fade-in">
               <div className="flex items-center gap-3 mb-6 text-blue-600">
-                <FiBox className="w-6 h-6" />
                 <h3 className="text-xl font-bold text-slate-800">
-                  Thông tin cơ sở
+                  Thông tin thuốc
                 </h3>
               </div>
 
-              {/* Upload ảnh thuốc */}
               <div className="mb-6">
                 <label className={labelClass}>Ảnh thuốc</label>
                 <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-5 text-center">
@@ -290,7 +232,7 @@ const AddMedicine = () => {
                     <span className="text-sm text-slate-500 font-medium">
                       {medicinePreview
                         ? "Nhấn để chọn ảnh khác"
-                        : "Tải lên ảnh hiển thị thuốc"}
+                        : "upload ảnh hiển thị thuốc"}
                     </span>
                   </label>
                 </div>
@@ -298,12 +240,12 @@ const AddMedicine = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div>
-                  <label className={labelClass}>Mã thuốc</label>
+                  <label className={labelClass}>Mã thuốc ATC</label>
                   <input
                     name="medicineCode"
                     value={basicForm.medicineCode}
                     onChange={handleBasicChange}
-                    placeholder="VD: THUOC001"
+                    placeholder="VD: N02BE01"
                     className={inputClass}
                   />
                 </div>
@@ -313,7 +255,7 @@ const AddMedicine = () => {
                     name="brandName"
                     value={basicForm.brandName}
                     onChange={handleBasicChange}
-                    placeholder="VD: Paracetamol 500mg"
+                    placeholder="VD: Paracetamol 500mg (Acetaminophen)"
                     className={inputClass}
                   />
                 </div>
@@ -328,7 +270,7 @@ const AddMedicine = () => {
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>Trạng thái</label>
+                  <label className={labelClass}>Trạng thái cung cấp</label>
                   <select
                     name="status"
                     value={basicForm.status}
@@ -344,9 +286,10 @@ const AddMedicine = () => {
                   <label className={labelClass}>Giá bán (VNĐ)</label>
                   <input
                     name="price"
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     value={basicForm.price}
-                    onChange={handleBasicChange}
+                    onChange={handlePriceChange}
                     placeholder="VD: 50000"
                     className={inputClass}
                   />
@@ -357,7 +300,7 @@ const AddMedicine = () => {
                     name="registrationNumber"
                     value={basicForm.registrationNumber}
                     onChange={handleBasicChange}
-                    placeholder="VD: VD-12345-19"
+                    placeholder="VD: VD-5340-08"
                     className={inputClass}
                   />
                 </div>
@@ -389,96 +332,34 @@ const AddMedicine = () => {
                 </div>
               </div>
 
-              {/* Nhóm thuốc */}
-              <div className="mb-8">
-                <label className={labelClass}>Nhóm thuốc</label>
-                {medicineGroups.length === 0 ? (
-                  <p className="text-sm text-slate-400 italic">
-                    Chưa có nhóm thuốc nào.
-                  </p>
-                ) : (
-                  <div className="flex flex-wrap gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                    {medicineGroups.map((group) => {
-                      const checked = groupIds.includes(group.groupId);
-                      return (
-                        <label
-                          key={group.groupId}
-                          className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium cursor-pointer border transition-all ${
-                            checked
-                              ? "bg-blue-600 text-white border-blue-600"
-                              : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onChange={() => toggleGroup(group.groupId)}
-                            className="hidden"
-                          />
-                          {group.groupName}
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+              <SearchMultiSelect
+                label="Nhóm thuốc"
+                placeholder="Tìm và chọn nhóm thuốc..."
+                apiUrl="/medicine-groups"
+                idKey="groupId"
+                nameKey="groupName"
+                selected={selectedGroups}
+                onChange={setSelectedGroups}
+              />
 
-              {/* Hoạt chất */}
-              <div className="mb-8">
-                <label className={labelClass}>Hoạt chất & Hàm lượng</label>
-                {activeIngredients.length === 0 ? (
-                  <p className="text-sm text-slate-400 italic">
-                    Chưa có hoạt chất nào.
-                  </p>
-                ) : (
-                  <div className="space-y-2">
-                    {activeIngredients.map((ingredient) => {
-                      const isSelected =
-                        ingredient.ingredientId in selectedIngredients;
-                      return (
-                        <div
-                          key={ingredient.ingredientId}
-                          className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
-                            isSelected
-                              ? "bg-blue-50 border-blue-300"
-                              : "bg-slate-50 border-slate-200"
-                          }`}
-                        >
-                          <label className="flex items-center gap-2 flex-1 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={() =>
-                                toggleIngredient(ingredient.ingredientId)
-                              }
-                              className="w-4 h-4 accent-blue-600"
-                            />
-                            <span className="text-sm font-medium text-slate-700">
-                              {ingredient.ingredientName}
-                            </span>
-                          </label>
-                          {isSelected && (
-                            <input
-                              type="text"
-                              placeholder="VD: 500mg"
-                              value={
-                                selectedIngredients[ingredient.ingredientId]
-                              }
-                              onChange={(e) =>
-                                handleStrengthChange(
-                                  ingredient.ingredientId,
-                                  e.target.value,
-                                )
-                              }
-                              className="w-36 py-2 px-3 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                            />
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+              <SearchMultiSelect
+                label="Hoạt chất & Hàm lượng"
+                placeholder="Tìm và chọn hoạt chất..."
+                apiUrl="/active-ingredients"
+                idKey="ingredientId"
+                nameKey="ingredientName"
+                selected={selectedIngredients}
+                onChange={setSelectedIngredients}
+                renderExtra={(item, updateItem) => (
+                  <input
+                    type="text"
+                    placeholder="VD: 500mg"
+                    value={item.strength || ""}
+                    onChange={(e) => updateItem({ strength: e.target.value })}
+                    className="w-36 py-2 px-3 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  />
                 )}
-              </div>
+              />
 
               <div className="flex justify-end pt-6 border-t border-slate-100">
                 <button
@@ -497,11 +378,10 @@ const AddMedicine = () => {
               <div className="flex items-center gap-3 mb-6 text-blue-600">
                 <FiFileText className="w-6 h-6" />
                 <h3 className="text-xl font-bold text-slate-800">
-                  Trích xuất tờ hướng dẫn (OCR)
+                  Trích xuất thông tin trong tờ hướng dẫn (OCR)
                 </h3>
               </div>
 
-              {/* Upload ảnh tờ hướng dẫn */}
               <div className="bg-blue-50/50 border-2 border-dashed border-blue-200 rounded-2xl p-6 text-center mb-8">
                 <input
                   type="file"
@@ -528,7 +408,7 @@ const AddMedicine = () => {
                   <span className="text-slate-600 font-medium">
                     {documentPreview
                       ? "Nhấn để chọn ảnh khác"
-                      : "Tải lên ảnh chụp tờ hướng dẫn sử dụng"}
+                      : "upload ảnh tờ hướng dẫn sử dụng"}
                   </span>
                 </label>
 
@@ -544,7 +424,7 @@ const AddMedicine = () => {
                   {ocrLoading ? (
                     <span className="flex items-center gap-2">
                       <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
-                      Đang phân tích...
+                      Đang phân tích... đợi chút ...
                     </span>
                   ) : (
                     <>
@@ -554,7 +434,6 @@ const AddMedicine = () => {
                 </button>
               </div>
 
-              {/* Form OCR */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div>
                   <label className={labelClass}>Dạng bào chế</label>
@@ -586,11 +465,9 @@ const AddMedicine = () => {
                 {[
                   { name: "uses", label: "Công dụng" },
                   { name: "indications", label: "Chỉ định" },
-                  { name: "contraindications", label: "Chống chỉ định" },
                   { name: "sideEffects", label: "Tác dụng phụ" },
-                  { name: "dosage", label: "Liều dùng" },
-                  { name: "administration", label: "Cách dùng" },
-                  { name: "warning", label: "Cảnh báo" },
+                  { name: "dosageAdministration", label: "Liều dùng & Cách dùng" },
+                  { name: "warning", label: "Cảnh báo - Thận trọng" },
                 ].map(({ name, label }) => (
                   <div key={name} className="md:col-span-2">
                     <label className={labelClass}>{label}</label>
@@ -610,7 +487,7 @@ const AddMedicine = () => {
                   onClick={() => setStep(1)}
                   className="flex justify-center items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-3 rounded-xl font-bold transition-all"
                 >
-                  <FiArrowLeft /> Quay lại
+                  <FiArrowLeft /> Quay lại trang trước
                 </button>
                 <button
                   onClick={handleSubmit}
@@ -622,10 +499,10 @@ const AddMedicine = () => {
                   }`}
                 >
                   {loading ? (
-                    "Đang lưu trữ..."
+                    "Đang lưu"
                   ) : (
                     <>
-                      <FiCheckCircle /> Xác nhận lưu thuốc
+                      <FiCheckCircle /> Xác nhận lưu thuốc mới
                     </>
                   )}
                 </button>
@@ -637,5 +514,4 @@ const AddMedicine = () => {
     </div>
   );
 };
-
 export default AddMedicine;

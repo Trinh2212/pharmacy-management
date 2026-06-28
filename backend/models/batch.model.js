@@ -70,9 +70,17 @@ Batch.init(
     updatedAt: "updated_at",
     deletedAt: "deleted_at",
 
+    indexes: [
+      {
+        name: "unique_med_batch",
+        unique: true,
+        fields: ["medicine_id", "batch_number"],
+      },
+    ],
+
     validate: {
       validateExpiryDate() {
-        if (new Date (this.expiryDate) <= new Date(this.productionDate)) {
+        if (new Date(this.expiryDate) <= new Date(this.productionDate)) {
           throw new Error("expiry date must be after production date");
         }
       },
