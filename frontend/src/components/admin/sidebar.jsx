@@ -44,6 +44,11 @@ const NAV_ITEMS = [
       },
     ],
   },
+  {
+    to: "/admin/profile",
+    label: "Hồ sơ cá nhân",
+    icon: FaUsers,
+  },
 ];
 
 function AccordionItem({ item }) {

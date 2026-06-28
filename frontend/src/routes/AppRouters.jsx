@@ -11,6 +11,7 @@ import Ingredient from "../pages/ingredient";
 import AddMedicine from "../pages/admin/AddMedicine"
 import Dashboard from "../pages/admin/DashBoard";
 import EmployeeManagement from "../pages/admin/EmployeeManagement";
+import Profile from "../pages/admin/Profile";
 
 function AppRouters() {
   return (
@@ -26,6 +27,7 @@ function AppRouters() {
       <Route path="admin" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="employees" element={<EmployeeManagement />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
       <Route path="login" element={<Login />} />
       <Route path="add-medicine" element={<AddMedicine />} />
