@@ -1,6 +1,7 @@
 require("dotenv").config();
 const {sequelize} = require("../config/database");
 const db = require("../models/index.model");
+const { Op } = require("sequelize");
 const bcrypt = require("bcrypt")
 const fs = require("fs");
 const path = require("path");
@@ -89,16 +90,24 @@ const employeeControllers = {
     
     const keyword = search.trim();
 
-    let filter = {};
+    // let filter = {};
 
-    if (keyword !== "") {
-      filter = {
-        [Op.or]: [
-          {fullName: {[Op.like]: `%${keyword}%`}},
-          {employeeCode: {[Op.like]: `%${keyword}%`}}
-        ]
-      }
-    }
+    // if (keyword !== "") {
+    //   filter = {
+    //     [Op.or]: [
+    //       {fullName: {[Op.like]: `%${keyword}%`}},
+    //       {employeeCode: {[Op.like]: `%${keyword}%`}}
+    //     ]
+    //   }
+    // }
+    const filter = keyword
+      ? {
+          [Op.or]: [
+            { fullName: { [Op.like]: `%${keyword}%` } },
+            { employeeCode: { [Op.like]: `%${keyword}%` } },
+          ],
+        }
+      : {};
 
     const employeeList = await db.Employee.findAll({
       attributes: {
@@ -115,7 +124,7 @@ const employeeControllers = {
   },
 
   createEmployeeByAdmin: async (req, res) => {
-    const {fullName, phoneNumber, email, password} = req.body;
+    const {fullName, phoneNumber, email, password, role} = req.body;
 
     const existedEmail = await db.Employee.findOne({
       where: { email },
@@ -153,6 +162,7 @@ const employeeControllers = {
       phoneNumber,
       email,
       password: hashedPassword,
+      role: role || "employee"
     })
 
     const employeeData = employee.toJSON();
@@ -166,7 +176,7 @@ const employeeControllers = {
 // bởi admin có thể sửa đc all nv và all info liên quan, khác với bên chính họ thì không bao gồm role
   updateEmployeeByAdmin: async (req, res) => {
     const {id} = req.params;
-    const updateData = req.body;
+    const updateData = { ...req.body };
 
     const employee = await db.Employee.findByPk(id);
 
@@ -209,7 +219,6 @@ const employeeControllers = {
     await employee.update(updateData);
 
     const employeeData = employee.toJSON();
-
     delete employeeData.password;
 
     return res.status(200).json({
@@ -223,13 +232,15 @@ const employeeControllers = {
     const employee = await db.Employee.findByPk(id);
 
     if (!employee) {
-      return res.status(404).json(
-        "không tìm thấy tài khoản nhân viên"
-      )
+      return res.status(404).json({
+        message: "không tìm thấy tài khoản nhân viên",
+      });
     }
 
     if (employee.role === 'admin')
-      return res.status(403).json("không thể xóa tài khoản admin được");
+      return res.status(403).json({
+        message: "không thể xóa tài khoản admin được",
+      });
 
     await employee.destroy();
 
@@ -241,15 +252,20 @@ const employeeControllers = {
   toggleLock : async (req, res) => {
     const employee = await db.Employee.findByPk(req.params.id);
 
-    if (!employee) return res.status(404).json("không tìm thấy tài khoản");
+    if (!employee) return res.status(404).json({
+      message: "không tìm thấy tài khoản"
+    });
 
     if (employee.role === "admin") 
-      return res.status(403).json("không thể khóa admin nè")
+      return res.status(403).json({
+        message: "không thể khóa admin nè",
+      });
     employee.isLocked = !employee.isLocked;
     await employee.save();
 
     return res.status(200).json({
-      message: employee.isLocked ? "tài khoản đã bị khóa rồi" : "tài khoản đã được mở khóa"
+      message: employee.isLocked ? "tài khoản đã bị khóa rồi" : "tài khoản đã được mở khóa",
+      isLocked: employee.isLocked,
     });
   },
 
@@ -258,12 +274,16 @@ const employeeControllers = {
     const employee = await db.Employee.findByPk(req.employee.employeeId);
     const validPassword = await bcrypt.compare(oldPassword, employee.password);
     if (!validPassword)
-      return res.status(400).json("mật khẩu cũ không đúng, nhớ lại coi");
+      return res.status(400).json({
+        message: "mật khẩu cũ không đúng, nhớ lại coi",
+      });
     const salt = await bcrypt.genSalt(10);
     const hashedNewPassword = await bcrypt.hash(newPassword, salt);
     employee.password = hashedNewPassword;
     await employee.save();
-    return res.status(200).json("đã đổi mật khẩu thành công");
+    return res.status(200).json({
+      message: "đã đổi mật khẩu thành công",
+    });
   }
 };
 

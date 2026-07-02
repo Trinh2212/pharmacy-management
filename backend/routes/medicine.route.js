@@ -11,12 +11,11 @@ const medicineValidations = require("../validations/requests/medicine.validation
 const parse = require("../middlewares/parse");
 const upload = require("../middlewares/upload");
 
-
 router.get("/", asyncHandler(medicineControllers.getAllMedicines));
-router.get("/medicineDetail/:id", asyncHandler(medicineControllers.getMedicineById));
+router.get("/medicine-detail/:id", asyncHandler(medicineControllers.getMedicineById));
 router.post(
   "/",
-  // verifyToken,
+  verifyToken,
   upload.fields([
     { name: "medicine", maxCount: 1 },
     { name: "document", maxCount: 1 },
@@ -45,4 +44,3 @@ router.put(
 );
 
 module.exports = router;
-// ocr - upload - imgInstruction sau - .... auto

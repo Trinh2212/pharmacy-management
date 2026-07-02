@@ -1,6 +1,6 @@
 import { FiShield, FiHeart, FiCheckCircle, FiLifeBuoy } from "react-icons/fi";
 
-const FEATURES_DATA = [
+const features = [
   {
     id: 1,
     icon: <FiShield />,
@@ -36,13 +36,12 @@ export function Features() {
             Vì Sao Khách Hàng Chọn Chúng Tôi?
           </h2>
           <p className="text-[#7f8c8d] text-[1.15rem]">
-            Nhà thuốc đạt chuẩn GPP - Chăm sóc sức khỏe toàn diện cho gia đình
-            bạn
+            Nhà thuốc đạt chuẩn GPP - Chăm sóc sức khỏe toàn diện cho gia đình bạn
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[35px] text-center">
-          {FEATURES_DATA.map((feature) => (
+          {features.map((feature) => (
             <div
               key={feature.id}
               

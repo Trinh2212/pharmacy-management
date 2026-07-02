@@ -96,17 +96,23 @@ export default function Medicines() {
             <select
               value={selectedGroup}
               onChange={(e) => handleGroupChange(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-300 text-gray-950 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 pr-10 appearance-none font-semibold transition-all"
+              className="btn-submit-gradient !p-3 !pr-10 w-full text-sm rounded-xl block appearance-none font-semibold transition-all !text-white border-none shadow-md"
             >
-              <option value="all">Tất cả danh mục</option>
+              <option value="all" className="text-gray-950">
+                Tất cả danh mục
+              </option>
               {groups.map((c) => (
-                <option key={c.groupId} value={c.groupId}>
+                <option
+                  key={c.groupId}
+                  value={c.groupId}
+                  className="text-gray-950"
+                >
                   {c.groupName}
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-              <FaChevronDown className="h-3.5 w-3.5 text-gray-500 transition-transform" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-white">
+              <FaChevronDown className="h-3.5 w-3.5 text-white transition-transform" />
             </div>
           </div>
         </div>
@@ -118,10 +124,10 @@ export default function Medicines() {
             <li>
               <button
                 onClick={() => handleGroupChange("all")}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                className={`w-full text-left rounded-lg transition-all duration-500 ease-in-out ${
                   selectedGroup === "all"
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "btn-submit-gradient !p-2 !px-3 !text-sm !font-semibold"
+                    : "text-gray-700 hover:bg-gray-100 px-3 py-2 text-sm font-medium"
                 }`}
               >
                 Tất cả
@@ -131,10 +137,10 @@ export default function Medicines() {
               <li key={c.groupId}>
                 <button
                   onClick={() => handleGroupChange(String(c.groupId))}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                  className={`w-full text-left rounded-lg transition-all duration-500 ease-in-out ${
                     selectedGroup === String(c.groupId)
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-700 hover:bg-gray-100"
+                      ? "btn-submit-gradient !p-2 !px-3 !text-sm !font-semibold"
+                      : "text-gray-700 hover:bg-gray-100 px-3 py-2 text-sm font-medium"
                   }`}
                 >
                   {c.groupName}
@@ -175,17 +181,19 @@ export default function Medicines() {
                   <button
                     disabled={currentPage <= 1}
                     onClick={() => handlePageChange(currentPage - 1)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-xs md:text-sm disabled:opacity-50"
+                    className="px-4 py-2 border border-slate-200 rounded-xl text-xs md:text-sm font-semibold text-slate-600 bg-white shadow-sm transition-all duration-300 disabled:opacity-40 disabled:pointer-events-none enabled:hover:bg-gradient-to-br enabled:hover:from-blue-600 enabled:hover:to-blue-400 enabled:hover:text-white enabled:hover:border-transparent enabled:hover:shadow-md"
                   >
                     Trang trước
                   </button>
-                  <span className="px-3 py-2 text-xs md:text-sm font-medium">
-                    Trang {currentPage} / {totalPages}
+                  <span className="px-4 py-2 text-xs md:text-sm font-semibold text-slate-700 bg-slate-100 rounded-xl">
+                    Trang <span className="text-blue-600">{currentPage}</span> /{" "}
+                    {totalPages}
                   </span>
+
                   <button
                     disabled={currentPage >= totalPages}
                     onClick={() => handlePageChange(currentPage + 1)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-xs md:text-sm disabled:opacity-50"
+                    className="px-4 py-2 border border-slate-200 rounded-xl text-xs md:text-sm font-semibold text-slate-600 bg-white shadow-sm transition-all duration-300 disabled:opacity-40 disabled:pointer-events-none enabled:hover:bg-gradient-to-br enabled:hover:from-blue-600 enabled:hover:to-blue-400 enabled:hover:text-white enabled:hover:border-transparent enabled:hover:shadow-md"
                   >
                     Trang sau
                   </button>

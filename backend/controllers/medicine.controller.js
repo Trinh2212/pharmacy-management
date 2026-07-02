@@ -15,16 +15,8 @@ const medicineControllers = {
 
     if (keyword) {
       filter[Op.or] = [
-        {
-          medicineCode: {
-            [Op.like]: `%${keyword}%`,
-          },
-        },
-        {
-          brandName: {
-            [Op.like]: `%${keyword}%`,
-          },
-        },
+        { medicineCode: { [Op.like]: `%${keyword}%` } },
+        { brandName: { [Op.like]: `%${keyword}%` } },
       ];
     }
 
@@ -44,20 +36,29 @@ const medicineControllers = {
         {
           model: db.MedicineIngredientDetail,
           as: "ingredientDetailInfo",
-          include: [
-            {
-              model: db.ActiveIngredient,
-              as: "ingredientInfo",
-            },
-          ],
+          include: [{ model: db.ActiveIngredient, as: "ingredientInfo" }],
+        },
+        {
+          model: db.Batch,
+          as: "batchInfo",
+          attributes: ["batchId", "stockQuantity"],
         },
       ],
       order: [["brandName", "ASC"]],
     });
 
+    const data = rows.map((medicine) => {
+      const plain = medicine.toJSON();
+      const totalStock = (plain.batchInfo || []).reduce(
+        (sum, batch) => sum + (batch.stockQuantity || 0),
+        0,
+      );
+      return { ...plain, totalStock };
+    });
+
     return res.status(200).json({
       message: "Lấy danh sách thuốc thành công",
-      data: rows,
+      data,
       totalMedicines: count,
       totalPages: Math.ceil(count / parsedLimit),
       currentPage: parsedPage,
@@ -271,9 +272,9 @@ const medicineControllers = {
       (req.files?.document?.[0]
         ? `/uploads/medicines/${req.files.document[0].filename}`
         : null);
-    
+
     let finalUsageData = usageData || null;
-    
+
     const result = await db.sequelize.transaction(async (t) => {
       const newMedicine = await db.Medicine.create(
         { ...medicineData, imageUrl },

@@ -42,7 +42,6 @@ export function BestSellers() {
       {/* title */}
       <div className="flex items-end justify-between mb-8">
         <div>
-          
           <h2 className="text-[#2d4271] text-2xl md:text-3xl font-extrabold tracking-tight">
             Sản Phẩm Bán Chạy
           </h2>
@@ -80,7 +79,7 @@ export function BestSellers() {
       <div className="mt-8 text-center sm:hidden">
         <Link
           to="/medicines"
-          className="inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-6 py-3 rounded-full"
+          className="inline-flex items-center gap-2 text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 px-6 py-3 rounded-full shadow-md shadow-blue-600/10 transition-all duration-300 hover:opacity-90 hover:shadow-lg hover:shadow-blue-600/20 active:scale-95"
         >
           Xem tất cả <FiArrowRight />
         </Link>

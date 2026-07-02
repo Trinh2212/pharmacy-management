@@ -49,11 +49,7 @@ export default function IngredientsPage() {
     };
   }, []);
 
-  // Nhóm hoạt chất theo chữ cái đầu (đã sort A-Z từ backend, giữ nguyên thứ tự)
   const groups = useMemo(() => {
-    console.log("1. Giá trị của ingredients:", ingredients);
-    console.log("2. Kiểu dữ liệu (type):", typeof ingredients);
-    console.log("3. Có phải là mảng không?:", Array.isArray(ingredients));
     const map = {};
     for (const item of ingredients) {
       const letter = getFirstLetter(item.ingredientName);
@@ -90,7 +86,7 @@ export default function IngredientsPage() {
           </p>
         </div>
         {!loading && !error && (
-          <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700">
+          <span className="rounded-full bg-gradient-to-br from-blue-700 to-blue-400 px-3 py-1 text-xs font-bold text-white shadow-sm">
             {ingredients.length} hoạt chất
           </span>
         )}
@@ -100,12 +96,6 @@ export default function IngredientsPage() {
         <div className="flex items-center justify-center gap-2 py-24 text-slate-400">
           <FiLoader className="h-5 w-5 animate-spin" />
           <span className="text-sm">Đang tải danh sách…</span>
-        </div>
-      )}
-
-      {!loading && error && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-          {error}
         </div>
       )}
 
@@ -120,7 +110,7 @@ export default function IngredientsPage() {
 
       {!loading && !error && ingredients.length > 0 && (
         <div className="flex gap-8">
-          {/* Nội dung chính: nhóm theo chữ cái */}
+          {/* nhóm theo chữ cái */}
           <div className="flex-1 space-y-10">
             {availableLetters.map((letter) => (
               <section
@@ -130,7 +120,7 @@ export default function IngredientsPage() {
                 className="scroll-mt-20"
               >
                 <div className="mb-3 flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-sm font-bold text-white">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-700 to-blue-400 text-sm font-bold text-white shadow-sm">
                     {letter}
                   </span>
                   <div className="h-px flex-1 bg-slate-200" />
@@ -150,7 +140,7 @@ export default function IngredientsPage() {
             ))}
           </div>
 
-          {/* Mục lục A-Z bám dính bên phải, bấm để nhảy tới nhóm chữ tương ứng */}
+          {/* Mục lục A-Z bên phải */}
           <aside className="hidden w-12 shrink-0 lg:block">
             <div className="sticky top-24 flex flex-col items-center gap-0.5 rounded-full border border-slate-100 bg-white py-3 shadow-sm">
               {ALPHABET.map((letter) => {
@@ -162,7 +152,7 @@ export default function IngredientsPage() {
                     onClick={() => scrollToLetter(letter)}
                     className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-semibold transition ${
                       isAvailable
-                        ? "text-slate-600 hover:bg-teal-100 hover:text-teal-700"
+                        ? "text-slate-600 hover:bg-gradient-to-br hover:from-blue-600 hover:to-blue-400 hover:text-white hover:shadow-sm"
                         : "text-slate-200"
                     }`}
                   >

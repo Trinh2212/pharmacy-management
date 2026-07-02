@@ -1,6 +1,19 @@
 import { useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { FaChartPie, FaMedkit, FaFlask, FaUsers, FaHome, FaLayerGroup, FaTruck, FaBoxes, FaChevronDown, FaFileAlt, FaList} from "react-icons/fa";
+import {
+  FaChartPie,
+  FaMedkit,
+  FaFlask,
+  FaUsers,
+  FaHome,
+  FaLayerGroup,
+  FaTruck,
+  FaBoxes,
+  FaChevronDown,
+  FaFileAlt,
+  FaList,
+} from "react-icons/fa";
+import { useAuth } from "../../contexts/AuthContext"; 
 
 const NAV_ITEMS = [
   {
@@ -13,32 +26,38 @@ const NAV_ITEMS = [
     label: "Danh mục thuốc",
     icon: FaMedkit,
     children: [
-      { to: "/admin/medicines", label: "Thuốc", icon: FaMedkit },
-      { to: "/admin/medicine-groups", label: "Nhóm thuốc", icon: FaLayerGroup },
-      { to: "/admin/ingredients", label: "Hoạt chất", icon: FaFlask },
+      { to: "/admin/medicine-management", label: "Thuốc", icon: FaMedkit },
+      {
+        to: "/admin/group-management",
+        label: "Nhóm thuốc",
+        icon: FaLayerGroup,
+      },
+      { to: "/admin/ingredient-management", label: "Hoạt chất", icon: FaFlask },
     ],
   },
   {
-    to: "/admin/suppliers",
+    to: "/admin/supplier-management",
     label: "Nhà cung cấp",
     icon: FaTruck,
   },
   {
-    to: "/admin/employees",
+    // Chỉ admin mới thấy mục Nhân viên
+    to: "/admin/employee-management",
     label: "Nhân viên",
     icon: FaUsers,
+    roles: ["admin"],
   },
   {
     label: "Nhập kho thuốc",
     icon: FaBoxes,
     children: [
       {
-        to: "/admin/warehouse/create",
+        to: "/admin/warehouse/add-receipt",
         label: "Tạo phiếu nhập",
         icon: FaFileAlt,
       },
       {
-        to: "/admin/warehouse/list",
+        to: "/admin/warehouse-management",
         label: "Danh sách phiếu nhập",
         icon: FaList,
       },
@@ -50,6 +69,11 @@ const NAV_ITEMS = [
     icon: FaUsers,
   },
 ];
+
+function isVisible(item, userRole) {
+  if (!item.roles) return true; 
+  return item.roles.includes(userRole); // có giới hạn kiểm tra role
+}
 
 function AccordionItem({ item }) {
   const location = useLocation();
@@ -104,6 +128,9 @@ function AccordionItem({ item }) {
 }
 
 export function Sidebar() {
+  const { user } = useAuth();
+  const userRole = user?.role;
+
   return (
     <aside className="hidden md:flex w-64 shrink-0 flex-col h-screen sticky top-0 bg-sidebar border-r border-sidebar-border overflow-y-auto">
       {/* Logo */}
@@ -129,7 +156,7 @@ export function Sidebar() {
 
       {/* Menu */}
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map((item) =>
+        {NAV_ITEMS.filter((item) => isVisible(item, userRole)).map((item) =>
           item.children ? (
             <AccordionItem key={item.label} item={item} />
           ) : (

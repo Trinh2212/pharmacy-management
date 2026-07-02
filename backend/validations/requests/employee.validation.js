@@ -8,6 +8,7 @@ const employeeValidations = {
       .length(10)
       .required(),
     email: Joi.string().email().max(100).required(),
+    role: Joi.string().valid("employee", "admin"),
     password: Joi.string().max(255).required().min(8),
   }).unknown(false),
 

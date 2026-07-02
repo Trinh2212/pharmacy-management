@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdLock } from "react-icons/md";
 import { FaUserAstronaut } from "react-icons/fa";
 import { TbLockOpenOff, TbLockOpen } from "react-icons/tb";
@@ -39,7 +39,11 @@ export default function Login() {
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-50">
       <div className="absolute inset-0 bg-sky-950/50">
-        <img src="/img/loginbg.jpg" alt="Pharmacy" className="h-full w-full object-cover blur-sm opacity-90"/>
+        <img
+          src="/img/loginbg.jpg"
+          alt="Pharmacy"
+          className="h-full w-full object-cover blur-sm opacity-90"
+        />
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
@@ -50,12 +54,21 @@ export default function Login() {
         >
           {/* Logo */}
           <div className="mb-8 flex flex-col items-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg overflow-hidden"
-              onClick={() => navigate("/")} >
-              <img src="/img/logo.png" alt="Logo Nhà Thuốc" className="h-full w-full object-cover" />
+            <div
+              className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg overflow-hidden"
+              onClick={() => navigate("/")}
+            >
+              <img
+                src="/img/logo.png"
+                alt="Logo Nhà Thuốc"
+                className="h-full w-full object-cover"
+              />
             </div>
 
-            <h1 className="mt-4 text-2xl font-bold text-slate-800"> CareMind Pharma </h1>
+            <h1 className="mt-4 text-2xl font-bold text-slate-800">
+              {" "}
+              CareMind Pharma{" "}
+            </h1>
 
             <p className="mt-2 text-sm text-slate-500">Đăng nhập để tiếp tục</p>
           </div>
@@ -117,7 +130,7 @@ export default function Login() {
 
           <button
             type="submit"
-            className="mt-6 w-full rounded-xl bg-gradient-to-r from-sky-600 to-cyan-600 py-3.5 font-semibold text-white shadow-lg transition hover:opacity-95"
+            className="btn-submit-gradient !mt-6 w-full rounded-xl !py-3 font-semibold text-white"
           >
             Đăng nhập
           </button>
@@ -125,8 +138,16 @@ export default function Login() {
           {errorMsg && (
             <p className="mt-3 text-center text-sm text-red-500">{errorMsg}</p>
           )}
-          <p className="mt-3 text-center text-sm text-slate-500">
-            Trang này chỉ dành riêng cho nhân viên nhà thuốc của chúng tôi
+          <p className="mt-4 text-center text-sm text-slate-500 flex flex-col items-center gap-2">
+            <span>
+              Trang này chỉ dành riêng cho nhân viên nhà thuốc của chúng tôi
+            </span>
+            <Link
+              to="/"
+              className="inline-flex items-center text-sm font-semibold text-blue-800 hover:text-blue-700 hover:underline transition-colors mt-1"
+            >
+              Trở về trang chủ
+            </Link>
           </p>
         </form>
       </div>

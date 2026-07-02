@@ -71,7 +71,7 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-7xl px-4 py-5 text-center text-xs opacity-60">
           <span>
-            © {new Date().getFullYear()} CareMind Pharma. Đồ án niên luận KHMT.
+            © {new Date().getFullYear()} CareMind Pharma. Đồ án niên luận cơ sở KHMT.
           </span>
         </div>
       </div>

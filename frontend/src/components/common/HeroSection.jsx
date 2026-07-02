@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-const BANNERS = [
+const banners = [
+  "img/banner/banner4.jpg",
   "img/banner/banner2.webp",
-  "img/banner/banner3.webp",
-  "img/banner/banner1.jpg",
-  "img/banner/xoang.png",
+  "img/banner/banner3.jpg",
+  "img/banner/banner1.png",
 ];
 
 export function HeroSection() {
@@ -13,12 +13,12 @@ export function HeroSection() {
 
   const prevSlide = () => {
     const isFirstSlide = currentIndex === 0;
-    const newIndex = isFirstSlide ? BANNERS.length - 1 : currentIndex - 1;
+    const newIndex = isFirstSlide ? banners.length - 1 : currentIndex - 1;
     setCurrentIndex(newIndex);
   };
 
   const nextSlide = () => {
-    const isLastSlide = currentIndex === BANNERS.length - 1;
+    const isLastSlide = currentIndex === banners.length - 1;
     const newIndex = isLastSlide ? 0 : currentIndex + 1;
     setCurrentIndex(newIndex);
   };
@@ -39,7 +39,7 @@ export function HeroSection() {
       <div className="relative w-full h-[250px] sm:h-[350px] md:h-[480px] group overflow-hidden shadow-md bg-gray-100">
         {/* hien thi banner */}
         <div
-          style={{ backgroundImage: `url(${BANNERS[currentIndex]})` }}
+          style={{ backgroundImage: `url(${banners[currentIndex]})` }}
           className="w-full h-full bg-center bg-cover bg-no-repeat transition-all duration-500 ease-out"
         ></div>
 
@@ -58,7 +58,7 @@ export function HeroSection() {
         </button>
 
         <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-          {BANNERS.map((_, slideIndex) => (
+          {banners.map((_, slideIndex) => (
             <button
               key={slideIndex}
               onClick={() => goToSlide(slideIndex)}

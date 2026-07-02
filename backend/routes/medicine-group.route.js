@@ -7,7 +7,6 @@ const medicineGValidations = require("../validations/requests/medicineGroup.vali
 const validate = require("../middlewares/validate");
 const asyncHandler = require("../middlewares/asyncHandler");
 
-// http://localhost:5000/api/medicine-groups
 router.get("/", asyncHandler(medicineGroupControllers.getMedicineGroup));
 router.get("/:id", asyncHandler(medicineGroupControllers.getMedicineGroupById));
 router.post(

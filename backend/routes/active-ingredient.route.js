@@ -6,7 +6,6 @@ const IngredientValidations = require("../validations/requests/activeIngre.valid
 const validate = require("../middlewares/validate");
 const asyncHandler = require("../middlewares/asyncHandler");
 
-// http://localhost:5000/api/active-ingredients
 router.get("/", asyncHandler(ingredientControllers.getActiveIngredient));
 router.get("/:id", asyncHandler(ingredientControllers.getActiveIngredientById));
 router.post(

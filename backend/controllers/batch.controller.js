@@ -1,55 +1,49 @@
-const sequelize = require("../config/database");
 const db = require("../models/index.model");
 
 const batchControllers = {
-    getAllBatch: async (req, res) => {
-        const {search = ""} = req.query
-        const keyword = search.trim();
+  //lấy batch theo medicine
+  getBatchesByMedicine: async (req, res) => {
+    const { medicineId } = req.params;
 
-        
-    } ,
-
-    createBatch : async ({
-    medicineId,
-    batchNumber,
-    productionDate,
-    expiryDate,
-    importQuantity,
-    }, transaction = null) => {
-    // Tìm lô thuốc
-    const batch = await Batch.findOne({
-        where: {
-        medicineId,
-        batchNumber,
-        },
-        transaction,
-    });
-
-    // Nếu đã tồn tại -> cập nhật số lượng
-    if (batch) {
-        batch.stockQuantity += Number(importQuantity);
-
-        await batch.save({ transaction });
-
-        return batch;
+    const medicine = await db.Medicine.findByPk(medicineId);
+    if (!medicine) {
+      return res.status(404).json({ message: "Không tìm thấy thuốc" });
     }
 
-    // Nếu chưa tồn tại -> tạo mới
-    const newBatch = await Batch.create(
-        {
-        medicineId,
-        batchNumber,
-        productionDate,
-        expiryDate,
-        stockQuantity: importQuantity,
-        },
-        {
-        transaction,
-        }
-    );
+    const batches = await db.Batch.findAll({
+      where: { medicineId },
+      order: [["expiryDate", "ASC"]],
+      attributes: [
+        "batchId",
+        "batchNumber",
+        "productionDate",
+        "expiryDate",
+        "stockQuantity",
+      ],
+    });
 
-    return newBatch;
-    },
+    return res.json({ data: batches });
+  },
+
+  // GET /api/batches/check?medicineId=1&batchNumber=LOT001
+  checkBatch: async (req, res) => {
+    const { medicineId, batchNumber } = req.query;
+
+    const batch = await db.Batch.findOne({
+      where: { medicineId, batchNumber },
+      attributes: [
+        "batchId",
+        "batchNumber",
+        "productionDate",
+        "expiryDate",
+        "stockQuantity",
+      ],
+    });
+
+    // exists=true  → lô cũ, frontend tự điền productionDate + expiryDate
+    // exists=false → lô mới, nhân viên nhập tay
+    return res.json({ exists: !!batch, batch: batch || null });
+  },
 };
 
 module.exports = batchControllers;

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Topbar } from "../../components/admin/Topbar";
+import { Topbar } from "../../components/admin/topbar";
 import axiosClient from "../../api/axiosClient";
 import Swal from "sweetalert2";
-import {FiCamera,FiLoader,FiUser,FiEdit2,FiLock} from "react-icons/fi";
+import { FiCamera, FiLoader, FiUser, FiEdit2, FiLock } from "react-icons/fi";
 
 const DEFAULT_AVATAR =
   "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
@@ -52,12 +52,11 @@ function SelectField({ label, name, value, onChange }) {
   );
 }
 
-// ── Info row dùng trong phần hiển thị ────────────────────────────────────────
 function InfoRow({ label, value }) {
   return (
     <div>
       <p className="text-xs text-gray-400 mb-0.5">{label}</p>
-      <p className="text-sm font-medium text-gray-800">{value || "—"}</p>
+      <p className="text-sm font-medium text-gray-800">{value || "chưa có thông tin"}</p>
     </div>
   );
 }
@@ -114,7 +113,7 @@ export default function Profile() {
     setProfileForm({
       fullName: data?.fullName || "",
       dob: data?.dob ? data.dob.split("T")[0] : "",
-      gender: data?.gender || "nam",
+      gender: data?.gender || "khác",
       email: data?.email || "",
       phoneNumber: data?.phoneNumber || "",
       address: data?.address || "",
@@ -124,8 +123,7 @@ export default function Profile() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    axiosClient
-      .get("/getProfile")
+    axiosClient.get("/getProfile")
       .then((res) => {
         if (!active) return;
         const data = extractEmployee(res);
@@ -208,9 +206,6 @@ export default function Profile() {
     if (passwordForm.newPassword.length < 8) {
       return Swal.fire("Cảnh báo", "Mật khẩu mới tối thiểu 8 ký tự", "warning");
     }
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      return Swal.fire("Cảnh báo", "Mật khẩu xác nhận không khớp", "warning");
-    }
     setSavingPassword(true);
     try {
       await axiosClient.put("/change-password", {
@@ -224,10 +219,7 @@ export default function Profile() {
         timer: 1800,
         showConfirmButton: false,
       });
-      setPasswordForm({
-        oldPassword: "",
-        newPassword: "",
-      });
+      setPasswordForm({ oldPassword: "", newPassword: "" });
       setShowPasswordModal(false);
     } catch (err) {
       Swal.fire(
@@ -249,44 +241,31 @@ export default function Profile() {
     );
   }
 
-  const displayAvatar = avatarPreview || employee?.avatarUrl || DEFAULT_AVATAR;
-
   return (
     <>
-      <Topbar
-        title="Hồ sơ cá nhân"
-        subtitle="Quản lý thông tin cá nhân"
-      />
+      <Topbar title="Hồ sơ cá nhân" subtitle="Quản lý thông tin cá nhân" />
       <div className="p-6 grid lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-        {}
+        {/* avatar */}
         <div className="bg-white border border-gray-100 rounded-2xl p-6 text-center h-fit sticky top-6 shadow-sm">
           <div className="relative h-32 w-32 mx-auto">
             <img
-              src={displayAvatar}
+              src={
+                employee?.avatarUrl
+                  ? employee.avatarUrl.startsWith("/uploads")
+                    ? `http://localhost:5000${employee.avatarUrl}`
+                    : employee.avatarUrl
+                  : DEFAULT_AVATAR
+              }
               alt="avatar"
               className="h-32 w-32 rounded-full object-cover border-4 border-white shadow"
-            />
-            <label
-              htmlFor="avatar-upload-side"
-              className="absolute bottom-1 right-1 h-9 w-9 rounded-full bg-teal-600 text-white grid place-items-center cursor-pointer hover:bg-teal-700 transition shadow"
-              title="Đổi ảnh đại diện"
-            >
-              <FiCamera className="h-4 w-4" />
-            </label>
-            <input
-              id="avatar-upload-side"
-              type="file"
-              accept="image/*"
-              onChange={handleAvatarChange}
-              className="hidden"
             />
           </div>
 
           <h3 className="mt-4 text-xl font-bold text-gray-900">
-            {employee?.fullName || "Chưa cập nhật"}
+            {employee?.fullName || "Chưa có thông tin"}
           </h3>
           <p className="text-sm text-teal-600 font-medium mt-1">
-            {employee?.role === "admin" ? "Quản trị" : "Nhân viên"}
+            {employee?.role === "admin" ? "Quản trị viên" : "Nhân viên"}
           </p>
           <p className="text-xs text-gray-400 mt-1">{employee?.employeeCode}</p>
 
@@ -299,10 +278,7 @@ export default function Profile() {
             </button>
             <button
               onClick={() => {
-                setPasswordForm({
-                  oldPassword: "",
-                  newPassword: "",
-                });
+                setPasswordForm({ oldPassword: "", newPassword: "" });
                 setShowPasswordModal(true);
               }}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-xl border border-gray-200 transition"
@@ -312,7 +288,7 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* info ── */}
+        {/* info */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
             <div className="flex items-center gap-2 border-b border-gray-100 pb-4 mb-5">
@@ -342,19 +318,25 @@ export default function Profile() {
           </div>
         </div>
       </div>
-
+      {/* Modal chỉnh sửa  */}
       {showEditModal && (
         <Modal
           title="CHỈNH SỬA THÔNG TIN"
           onClose={() => setShowEditModal(false)}
         >
           <form onSubmit={handleSubmitProfile}>
-            <div className="px-6 py-5 overflow-y-auto flex flex-col gap-4">     
-              {/* avatar */}
+            <div className="px-6 py-5 overflow-y-auto flex flex-col gap-4">
               <div className="flex items-center gap-4 pb-2">
                 <div className="relative h-16 w-16 shrink-0">
                   <img
-                    src={avatarPreview || employee?.avatarUrl || DEFAULT_AVATAR}
+                    src={
+                      avatarPreview ||
+                      (employee?.avatarUrl
+                        ? employee.avatarUrl.startsWith("/uploads")
+                          ? `http://localhost:5000${employee.avatarUrl}`
+                          : employee.avatarUrl
+                        : DEFAULT_AVATAR)
+                    }
                     alt="avatar"
                     className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
                   />
@@ -461,7 +443,7 @@ export default function Profile() {
           </form>
         </Modal>
       )}
-
+      {/* Modal đổi mật khẩu */}
       {showPasswordModal && (
         <Modal title="ĐỔI MẬT KHẨU" onClose={() => setShowPasswordModal(false)}>
           <form onSubmit={handleSubmitPassword}>

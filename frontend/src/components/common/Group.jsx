@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axiosClient from "../../api/axiosClient";
+import { FiArrowRight } from "react-icons/fi";
 
-const UI_STYLES = [
+const styles = [
   {
     imageUrl:
       "https://cdn.nhathuoclongchau.com.vn/unsafe/96x0/filters:quality(90):format(webp)/smalls/Than_kinh_nao_ae09cbf6e8.png",
@@ -84,20 +85,21 @@ export function Group() {
             Nhóm thuốc nổi bật
           </h2>
           <p className="text-sm text-slate-500 mt-1">
-            Chọn nhanh nhóm thuốc bạn quan tâm
+            Chọn nhanh nhóm thuốc bạn quan tâm nào -.-
           </p>
         </div>
         <Link
           to="/medicines"
-          className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline hidden sm:inline"
+          className="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors hidden sm:flex items-center gap-1 group"
         >
-          Xem tất cả →
+          Xem tất cả
+          <FiArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
         </Link>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
         {groups.slice(0, 8).map((group, index) => {
-          const style = UI_STYLES[index % UI_STYLES.length];
+          const style = styles[index % styles.length];
 
           return (
             <Link

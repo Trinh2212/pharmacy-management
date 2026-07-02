@@ -19,7 +19,7 @@ export default function Contact() {
     e.preventDefault();
 
     Swal.fire({
-      title: "Đang gửi tin nhắn...",
+      title: "Đang gửi tin nhắn...vui lòng chờ xíu -.-",
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
@@ -37,11 +37,14 @@ export default function Contact() {
       Swal.fire({
         icon: "success",
         title: "Đã gửi lời nhắn thành công!",
-        text: "Hệ thống nhà thuốc đã nhận được thông tin của bạn. Xin cám ơn nhé!",
-        confirmButtonColor: "#2563eb",
+        buttonsStyling: false,
+        text: "Nhà thuốc đã nhận được thông tin của bạn. Chúng tui sẽ phản hồi sớm, xin cảm ơn",
+        customClass: {
+          confirmButton: "btn-swal-ok", 
+          icon: "icon-swal-success", 
+        },
       });
 
-      // Xóa form
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
       console.error("Lỗi gửi mail:", error);
@@ -188,10 +191,7 @@ export default function Contact() {
                   required
                 ></textarea>
               </div>
-              <button
-                type="submit"
-                className="w-full p-5 bg-gradient-to-br from-blue-600 to-blue-700 text-white border-none rounded-xl text-xl font-extrabold cursor-pointer transition-all duration-500 ease-in-out shadow-lg shadow-blue-600/20 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-600/40"
-              >
+              <button type="submit" className="btn-submit-gradient">
                 GỬI LỜI NHẮN
               </button>
             </form>

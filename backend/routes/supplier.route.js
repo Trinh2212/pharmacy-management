@@ -8,7 +8,6 @@ const supplierValidations = require("../validations/requests/supplier.validation
 const validate = require("../middlewares/validate");
 const asyncHandler = require("../middlewares/asyncHandler")
 
-// http://localhost:5000/api/suppliers
 router.get("/", asyncHandler(supplierControllers.getSupplier));
 router.get("/:id", asyncHandler(supplierControllers.getSupplierById));
 router.post(

@@ -19,7 +19,6 @@ export function MedicineCard({ p }) {
           className="h-full w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
         />
 
-        {/* Hiển thị trạng thái (nếu hết hàng hoặc ngừng cung cấp) */}
         {p.status === "hết hàng" && (
           <span className="absolute top-3 right-3 bg-red-500 text-white text-[10px] uppercase font-bold px-2.5 py-1 rounded-md tracking-wider shadow-sm">
             Hết hàng
@@ -60,9 +59,10 @@ export function MedicineCard({ p }) {
 
           <Link
             to={`medicineDetail/${p.medicineId}`}
-            className="w-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition-colors duration-300"
+            className="group w-full bg-blue-50 text-blue-600 rounded-xl py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition-none duration-0 hover:bg-gradient-to-r hover:from-blue-600 hover:to-cyan-500 hover:text-white hover:shadow-lg hover:shadow-blue-600/20 active:scale-[0.98]"
           >
-            <FiEye className="text-lg" /> Xem chi tiết
+            <FiEye className="text-lg text-blue-600 transition-none duration-0 group-hover:text-white" />
+            <span>Xem chi tiết</span>
           </Link>
         </div>
       </div>
