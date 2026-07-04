@@ -191,7 +191,10 @@ export default function Contact() {
                   required
                 ></textarea>
               </div>
-              <button type="submit" className="btn-submit-gradient">
+              <button
+                type="submit"
+                className="btn-gradient w-full p-5 text-xl font-extrabold"
+              >
                 GỬI LỜI NHẮN
               </button>
             </form>

@@ -1,18 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import {
-  FaChartPie,
-  FaMedkit,
-  FaFlask,
-  FaUsers,
-  FaHome,
-  FaLayerGroup,
-  FaTruck,
-  FaBoxes,
-  FaChevronDown,
-  FaFileAlt,
-  FaList,
-} from "react-icons/fa";
+import { FaChartPie, FaMedkit, FaFlask, FaUsers, FaHome, FaLayerGroup, FaTruck, FaBoxes, FaChevronDown, FaFileAlt, FaList} from "react-icons/fa";
 import { useAuth } from "../../contexts/AuthContext"; 
 
 const NAV_ITEMS = [
@@ -89,8 +77,8 @@ function AccordionItem({ item }) {
         className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition
           ${
             isChildActive
-              ? "bg-sidebar-accent text-sidebar-primary font-semibold"
-              : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+              ? "btn-gradient text-white font-semibold shadow-md"
+              : "text-gray-700 hover:bg-gray-100"
           }`}
       >
         <item.icon className="h-4 w-4 shrink-0" />
@@ -103,7 +91,7 @@ function AccordionItem({ item }) {
       </button>
 
       {open && (
-        <div className="mt-1 ml-4 pl-3 border-l border-sidebar-border space-y-0.5">
+        <div className="mt-1 ml-4 pl-3 border-l border-gray-200 space-y-0.5">
           {item.children.map((child) => (
             <NavLink
               key={child.to}
@@ -112,8 +100,8 @@ function AccordionItem({ item }) {
                 `flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition
                 ${
                   isActive
-                    ? "bg-sidebar-accent text-sidebar-primary font-semibold"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                    ? "bg-blue-50 text-blue-700 font-semibold"
+                    : "text-gray-600 hover:bg-gray-100"
                 }`
               }
             >
@@ -134,9 +122,9 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex w-64 shrink-0 flex-col h-screen sticky top-0 bg-sidebar border-r border-sidebar-border overflow-y-auto">
       {/* Logo */}
-      <div className="p-5 border-b border-sidebar-border shrink-0">
+      <div className="p-5 shrink-0">
         <Link to="/" className="flex items-center gap-2">
-          <div className="h-10 w-10 rounded-xl bg-gradient-hero grid place-items-center shadow-soft overflow-hidden">
+          <div className="h-10 w-10 rounded-xl grid place-items-center shadow-sm overflow-hidden">
             <img
               src="/img/logo.png"
               alt="caremind pharmacy"
@@ -153,6 +141,7 @@ export function Sidebar() {
           </div>
         </Link>
       </div>
+      <div className="h-0.5 mx-4 bg-blue-200 rounded-full" />
 
       {/* Menu */}
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
@@ -165,11 +154,11 @@ export function Sidebar() {
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition
+                `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300
                 ${
                   isActive
-                    ? "bg-sidebar-accent text-sidebar-primary font-semibold shadow-sm"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                    ? "btn-gradient text-white shadow-md"
+                    : "text-gray-700 hover:bg-gray-100"
                 }`
               }
             >
@@ -178,11 +167,11 @@ export function Sidebar() {
           ),
         )}
       </nav>
-
-      <div className="p-3 border-t border-sidebar-border shrink-0">
+      <div className="h-0.5 mx-4 bg-blue-200 rounded-full" />
+      <div className="p-3 shrink-0">
         <Link
           to="/"
-          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-sidebar-foreground hover:bg-rose-50 hover:text-rose-600 transition"
+          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 text-gray-700 hover:bg-gray-100 hover:text-blue-600"
         >
           <FaHome className="h-4 w-4" /> Trang chủ
         </Link>

@@ -51,6 +51,7 @@ const medicineValidations = {
     origin: Joi.string().max(50).allow(null, ""),
     price: Joi.number().positive().precision(2),
     registrationNumber: Joi.string().max(50),
+    status: Joi.string().valid("đang cung cấp", "ngừng cung cấp"),
     unit: Joi.string().valid(
       "Viên",
       "Vỉ",

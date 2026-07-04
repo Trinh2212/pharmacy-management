@@ -1,20 +1,14 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Topbar } from "../../components/admin/topbar";
 import axiosClient from "../../api/axiosClient";
-import Swal from "sweetalert2";
-import { FiCamera, FiLoader, FiUser, FiEdit2, FiLock } from "react-icons/fi";
+import { useAuth } from "../../contexts/AuthContext";
+import { alertSuccess, alertError, alertWarning } from "../../utils/SwalAlert";
+import { FiCamera, FiLoader, FiUser, FiEdit2, FiLock, FiLogOut } from "react-icons/fi";
+import { FaXmark } from "react-icons/fa6";
+const DEFAULT_AVATAR = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
 
-const DEFAULT_AVATAR =
-  "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
-
-function Field({
-  label,
-  name,
-  value,
-  onChange,
-  type = "text",
-  disabled = false,
-}) {
+function Field({ label, name, value, onChange, type = "text", disabled = false }) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -26,7 +20,7 @@ function Field({
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="form-base"
       />
     </div>
   );
@@ -35,14 +29,14 @@ function Field({
 function SelectField({ label, name, value, onChange }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="block text-sm font-medium text-gray-800 mb-1">
         {label}
       </label>
       <select
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+        className="form-base"
       >
         <option value="nam">Nam</option>
         <option value="nữ">Nữ</option>
@@ -73,19 +67,30 @@ function Modal({ title, onClose, children }) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]"
+        className="bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="text-xl font-bold text-teal-700">{title}</h3>
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
+          <div className="w-5"></div>{" "}
+          <h3 className="text-xl font-bold text-slate-800 text-center">
+            {title}
+          </h3>
+          <button
+            onClick={onClose}
+            className="p-1 text-gray-400 hover:text-gray-600 transition"
+          >
+            <FaXmark className="h-5 w-5" />
+          </button>
         </div>
-        {children}
+        <div className="flex flex-col overflow-y-auto">{children}</div>
       </div>
     </div>
   );
 }
 
 export default function Profile() {
+  const navigate = useNavigate();
+  const { logout } = useAuth(); 
   const [employee, setEmployee] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -123,7 +128,8 @@ export default function Profile() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    axiosClient.get("/getProfile")
+    axiosClient
+      .get("/employees/getProfile")
       .then((res) => {
         if (!active) return;
         const data = extractEmployee(res);
@@ -132,7 +138,7 @@ export default function Profile() {
       })
       .catch(() => {
         if (!active) return;
-        Swal.fire("Lỗi", "Không thể tải thông tin hồ sơ", "error");
+        alertError("Không thể tải thông tin hồ sơ rồi, có lẽ có sự cố -.-");
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -141,6 +147,11 @@ export default function Profile() {
       active = false;
     };
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   const handleOpenEdit = () => {
     syncForm(employee);
@@ -169,26 +180,16 @@ export default function Profile() {
       form.append("address", profileForm.address);
       if (avatarFile) form.append("avatar", avatarFile);
 
-      const res = await axiosClient.put("/updateProfile", form, {
+      const res = await axiosClient.put("/employees/updateProfile", form, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       const updated = extractEmployee(res) || { ...employee, ...profileForm };
       setEmployee(updated);
       setShowEditModal(false);
-      Swal.fire({
-        icon: "success",
-        title: "Thành công",
-        text: "Hồ sơ đã được cập nhật!",
-        timer: 1800,
-        showConfirmButton: false,
-      });
+      alertSuccess("Hồ sơ đã được cập nhật thành công!");
     } catch (err) {
-      Swal.fire(
-        "Lỗi",
-        err.response?.data?.message || "Không thể cập nhật",
-        "error",
-      );
+      alertError(err, "Không thể cập nhật hồ sơ. có lẽ có sự cố rồi -.-");
     } finally {
       setSavingProfile(false);
     }
@@ -197,36 +198,22 @@ export default function Profile() {
   const handleSubmitPassword = async (e) => {
     e.preventDefault();
     if (!passwordForm.oldPassword || !passwordForm.newPassword) {
-      return Swal.fire(
-        "Cảnh báo",
-        "Vui lòng điền đủ mật khẩu cũ và mới",
-        "warning",
-      );
+      return alertWarning("Vui lòng điền đủ mật khẩu cũ và mới");
     }
     if (passwordForm.newPassword.length < 8) {
-      return Swal.fire("Cảnh báo", "Mật khẩu mới tối thiểu 8 ký tự", "warning");
+      return alertWarning("Mật khẩu mới tối thiểu 8 ký tự");
     }
     setSavingPassword(true);
     try {
-      await axiosClient.put("/change-password", {
+      await axiosClient.put("employees/change-password", {
         oldPassword: passwordForm.oldPassword,
         newPassword: passwordForm.newPassword,
       });
-      Swal.fire({
-        icon: "success",
-        title: "Thành công",
-        text: "Mật khẩu đã được thay đổi!",
-        timer: 1800,
-        showConfirmButton: false,
-      });
+      alertSuccess("mật khẩu mới đã được lưu thành công")
       setPasswordForm({ oldPassword: "", newPassword: "" });
       setShowPasswordModal(false);
     } catch (err) {
-      Swal.fire(
-        "Lỗi",
-        err.response?.data?.message || "Không thể đổi mật khẩu",
-        "error",
-      );
+      alertError(err, "đổi mật khẩu thất bại rồi -.-");
     } finally {
       setSavingPassword(false);
     }
@@ -264,7 +251,7 @@ export default function Profile() {
           <h3 className="mt-4 text-xl font-bold text-gray-900">
             {employee?.fullName || "Chưa có thông tin"}
           </h3>
-          <p className="text-sm text-teal-600 font-medium mt-1">
+          <p className="text-sm text-blue-800 font-medium mt-1">
             {employee?.role === "admin" ? "Quản trị viên" : "Nhân viên"}
           </p>
           <p className="text-xs text-gray-400 mt-1">{employee?.employeeCode}</p>
@@ -272,7 +259,7 @@ export default function Profile() {
           <div className="mt-6 pt-5 border-t border-gray-100 flex flex-col gap-2">
             <button
               onClick={handleOpenEdit}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-xl transition"
+              className="btn-gradient w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium"
             >
               <FiEdit2 className="h-4 w-4" /> Chỉnh sửa thông tin
             </button>
@@ -281,7 +268,7 @@ export default function Profile() {
                 setPasswordForm({ oldPassword: "", newPassword: "" });
                 setShowPasswordModal(true);
               }}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-xl border border-gray-200 transition"
+              className="btn-light-gradient w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium"
             >
               <FiLock className="h-4 w-4" /> Đổi mật khẩu
             </button>
@@ -292,8 +279,8 @@ export default function Profile() {
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
             <div className="flex items-center gap-2 border-b border-gray-100 pb-4 mb-5">
-              <FiUser className="h-5 w-5 text-teal-600" />
-              <h3 className="font-bold text-lg text-gray-800">
+              <FiUser className="h-5 w-5 text-blue-800" />
+              <h3 className="font-bold text-lg text-blue-800">
                 Thông tin cá nhân
               </h3>
             </div>
@@ -315,6 +302,16 @@ export default function Profile() {
               />
               <InfoRow label="Địa chỉ" value={employee?.address} />
             </div>
+          </div>
+
+          {/* Nút đăng xuất - canh giữa so với ô thông tin cá nhân */}
+          <div className="flex justify-center">
+            <button
+              onClick={handleLogout}
+              className="btn-danger-outline flex items-center gap-2 px-5 py-2.5 text-sm font-medium"
+            >
+              <FiLogOut className="h-4 w-4" /> Đăng xuất
+            </button>
           </div>
         </div>
       </div>
@@ -428,14 +425,14 @@ export default function Profile() {
               <button
                 type="button"
                 onClick={() => setShowEditModal(false)}
-                className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium transition"
+                className="btn-cancel px-4 py-2 text-sm font-medium"
               >
                 Hủy
               </button>
               <button
                 type="submit"
                 disabled={savingProfile}
-                className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition disabled:opacity-60"
+                className="btn-gradient px-4 py-2 text-sm font-medium"
               >
                 {savingProfile ? "Đang lưu..." : "Lưu thay đổi"}
               </button>
@@ -461,7 +458,7 @@ export default function Profile() {
                 }
               />
               <Field
-                label="Mật khẩu mới (*) — tối thiểu 8 ký tự"
+                label="Mật khẩu mới (*) phải tối thiểu 8 ký tự"
                 type="password"
                 name="newPassword"
                 value={passwordForm.newPassword}
@@ -478,14 +475,14 @@ export default function Profile() {
               <button
                 type="button"
                 onClick={() => setShowPasswordModal(false)}
-                className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium transition"
+                className="btn-cancel px-4 py-2 text-sm font-medium"
               >
                 Hủy
               </button>
               <button
                 type="submit"
                 disabled={savingPassword}
-                className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition disabled:opacity-60"
+                className="btn-gradient px-4 py-2 text-sm font-medium"
               >
                 {savingPassword ? "Đang xử lý..." : "Xác nhận"}
               </button>

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @layer components {
+  /* swal thành công */
   .btn-swal-ok {
     @apply bg-gradient-to-r from-blue-700 to-blue-400 text-white px-6 py-2.5 rounded-lg font-medium shadow-sm cursor-pointer focus:ring-4 focus:ring-blue-300;
     @apply hover:from-blue-600 hover:to-blue-300 transition-all;
@@ -19,9 +20,77 @@
     @apply !bg-blue-600;
   }
 
-  /* button */
-  .btn-submit-gradient {
-    @apply w-full p-5 bg-gradient-to-br from-blue-700 to-cyan-500 text-white border-none rounded-xl text-xl font-extrabold cursor-pointer transition-all duration-500 ease-in-out shadow-lg shadow-blue-600/20;
-    @apply hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-600/40;
+  /* Swal lỗi */
+  .btn-swal-error-ok {
+    @apply bg-gradient-to-r from-red-700 to-red-400 text-white px-6 py-2.5 rounded-lg font-medium shadow-sm cursor-pointer focus:ring-4 focus:ring-red-300;
+    @apply hover:from-red-600 hover:to-red-300 transition-all;
   }
+
+  .icon-swal-error {
+    @apply !border-red-600;
+  }
+  
+  .icon-swal-error .swal2-x-mark-line-left,
+  .icon-swal-error .swal2-x-mark-line-right {
+    @apply !bg-red-600;
+  }
+  /* swal cảnh báo */
+  .btn-swal-warning-ok {
+    @apply bg-gradient-to-r from-amber-600 to-amber-400 text-white px-6 py-2.5 rounded-lg font-medium shadow-sm cursor-pointer focus:ring-4 focus:ring-amber-300;
+    @apply hover:from-amber-500 hover:to-amber-300 transition-all;
+  }
+
+  .icon-swal-warning {
+    @apply !border-amber-500 !text-amber-500;
+  }
+
+  .btn-swal-cancel {
+    @apply px-5 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg 
+           hover:bg-gray-300 active:bg-gray-400 transition-colors duration-200 mx-2;
+  }
+
+  .btn-swal-danger {
+    @apply px-5 py-2 bg-red-500 text-white font-medium rounded-lg 
+           hover:bg-red-600 active:bg-red-700 transition-colors duration-200 mx-2;
+}
+  /* button */
+  .btn-gradient {
+    @apply bg-gradient-to-br from-blue-700 to-cyan-500 text-white border-none rounded-xl cursor-pointer transition-all duration-500 ease-in-out shadow-lg shadow-blue-600/20;
+    @apply hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-600/40;
+
+    @apply disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg;
+  }
+
+  /* button light */
+  .btn-light-gradient {
+    @apply bg-gradient-to-br from-white to-gray-100 text-gray-700 border border-gray-200 rounded-xl cursor-pointer transition-all duration-500 ease-in-out shadow-sm;
+    @apply hover:-translate-y-1 hover:shadow-md hover:border-gray-300 hover:text-gray-900;
+
+    @apply disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none;
+  }
+  
+  /* button đăng xuất */
+  .btn-danger-outline {
+    @apply text-red-600 bg-white border border-red-200 rounded-xl cursor-pointer transition-all duration-500 ease-in-out;
+    @apply hover:bg-red-50 hover:border-red-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-red-500/10;
+    
+    @apply disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none;
+  }
+  /* button hủy */
+  .btn-cancel {
+    @apply bg-gradient-to-br from-gray-600 to-gray-400 text-white border-none rounded-xl cursor-pointer transition-all duration-500 ease-in-out shadow-lg shadow-gray-500/10;
+    @apply hover:-translate-y-1 hover:shadow-xl hover:shadow-gray-500/30;
+
+    @apply disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg;
+  }
+
+  /* Form nhập liệu */
+  .form-base {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-xl text-sm transition-all duration-300 bg-white;
+    
+    @apply focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500;
+    
+    @apply disabled:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed;
+}
+
 }

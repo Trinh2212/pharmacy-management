@@ -2,6 +2,8 @@ import { useState } from "react";
 import axiosClient from "../../api/axiosClient";
 import { FiArrowRight, FiArrowLeft, FiSearch, FiCheckCircle, FiUploadCloud, FiFileText } from "react-icons/fi";
 import SearchMultiSelect from "../../components/admin/search";
+import { alertWarning, alertError, alertSuccess } from "../../utils/SwalAlert";
+
 
 const initMedicine = {
   medicineCode: "",
@@ -97,7 +99,7 @@ const AddMedicine = () => {
       });
     } catch (error) {
       console.error("OCR lỗi:", error.response?.data || error.message);
-      alert("OCR thất bại, vui lòng thử lại!");
+      alertError("OCR thất bại, vui lòng thử lại!");
     } finally {
       setOcrLoading(false);
     }
@@ -105,12 +107,11 @@ const AddMedicine = () => {
 
   const handleSubmit = async () => {
     if (selectedGroups.length === 0)
-      return alert("Vui lòng chọn ít nhất 1 nhóm thuốc!");
-
+      return alertWarning("Vui lòng chọn ít nhất 1 nhóm thuốc!");
     if (selectedIngredients.length === 0)
-      return alert("Vui lòng chọn ít nhất 1 hoạt chất!");
+      return alertWarning("Vui lòng chọn ít nhất 1 hoạt chất!");
     if (selectedIngredients.some((i) => !i.strength?.trim())) {
-      return alert("Vui lòng nhập hàm lượng cho tất cả hoạt chất đã chọn!");
+      return alertWarning("Vui lòng nhập hàm lượng cho tất cả hoạt chất đã chọn!");
     }
 
     const groupIds = selectedGroups.map((g) => g.groupId);
@@ -143,7 +144,7 @@ const AddMedicine = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      alert("Thêm thuốc thành công!");
+      alertSuccess("Thêm thuốc thành công!");
       setStep(1);
       setBasicForm(initMedicine);
       setOcrForm(init_usage);
@@ -155,11 +156,7 @@ const AddMedicine = () => {
       setDocumentPreview(null);
     } catch (error) {
       console.error("Lưu thuốc lỗi:", error.response?.data);
-      alert(
-        error.response?.data?.message ||
-          error.response?.data?.error ||
-          "Lưu thất bại!",
-      );
+      alertError( error || "Lưu thất bại!");
     } finally {
       setLoading(false);
     }
@@ -205,7 +202,7 @@ const AddMedicine = () => {
               </div>
 
               <div className="mb-6">
-                <label className={labelClass}>Ảnh thuốc</label>
+                <label className={labelClass}>Ảnh hiển thị thuốc</label>
                 <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-5 text-center">
                   <input
                     type="file"
@@ -290,7 +287,7 @@ const AddMedicine = () => {
                     inputMode="numeric"
                     value={basicForm.price}
                     onChange={handlePriceChange}
-                    placeholder="VD: 50000"
+                    placeholder="VD: 500000"
                     className={inputClass}
                   />
                 </div>
@@ -300,12 +297,12 @@ const AddMedicine = () => {
                     name="registrationNumber"
                     value={basicForm.registrationNumber}
                     onChange={handleBasicChange}
-                    placeholder="VD: VD-5340-08"
+                    placeholder="VD: VN-0512-22"
                     className={inputClass}
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>Đơn vị tính</label>
+                  <label className={labelClass}>Đơn vị</label>
                   <select
                     name="unit"
                     value={basicForm.unit}
@@ -364,7 +361,7 @@ const AddMedicine = () => {
               <div className="flex justify-end pt-6 border-t border-slate-100">
                 <button
                   onClick={() => setStep(2)}
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-600/20 hover:-translate-y-0.5"
+                  className="flex items-center gap-2 px-8 py-3 font-bold btn-gradient"
                 >
                   Tiếp theo <FiArrowRight />
                 </button>
@@ -401,7 +398,7 @@ const AddMedicine = () => {
                       className="max-h-48 rounded-lg shadow-md border border-slate-200"
                     />
                   ) : (
-                    <div className="w-16 h-16 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center">
                       <FiUploadCloud className="w-8 h-8" />
                     </div>
                   )}
@@ -415,15 +412,13 @@ const AddMedicine = () => {
                 <button
                   onClick={handleOCR}
                   disabled={ocrLoading || !documentFile}
-                  className={`mt-4 flex items-center gap-2 mx-auto px-6 py-2.5 rounded-full font-bold transition-all ${
-                    ocrLoading || !documentFile
-                      ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                      : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/30"
+                  className={`mt-4 flex items-center gap-2 mx-auto px-6 py-2.5 font-bold transition-all ${
+                    ocrLoading || !documentFile ? "btn-cancel" : "btn-gradient"
                   }`}
                 >
                   {ocrLoading ? (
                     <span className="flex items-center gap-2">
-                      <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+                      <span className="animate-spin w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full"></span>
                       Đang phân tích... đợi chút ...
                     </span>
                   ) : (
@@ -454,7 +449,7 @@ const AddMedicine = () => {
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>Bảo quản</label>
+                  <label className={labelClass}>Cách Bảo quản</label>
                   <input
                     name="storageCondition"
                     value={ocrForm.storageCondition}
@@ -464,9 +459,12 @@ const AddMedicine = () => {
                 </div>
                 {[
                   { name: "uses", label: "Công dụng" },
-                  { name: "indications", label: "Chỉ định" },
+                  { name: "contraindications", label: "Chống chỉ định" },
                   { name: "sideEffects", label: "Tác dụng phụ" },
-                  { name: "dosageAdministration", label: "Liều dùng & Cách dùng" },
+                  {
+                    name: "dosageAdministration",
+                    label: "Liều dùng & Cách dùng",
+                  },
                   { name: "warning", label: "Cảnh báo - Thận trọng" },
                 ].map(({ name, label }) => (
                   <div key={name} className="md:col-span-2">
@@ -485,21 +483,20 @@ const AddMedicine = () => {
               <div className="flex flex-col sm:flex-row justify-between gap-4 pt-6 border-t border-slate-100">
                 <button
                   onClick={() => setStep(1)}
-                  className="flex justify-center items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-3 rounded-xl font-bold transition-all"
+                  className="flex justify-center items-center gap-2 px-8 py-3 font-bold btn-cancel"
                 >
                   <FiArrowLeft /> Quay lại trang trước
                 </button>
                 <button
                   onClick={handleSubmit}
                   disabled={loading}
-                  className={`flex justify-center items-center gap-2 px-8 py-3 rounded-xl font-bold transition-all ${
-                    loading
-                      ? "bg-blue-400 text-white cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 hover:-translate-y-0.5"
-                  }`}
+                  className="flex justify-center items-center gap-2 px-8 py-3 font-bold btn-gradient"
                 >
                   {loading ? (
-                    "Đang lưu"
+                    <span className="flex items-center gap-2">
+                      <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+                      Đang lưu...
+                    </span>
                   ) : (
                     <>
                       <FiCheckCircle /> Xác nhận lưu thuốc mới

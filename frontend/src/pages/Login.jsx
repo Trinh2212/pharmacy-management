@@ -130,7 +130,7 @@ export default function Login() {
 
           <button
             type="submit"
-            className="btn-submit-gradient !mt-6 w-full rounded-xl !py-3 font-semibold text-white"
+            className="btn-gradient mt-6 w-full py-3 font-semibold"
           >
             Đăng nhập
           </button>

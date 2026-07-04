@@ -15,14 +15,14 @@ import Ingredient from "../pages/Ingredients";
 import Dashboard from "../pages/admin/DashBoard";
 import MedicineManagement from "../pages/admin/MedicineManagement";
 import AddMedicine from "../pages/admin/AddMedicine";
-// import UpdateMedicine from "../pages/admin/UpdateMedicine";
+import UpdateMedicine from "../pages/admin/UpdateMedicine";
 import GroupManagement from "../pages/admin/GroupManagement";
 import IngredientManagement from "../pages/admin/IngredientManagement";
 import SupplierManagement from "../pages/admin/SupplierManagement";
 import EmployeeManagement from "../pages/admin/EmployeeManagement";
 import Profile from "../pages/admin/Profile";
 import AddReceipt from "../pages/admin/AddReceipt";
-// import WarehouseManagement from "../pages/admin/WarehouseManagement";
+import WarehouseManagement from "../pages/admin/WarehouseManagement";
 
 
 function AppRouters() {
@@ -43,7 +43,7 @@ function AppRouters() {
           <Route index element={<Dashboard />} />
           <Route path="medicine-management" element={<MedicineManagement />} />
           <Route path="medicine/add-medicine" element={<AddMedicine />} />
-          {/* <Route path="medicine/update-medicine" element={<UpdateMedicine />} /> */}
+          <Route path="medicine/update-medicine/:id" element={<UpdateMedicine />} />
           <Route path="group-management" element={<GroupManagement />} />
           <Route
             path="ingredient-management"
@@ -51,7 +51,7 @@ function AppRouters() {
           />
           <Route path="supplier-management" element={<SupplierManagement />} />
           <Route path="warehouse/add-receipt" element={<AddReceipt />} />
-          {/* <Route path="warehouse-management" element={<WarehouseManagement />} /> */}
+          <Route path="warehouse-management" element={<WarehouseManagement />} />
           <Route path="profile" element={<Profile />} />
 
           {/* chỉ admin mới vào được /admin/employees */}

@@ -27,8 +27,12 @@ router.post(
 router.put(
   "/:id",
   verifyToken,
-  upload.single("medicine"),
-  validate(medicineValidations.createMedicine),
+  upload.fields([
+    { name: "medicine", maxCount: 1 },
+    { name: "document", maxCount: 1 },
+  ]),
+  parse,
+  validate(medicineValidations.updateMedicine),
   asyncHandler(medicineControllers.updateMedicine),
 );
 router.delete(

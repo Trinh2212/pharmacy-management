@@ -3,33 +3,41 @@ const { sequelize } = require("../config/database");
 const { Op } = require("sequelize");
 
 const warehouseReceiptControllers = {
-
   createReceipt: async (req, res) => {
     const { receiptCode, receiptDate, supplierId, details } = req.body;
-    const employeeId = req.user?.employeeId;
+    const employeeId = req.employee?.employeeId;
 
     if (!employeeId) {
-      return res.status(401).json({ message: "Không xác định được nhân viên thực hiện, vui lòng đăng nhập lại" });
+      return res.status(401).json({
+        message:
+          "Không xác định được nhân viên thực hiện, vui lòng đăng nhập lại",
+      });
     }
 
     // ── PHASE 1: VALIDATE NGHIỆP VỤ (cần query DB)
     const errors = [];
 
     // 1a. Mã phiếu trùng không?
-    const codeTaken = await WarehouseReceipt.findOne({ where: { receiptCode } });
+    const codeTaken = await db.WarehouseReceipt.findOne({
+      where: { receiptCode },
+    });
     if (codeTaken) {
-      return res.status(409).json({ message: `Mã phiếu nhập "${receiptCode}" đã tồn tại` });
+      return res
+        .status(409)
+        .json({ message: `Mã phiếu nhập "${receiptCode}" đã tồn tại` });
     }
 
     // 1b. Nhà cung cấp tồn tại không?
-    const supplier = await Supplier.findByPk(supplierId);
+    const supplier = await db.Supplier.findByPk(supplierId);
     if (!supplier) {
       return res.status(404).json({ message: "Không tìm thấy nhà cung cấp" });
     }
 
     // 1c. Tất cả medicineId trong details có tồn tại không?
     const medicineIds = [...new Set(details.map((d) => d.medicineId))];
-    const medicines = await Medicine.findAll({ where: { medicineId: { [Op.in]: medicineIds } } });
+    const medicines = await db.Medicine.findAll({
+      where: { medicineId: { [Op.in]: medicineIds } },
+    });
     const medicineMap = new Map(medicines.map((m) => [m.medicineId, m]));
 
     // 1d. Kiểm tra trùng dòng trong cùng phiếu (cùng medicineId + batchNumber)
@@ -38,13 +46,17 @@ const warehouseReceiptControllers = {
       const lineNo = idx + 1;
 
       if (!medicineMap.has(line.medicineId)) {
-        errors.push(`Dòng ${lineNo}: không tìm thấy thuốc (medicineId=${line.medicineId})`);
+        errors.push(
+          `Dòng ${lineNo}: không tìm thấy thuốc (medicineId=${line.medicineId})`,
+        );
         return;
       }
 
       const dedupKey = `${line.medicineId}__${line.batchNumber.toLowerCase()}`;
       if (seenLines.has(dedupKey)) {
-        errors.push(`Dòng ${lineNo}: trùng lô thuốc với dòng khác trong phiếu, vui lòng gộp lại`);
+        errors.push(
+          `Dòng ${lineNo}: trùng lô thuốc với dòng khác trong phiếu, vui lòng check lại`,
+        );
       }
       seenLines.add(dedupKey);
     });
@@ -56,38 +68,57 @@ const warehouseReceiptControllers = {
     // 1e. Với mỗi lô: xác định mới/cũ — lô mới bắt buộc có productionDate + expiryDate
     const lineResolutions = await Promise.all(
       details.map(async (line) => {
-        const existingBatch = await Batch.findOne({
+        const existingBatch = await db.Batch.findOne({
           where: { medicineId: line.medicineId, batchNumber: line.batchNumber },
         });
 
         if (!existingBatch) {
           if (!line.productionDate) {
-            return { error: `Lô "${line.batchNumber}" là lô mới, cần nhập ngày sản xuất` };
+            return {
+              error: `Lô "${line.batchNumber}" là lô mới, cần nhập ngày sản xuất`,
+            };
           }
           if (!line.expiryDate) {
-            return { error: `Lô "${line.batchNumber}" là lô mới, cần nhập hạn sử dụng` };
+            return {
+              error: `Lô "${line.batchNumber}" là lô mới, cần nhập hạn sử dụng`,
+            };
           }
           if (new Date(line.expiryDate) <= new Date(line.productionDate)) {
-            return { error: `Lô "${line.batchNumber}": hạn sử dụng phải sau ngày sản xuất` };
+            return {
+              error: `Lô "${line.batchNumber}": hạn sử dụng phải sau ngày sản xuất`,
+            };
           }
         }
 
         return { line, existingBatch };
-      })
+      }),
     );
 
-    const resolutionErrors = lineResolutions.filter((r) => r.error).map((r) => r.error);
+    const resolutionErrors = lineResolutions
+      .filter((r) => r.error)
+      .map((r) => r.error);
     if (resolutionErrors.length > 0) {
-      return res.status(400).json({ message: "Dữ liệu không hợp lệ", errors: resolutionErrors });
+      return res
+        .status(400)
+        .json({ message: "Dữ liệu không hợp lệ", errors: resolutionErrors });
     }
 
     // ── PHASE 2: GHI DỮ LIỆU TRONG TRANSACTION ─────────────────────────────
-    const totalPrice = details.reduce((sum, d) => sum + d.importQuantity * d.importPrice, 0);
+    const totalPrice = details.reduce(
+      (sum, d) => sum + d.importQuantity * d.importPrice,
+      0,
+    );
 
     const createdReceiptId = await sequelize.transaction(async (t) => {
-      const receipt = await WarehouseReceipt.create(
-        { receiptCode, receiptDate: receiptDate || undefined, supplierId, employeeId, totalPrice },
-        { transaction: t }
+      const receipt = await db.WarehouseReceipt.create(
+        {
+          receiptCode,
+          receiptDate: receiptDate || undefined,
+          supplierId,
+          employeeId,
+          totalPrice,
+        },
+        { transaction: t },
       );
 
       for (const resolved of lineResolutions) {
@@ -96,10 +127,13 @@ const warehouseReceiptControllers = {
 
         if (batch) {
           // Lô cũ → chỉ cộng dồn stockQuantity, KHÔNG đổi productionDate / expiryDate
-          await batch.increment("stockQuantity", { by: line.importQuantity, transaction: t });
+          await batch.increment("stockQuantity", {
+            by: line.importQuantity,
+            transaction: t,
+          });
         } else {
           // Lô mới → tạo mới
-          batch = await Batch.create(
+          batch = await db.Batch.create(
             {
               medicineId: line.medicineId,
               batchNumber: line.batchNumber,
@@ -107,71 +141,99 @@ const warehouseReceiptControllers = {
               expiryDate: line.expiryDate,
               stockQuantity: line.importQuantity,
             },
-            { transaction: t }
+            { transaction: t },
           );
         }
 
-        await WarehouseReceiptDetail.create(
+        await db.WarehouseReceiptDetail.create(
           {
             receiptId: receipt.receiptId,
             batchId: batch.batchId,
             importQuantity: line.importQuantity,
             importPrice: line.importPrice,
           },
-          { transaction: t }
+          { transaction: t },
         );
       }
 
       return receipt.receiptId;
     });
 
-    const fullReceipt = await WarehouseReceipt.findByPk(createdReceiptId, {
+    const fullReceipt = await db.WarehouseReceipt.findByPk(createdReceiptId, {
       include: [
-        { model: Supplier, as: "supplierInfo" },
-        { model: Employee, as: "employeeInfo" },
+        { model: db.Supplier, as: "supplierInfo" },
+        { model: db.Employee, as: "employeeInfo" },
         {
-          model: WarehouseReceiptDetail,
+          model: db.WarehouseReceiptDetail,
           as: "detailInfo",
-          include: [{ model: Batch, as: "batchInfo", include: [{ model: Medicine, as: "medicineInfo" }] }],
+          include: [
+            {
+              model: db.Batch,
+              as: "batchInfo",
+              include: [{ model: db.Medicine, as: "medicineInfo" }],
+            },
+          ],
         },
       ],
     });
 
-    return res.status(201).json({ message: "Tạo phiếu nhập thành công", data: fullReceipt });
+    return res
+      .status(201)
+      .json({ message: "Tạo phiếu nhập thành công", data: fullReceipt });
   },
 
   // GET /api/warehouse-receipts?page=1&limit=10
   getAllReceipts: async (req, res) => {
-    const page = Math.max(parseInt(req.query.page) || 1, 1);
-    const limit = Math.max(parseInt(req.query.limit) || 10, 1);
-    const offset = (page - 1) * limit;
+    const { search = "", page = 1, limit = 10 } = req.query;
 
-    const { count, rows } = await WarehouseReceipt.findAndCountAll({
-      limit,
+    const parsedLimit = parseInt(limit, 10);
+    const parsedPage = parseInt(page, 10);
+    const offset = (parsedPage - 1) * parsedLimit;
+    const keyword = search.trim();
+
+    const filter = {};
+
+    if (keyword) {
+      filter.receiptCode = { [Op.like]: `%${keyword}%` };
+    }
+
+    const { count, rows } = await db.WarehouseReceipt.findAndCountAll({
+      where: filter,
+      distinct: true,
+      limit: parsedLimit,
       offset,
       order: [["receiptId", "DESC"]],
       include: [
-        { model: Supplier, as: "supplierInfo" },
-        { model: Employee, as: "employeeInfo" },
+        { model: db.Supplier, as: "supplierInfo" },
+        { model: db.Employee, as: "employeeInfo" },
       ],
     });
 
-    return res.json({
+    return res.status(200).json({
+      message: "Lấy danh sách phiếu nhập thành công",
       data: rows,
-      pagination: { page, limit, total: count, totalPages: Math.ceil(count / limit) },
+      totalReceipts: count,
+      totalPages: Math.ceil(count / parsedLimit),
+      currentPage: parsedPage,
     });
   },
 
   // GET /api/warehouse-receipts/:id
   getReceiptById: async (req, res) => {
-    const receipt = await WarehouseReceipt.findByPk(req.params.id, {
+    const receipt = await db.WarehouseReceipt.findByPk(req.params.id, {
       include: [
-        { model: Supplier, as: "supplierInfo" },
-        { model: Employee, as: "employeeInfo" },
+        { model: db.Supplier, as: "supplierInfo" },
+        { model: db.Employee, as: "employeeInfo" },
         {
-          model: WarehouseReceiptDetail,
+          model: db.WarehouseReceiptDetail,
           as: "detailInfo",
-          include: [{ model: Batch, as: "batchInfo", include: [{ model: Medicine, as: "medicineInfo" }] }],
+          include: [
+            {
+              model: db.Batch,
+              as: "batchInfo",
+              include: [{ model: db.Medicine, as: "medicineInfo" }],
+            },
+          ],
         },
       ],
     });
@@ -186,7 +248,9 @@ const warehouseReceiptControllers = {
   // GET /api/warehouse-receipts/check-code?code=PN0001
   checkReceiptCode: async (req, res) => {
     const { code } = req.query;
-    const existing = await WarehouseReceipt.findOne({ where: { receiptCode: code } });
+    const existing = await db.WarehouseReceipt.findOne({
+      where: { receiptCode: code },
+    });
     return res.json({ exists: !!existing });
   },
 };

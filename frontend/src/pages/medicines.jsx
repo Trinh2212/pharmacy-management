@@ -96,7 +96,7 @@ export default function Medicines() {
             <select
               value={selectedGroup}
               onChange={(e) => handleGroupChange(e.target.value)}
-              className="btn-submit-gradient !p-3 !pr-10 w-full text-sm rounded-xl block appearance-none font-semibold transition-all !text-white border-none shadow-md"
+              className="btn-gradient w-full block appearance-none p-3 pr-10 text-sm shadow-md"
             >
               <option value="all" className="text-gray-950">
                 Tất cả danh mục
@@ -124,10 +124,10 @@ export default function Medicines() {
             <li>
               <button
                 onClick={() => handleGroupChange("all")}
-                className={`w-full text-left rounded-lg transition-all duration-500 ease-in-out ${
+                className={`w-full text-left rounded-lg px-3 py-2 text-sm transition-all duration-500 ease-in-out ${
                   selectedGroup === "all"
-                    ? "btn-submit-gradient !p-2 !px-3 !text-sm !font-semibold"
-                    : "text-gray-700 hover:bg-gray-100 px-3 py-2 text-sm font-medium"
+                    ? "btn-gradient font-semibold"
+                    : "text-gray-700 hover:bg-gray-100 font-medium"
                 }`}
               >
                 Tất cả
@@ -137,10 +137,10 @@ export default function Medicines() {
               <li key={c.groupId}>
                 <button
                   onClick={() => handleGroupChange(String(c.groupId))}
-                  className={`w-full text-left rounded-lg transition-all duration-500 ease-in-out ${
+                  className={`w-full text-left rounded-lg px-3 py-2 text-sm transition-all duration-500 ease-in-out ${
                     selectedGroup === String(c.groupId)
-                      ? "btn-submit-gradient !p-2 !px-3 !text-sm !font-semibold"
-                      : "text-gray-700 hover:bg-gray-100 px-3 py-2 text-sm font-medium"
+                      ? "btn-gradient font-semibold"
+                      : "text-gray-700 hover:bg-gray-100 font-medium"
                   }`}
                 >
                   {c.groupName}

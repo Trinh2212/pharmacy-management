@@ -1,25 +1,7 @@
 import { FaSearch } from "react-icons/fa";
 import { FaPlus, FaPenToSquare, FaTrashCan, FaEye } from "react-icons/fa6";
-import Swal from "sweetalert2";
+import { alertSuccess, alertError, alertWarning, alertConfirm } from "../../utils/SwalAlert";
 
-/**
- * Topbar dùng chung cho các trang quản lý dạng danh sách (Employee, Supplier, ...).
- *
- * Props:
- * - title, subtitle: tiêu đề trang (giữ như cũ)
- * - hasSelection: boolean — đang có 1 dòng được chọn trong bảng hay không
- * - actions: {
- *     onCreate?: () => void,                 // Thêm — luôn chạy được, không cần chọn dòng
- *     onEdit?:   () => void,                 // Sửa — cần hasSelection
- *     onDelete?: () => void,                 // Xóa — cần hasSelection
- *     onView?:   () => void,                 // Xem chi tiết — cần hasSelection
- *   }
- *   Trang nào không cần 1 hành động nào đó (ví dụ Supplier không có Xem/Xóa-khóa)
- *   thì không truyền field đó vào, nút tương ứng sẽ không hiển thị.
- * - onSearch?: (keyword: string) => void     // gõ tìm kiếm, mỗi trang tự lọc dữ liệu của mình
- * - searchValue?: string                     // giá trị hiện tại của ô search (controlled), bắt buộc nếu dùng onSearch
- * - searchPlaceholder?: string
- */
 export function Topbar({
   title,
   subtitle,
@@ -33,7 +15,7 @@ export function Topbar({
 
   const requireSelection = (handler) => () => {
     if (!hasSelection) {
-      Swal.fire("Thông báo", "Vui lòng chọn một dòng để thực hiện hành động này", "warning");
+      alertWarning("Vui lòng chọn một dòng để thực hiện hành động này");
       return;
     }
     handler();
@@ -42,7 +24,6 @@ export function Topbar({
   return (
     <header className="bg-card border-b border-border">
       <div className="flex items-center gap-3 px-6 py-4">
-
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-extrabold truncate">{title}</h1>
           {subtitle && (
@@ -52,13 +33,13 @@ export function Topbar({
 
         {/* ô tìm kiếm */}
         {onSearch && (
-          <div className="hidden md:flex items-center bg-secondary rounded-full px-4 py-2 w-72">
-            <FaSearch className="h-4 w-4 text-muted-foreground" />
+          <div className="hidden md:flex items-center bg-blue-50 border border-blue-100 rounded-full px-4 py-2 w-72 transition-all focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-200 focus-within:border-blue-300">
+            <FaSearch className="h-4 w-4 text-blue-600" />
             <input
               placeholder={searchPlaceholder}
               value={searchValue}
               onChange={(e) => onSearch(e.target.value)}
-              className="flex-1 bg-transparent px-3 text-sm outline-none"
+              className="flex-1 bg-transparent px-3 text-sm outline-none text-black placeholder-gray-500"
             />
           </div>
         )}
@@ -69,7 +50,7 @@ export function Topbar({
             <button
               onClick={onCreate}
               title="Thêm"
-              className="h-10 w-10 grid place-items-center rounded-full bg-teal-600 hover:bg-teal-700 text-white transition"
+              className="h-10 w-10 grid place-items-center rounded-full bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm hover:shadow"
             >
               <FaPlus className="h-4 w-4" />
             </button>

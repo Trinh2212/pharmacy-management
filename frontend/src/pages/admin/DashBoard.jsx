@@ -1,4 +1,4 @@
-import { Topbar } from "../../components/admin/topbar";
+import { Topbar } from "../../components/admin/TopBar";
 // import { DashboardCard } from "../../components/admin/DashboardCard";
 import { MedicineCard } from "../../components/common/MedicineCard";
 // 👉 Đổi import từ lucide-react sang react-icons/fa

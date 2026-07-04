@@ -80,6 +80,14 @@ const medicineControllers = {
             },
           ],
         },
+        {
+          model: db.MedicineGroup,
+          as: "medicineGroupInfo",
+        },
+        {
+          model: db.UsageInstruction,
+          as: "usageInstruction",
+        },
       ],
     });
 
@@ -344,6 +352,7 @@ const medicineControllers = {
       message: "xóa thuốc thành công",
     });
   },
+
   updateMedicine: async (req, res) => {
     const { id } = req.params;
 
@@ -389,11 +398,20 @@ const medicineControllers = {
       });
     }
 
+    // ── Ảnh hiển thị thuốc ──
     let imageUrl = medicine.imageUrl;
-
-    if (req.file) {
-      imageUrl = `/uploads/medicines/${req.body.medicineCode}/${req.file.filename}`;
+    if (req.files?.medicine?.[0]) {
+      imageUrl = `/uploads/medicines/${req.files.medicine[0].filename}`;
     }
+
+    // ── Ảnh tờ hướng dẫn sử dụng ──
+    let documentUrl =
+      req.body.documentPath ||
+      (req.files?.document?.[0]
+        ? `/uploads/medicines/${req.files.document[0].filename}`
+        : null);
+
+    let finalUsageData = usageData || null;
 
     const result = await db.sequelize.transaction(async (t) => {
       // 1. update medicine
@@ -429,17 +447,22 @@ const medicineControllers = {
       });
 
       // 4. update usageData
-      if (usageData) {
+      if (finalUsageData || documentUrl) {
         const usage = await db.UsageInstruction.findOne({
           where: { medicineId },
           transaction: t,
         });
 
+        const usagePayload = {
+          ...finalUsageData,
+          ...(documentUrl ? { document: documentUrl } : {}),
+        };
+
         if (usage) {
-          await usage.update({ ...usageData }, { transaction: t });
+          await usage.update(usagePayload, { transaction: t });
         } else {
           await db.UsageInstruction.create(
-            { ...usageData, medicineId },
+            { ...usagePayload, medicineId },
             { transaction: t },
           );
         }
@@ -477,6 +500,7 @@ const medicineControllers = {
       data: finalMedicine,
     });
   },
+
   changeStatus: async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;

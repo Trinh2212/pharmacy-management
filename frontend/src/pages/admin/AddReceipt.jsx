@@ -1,19 +1,13 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { Topbar } from "../../components/admin/topbar";
+import { Topbar } from "../../components/admin/TopBar";
 import axiosClient from "../../api/axiosClient";
-import Swal from "sweetalert2";
-import {
-  FaPlus,
-  FaTrashCan,
-  FaMagnifyingGlass,
-  FaChevronDown,
-} from "react-icons/fa6";
+import { alertSuccess, alertError, alertWarning, alertConfirm } from "../../utils/SwalAlert";
+import { FaPlus, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 function formatCurrency(value) {
   const n = Number(value);
-  if (!value && value !== 0) return "—";
-  if (Number.isNaN(n)) return "—";
+  if (!value && value !== 0) return "";
+  if (Number.isNaN(n)) return "";
   return n.toLocaleString("vi-VN") + "đ";
 }
 
@@ -21,14 +15,17 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+const NO_SPINNER = "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
+
 function InlineInput({
   label,
   value,
   onChange,
+  onBlur,
   placeholder,
   type = "text",
   readOnly = false,
+  noSpinner = false,
   className = "",
 }) {
   return (
@@ -40,32 +37,24 @@ function InlineInput({
         type={type}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         placeholder={placeholder}
         readOnly={readOnly}
-        className={`px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 h-10
-          ${readOnly ? "bg-gray-100 text-gray-600 cursor-not-allowed border-gray-200" : "border-gray-300 bg-white"}`}
+        className={`px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 h-10
+          ${readOnly ? "bg-gray-100 text-gray-600 cursor-not-allowed border-gray-200" : "border-gray-300 bg-white"}
+          ${noSpinner ? NO_SPINNER : ""}`}
       />
     </div>
   );
 }
 
-// Autocomplete dropdown tìm thuốc theo brandName / medicineCode
-function MedicineSearchInput({ medicines, onSelect }) {
+function MedicineSearchInput({ onSelect }) {
   const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const ref = useRef(null);
-
-  const filtered = useMemo(() => {
-    if (!query.trim()) return [];
-    const k = query.trim().toLowerCase();
-    return medicines
-      .filter((m) =>
-        [m.medicineCode, m.brandName]
-          .filter(Boolean)
-          .some((v) => v.toLowerCase().includes(k)),
-      )
-      .slice(0, 10);
-  }, [query, medicines]);
+  const debounceRef = useRef(null);
 
   useEffect(() => {
     const handler = (e) => {
@@ -75,6 +64,27 @@ function MedicineSearchInput({ medicines, onSelect }) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  const runSearch = useCallback((keyword) => {
+    if (!keyword.trim()) {
+      setResults([]);
+      return;
+    }
+    setLoading(true);
+    axiosClient
+      .get("/medicines", { params: { search: keyword.trim(), limit: 10 } })
+      .then((res) => setResults(res.data.data ?? []))
+      .catch(() => setResults([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleChange = (e) => {
+    const val = e.target.value;
+    setQuery(val);
+    setOpen(true);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => runSearch(val), 350);
+  };
+
   const handleSelect = (m) => {
     onSelect(m);
     setQuery(m.brandName || "");
@@ -83,43 +93,46 @@ function MedicineSearchInput({ medicines, onSelect }) {
 
   return (
     <div ref={ref} className="relative flex-1 min-w-[220px]">
-      <div className="flex items-center border border-gray-300 rounded-lg bg-white overflow-hidden h-10 focus-within:ring-2 focus-within:ring-teal-500">
+      <div className="flex items-center border border-gray-300 rounded-lg bg-white overflow-hidden h-10 focus-within:ring-2 focus-within:ring-blue-500">
         <FaMagnifyingGlass className="ml-3 text-gray-400 h-4 w-4 shrink-0" />
         <input
           value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setOpen(true);
-          }}
+          onChange={handleChange}
           onFocus={() => query && setOpen(true)}
           placeholder="Tên, mã thuốc…"
           className="flex-1 px-3 py-2 text-sm outline-none bg-transparent"
         />
       </div>
-      {open && filtered.length > 0 && (
+      {open && (loading || results.length > 0) && (
         <div className="absolute z-50 top-11 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg max-h-56 overflow-y-auto">
-          {filtered.map((m) => (
-            <button
-              key={m.medicineId}
-              onMouseDown={() => handleSelect(m)}
-              className="w-full text-left px-4 py-2.5 text-sm hover:bg-teal-50 transition flex items-center gap-3"
-            >
-              <span className="text-xs font-mono text-teal-600 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-100 shrink-0">
-                {m.medicineCode}
-              </span>
-              <span className="text-gray-800">{m.brandName}</span>
-              <span className="ml-auto text-gray-400 text-xs shrink-0">
-                {m.unit || ""}
-              </span>
-            </button>
-          ))}
+          {loading ? (
+            <div className="px-4 py-3 text-sm text-gray-400 flex items-center gap-2">
+              <span className="h-3 w-3 rounded-full border-2 border-gray-300 border-t-blue-500 animate-spin" />
+              Đang tìm...
+            </div>
+          ) : (
+            results.map((m) => (
+              <button
+                key={m.medicineId}
+                onMouseDown={() => handleSelect(m)}
+                className="w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50 transition flex items-center gap-3"
+              >
+                <span className="text-xs font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 shrink-0">
+                  {m.medicineCode}
+                </span>
+                <span className="text-gray-800">{m.brandName}</span>
+                <span className="ml-auto text-gray-400 text-xs shrink-0">
+                  {m.unit || ""}
+                </span>
+              </button>
+            ))
+          )}
         </div>
       )}
     </div>
   );
 }
 
-// ── Giá trị mặc định hàng nhập liệu ─────────────────────────────────────────
 const EMPTY_ROW = {
   selectedMedicine: null,
   unit: "",
@@ -128,56 +141,39 @@ const EMPTY_ROW = {
   expiryDate: "",
   quantity: "1",
   importPrice: "",
-  // UI state
-  batchChecked: false, // đã gọi /batches/check chưa
-  isOldBatch: false, // lô cũ → lock productionDate + expiryDate
+  batchChecked: false,
+  isOldBatch: false,
 };
 
-// ── Main component ────────────────────────────────────────────────────────────
 export default function ImportReceiptCreate() {
-  const [medicines, setMedicines] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
 
-  // Thông tin phiếu nhập
   const [receiptCode, setReceiptCode] = useState("");
   const [receiptDate, setReceiptDate] = useState(todayISO());
   const [supplierId, setSupplierId] = useState("");
 
-  // Hàng nhập liệu hiện tại
   const [row, setRow] = useState(EMPTY_ROW);
-
-  // Danh sách đã thêm vào phiếu
   const [items, setItems] = useState([]);
 
-  // ── Fetch danh sách thuốc + NCC ──────────────────────────────────────────
   useEffect(() => {
-    axiosClient
-      .get("/medicines")
-      .then((r) => setMedicines(r.data.data ?? []))
-      .catch(() => Swal.fire("Lỗi", "Không thể tải danh sách thuốc", "error"));
     axiosClient
       .get("/suppliers")
       .then((r) => setSuppliers(r.data.data ?? []))
-      .catch(() =>
-        Swal.fire("Lỗi", "Không thể tải danh sách nhà cung cấp", "error"),
-      );
+      .catch(() => alertError("Không thể tải danh sách nhà cung cấp"));
   }, []);
 
-  // ── Chọn thuốc từ autocomplete ────────────────────────────────────────────
   const handleSelectMedicine = (m) => {
     setRow((prev) => ({
-      ...EMPTY_ROW, // reset lô khi đổi thuốc
+      ...EMPTY_ROW,
       selectedMedicine: m,
       unit: m.unit || "",
     }));
   };
 
-  // ── Kiểm tra lô khi blur khỏi field số lô ────────────────────────────────
-  // Gọi GET /batches/check → lô cũ thì tự điền productionDate + expiryDate (readonly)
   const handleBatchNumberBlur = useCallback(async () => {
     const { selectedMedicine, batchNumber } = row;
     if (!selectedMedicine || !batchNumber.trim()) return;
-    if (row.batchChecked) return; // đã check rồi, không gọi lại
+    if (row.batchChecked) return;
 
     try {
       const res = await axiosClient.get("/batches/check", {
@@ -189,7 +185,6 @@ export default function ImportReceiptCreate() {
       const { exists, batch } = res.data;
 
       if (exists && batch) {
-        // Lô cũ → điền sẵn ngày, lock lại
         setRow((prev) => ({
           ...prev,
           productionDate: batch.productionDate ?? "",
@@ -198,16 +193,13 @@ export default function ImportReceiptCreate() {
           isOldBatch: true,
         }));
       } else {
-        // Lô mới → chỉ đánh dấu đã check, nhân viên nhập tay
         setRow((prev) => ({ ...prev, batchChecked: true, isOldBatch: false }));
       }
     } catch {
-      // Không block UX nếu check thất bại, nhân viên vẫn nhập được
       setRow((prev) => ({ ...prev, batchChecked: true }));
     }
   }, [row]);
 
-  // Reset trạng thái check lô khi nhân viên sửa lại số lô
   const handleBatchNumberChange = (e) => {
     setRow((prev) => ({
       ...prev,
@@ -219,7 +211,6 @@ export default function ImportReceiptCreate() {
     }));
   };
 
-  // ── Thêm dòng vào bảng ───────────────────────────────────────────────────
   const handleAddItem = async () => {
     const {
       selectedMedicine,
@@ -231,55 +222,32 @@ export default function ImportReceiptCreate() {
       isOldBatch,
     } = row;
 
-    if (!selectedMedicine)
-      return Swal.fire("Cảnh báo", "Vui lòng chọn thuốc cần nhập", "warning");
-    if (!batchNumber.trim())
-      return Swal.fire("Cảnh báo", "Vui lòng nhập số lô", "warning");
+    if (!selectedMedicine) return alertWarning("Vui lòng chọn thuốc cần nhập");
+    if (!batchNumber.trim()) return alertWarning("Vui lòng nhập số lô");
     if (!Number.isInteger(Number(quantity)) || Number(quantity) < 1)
-      return Swal.fire(
-        "Cảnh báo",
-        "Số lượng phải là số nguyên >= 1",
-        "warning",
-      );
+      return alertWarning("Số lượng phải là số nguyên >= 1");
     if (importPrice === "" || Number(importPrice) < 0)
-      return Swal.fire("Cảnh báo", "Vui lòng nhập giá nhập hợp lệ", "warning");
+      return alertWarning("Vui lòng nhập giá nhập hợp lệ");
 
-    // Nếu chưa check lô → check ngay trước khi thêm
     if (!row.batchChecked) await handleBatchNumberBlur();
 
-    // Lô mới bắt buộc nhập productionDate + expiryDate
     if (!row.isOldBatch) {
       if (!productionDate)
-        return Swal.fire(
-          "Cảnh báo",
-          "Lô mới cần nhập ngày sản xuất (YYYY-MM-DD)",
-          "warning",
-        );
+        return alertWarning("Lô mới cần nhập NSX");
       if (!expiryDate)
-        return Swal.fire(
-          "Cảnh báo",
-          "Lô mới cần nhập hạn sử dụng (YYYY-MM-DD)",
-          "warning",
-        );
+        return alertWarning("Lô mới cần nhập HSD");
       if (new Date(expiryDate) <= new Date(productionDate))
-        return Swal.fire(
-          "Cảnh báo",
-          "Hạn sử dụng phải sau ngày sản xuất",
-          "warning",
-        );
+        return alertWarning("HSD phải sau NSX");
     }
 
-    // Kiểm tra trùng dòng trong phiếu hiện tại
     const dup = items.find(
       (i) =>
         i.medicineId === selectedMedicine.medicineId &&
         i.batchNumber.toLowerCase() === batchNumber.trim().toLowerCase(),
     );
     if (dup)
-      return Swal.fire(
-        "Cảnh báo",
-        `Lô "${batchNumber.trim()}" của thuốc này đã có trong phiếu, vui lòng gộp lại`,
-        "warning",
+      return alertWarning(
+        `Lô "${batchNumber.trim()}" của thuốc này đã có trong phiếu, vui lòng check lại`,
       );
 
     setItems((prev) => [
@@ -289,7 +257,7 @@ export default function ImportReceiptCreate() {
         medicineId: selectedMedicine.medicineId,
         medicineCode: selectedMedicine.medicineCode,
         brandName: selectedMedicine.brandName,
-        unit: row.unit || selectedMedicine.unit || "—",
+        unit: row.unit || selectedMedicine.unit || "chưa cập nhật",
         batchNumber: batchNumber.trim(),
         productionDate: productionDate || null,
         expiryDate: expiryDate || null,
@@ -299,7 +267,6 @@ export default function ImportReceiptCreate() {
       },
     ]);
 
-    // Reset hàng nhập liệu, giữ lại thuốc + đơn vị để nhập nhanh lô khác
     setRow((prev) => ({
       ...EMPTY_ROW,
       selectedMedicine: prev.selectedMedicine,
@@ -310,25 +277,18 @@ export default function ImportReceiptCreate() {
   const handleRemoveItem = (key) =>
     setItems((prev) => prev.filter((i) => i.key !== key));
 
-  // ── Tổng tiền ─────────────────────────────────────────────────────────────
   const totalAmount = useMemo(
     () => items.reduce((sum, i) => sum + i.importQuantity * i.importPrice, 0),
     [items],
   );
 
-  // ── Hủy bỏ ───────────────────────────────────────────────────────────────
   const handleCancel = async () => {
     if (items.length === 0 && !supplierId && !receiptCode) return;
-    const result = await Swal.fire({
-      title: "Hủy bỏ phiếu nhập?",
-      text: "Toàn bộ thông tin đã nhập sẽ bị xóa.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#ef4444",
-      cancelButtonColor: "#6b7280",
-      confirmButtonText: "Vâng, hủy bỏ",
-      cancelButtonText: "Tiếp tục nhập",
-    });
+    const result = await alertConfirm(
+      "Toàn bộ thông tin đã nhập sẽ bị xóa.",
+      "Hủy bỏ phiếu nhập?",
+      "btn-swal-danger",
+    );
     if (result.isConfirmed) {
       setItems([]);
       setSupplierId("");
@@ -338,18 +298,11 @@ export default function ImportReceiptCreate() {
     }
   };
 
-  // ── Lưu phiếu → POST /warehouse-receipts ─────────────────────────────────
   const handleSubmit = async () => {
-    if (!receiptCode.trim())
-      return Swal.fire("Cảnh báo", "Vui lòng nhập mã phiếu nhập", "warning");
-    if (!supplierId)
-      return Swal.fire("Cảnh báo", "Vui lòng chọn nhà cung cấp", "warning");
+    if (!receiptCode.trim()) return alertWarning("Vui lòng nhập mã phiếu nhập");
+    if (!supplierId) return alertWarning("Vui lòng chọn nhà cung cấp");
     if (items.length === 0)
-      return Swal.fire(
-        "Cảnh báo",
-        "Vui lòng thêm ít nhất một loại thuốc",
-        "warning",
-      );
+      return alertWarning("Vui lòng thêm ít nhất một loại thuốc");
 
     const payload = {
       receiptCode: receiptCode.trim(),
@@ -358,7 +311,7 @@ export default function ImportReceiptCreate() {
       details: items.map((i) => ({
         medicineId: i.medicineId,
         batchNumber: i.batchNumber,
-        productionDate: i.productionDate || undefined, // undefined → Joi bỏ qua (optional)
+        productionDate: i.productionDate || undefined,
         expiryDate: i.expiryDate || undefined,
         importQuantity: i.importQuantity,
         importPrice: i.importPrice,
@@ -367,12 +320,7 @@ export default function ImportReceiptCreate() {
 
     try {
       await axiosClient.post("/warehouse-receipts", payload);
-      await Swal.fire({
-        icon: "success",
-        title: "Lưu phiếu nhập thành công",
-        timer: 1800,
-        showConfirmButton: false,
-      });
+      alertSuccess("Lưu phiếu nhập thành công");
       setItems([]);
       setSupplierId("");
       setReceiptCode("");
@@ -381,55 +329,24 @@ export default function ImportReceiptCreate() {
     } catch (err) {
       const msg = err.response?.data?.message || "Lỗi khi lưu phiếu nhập";
       const errs = err.response?.data?.errors;
-      Swal.fire("Lỗi", errs ? `${msg}\n• ${errs.join("\n• ")}` : msg, "error");
+      alertError(errs ? `${msg}\n ${errs.join("\n ")}` : msg);
     }
   };
 
-  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <>
       <Topbar
-        title="Phiếu nhập hàng"
-        subtitle="Lập phiếu nhập hàng từ nhà cung cấp"
+        title="Phiếu nhập Thuốc"
+        subtitle="Lập phiếu nhập Thuốc theo giấy tờ đã hoàn tất kiểm tra"
       />
-
       <div className="p-6 bg-gray-50 min-h-screen flex flex-col gap-4">
-        {/* ── HÀNG 1: Thông tin phiếu nhập ── */}
+        {/*Mã phiếu nhập , Ngày nhập  */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-6 py-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-            {/* Chọn nhà cung cấp */}
-            <div className="flex flex-col gap-1">
-              <span className="text-xs text-gray-500 font-medium">
-                Nhà cung cấp <span className="text-red-500">*</span>
-              </span>
-              <div className="flex items-center gap-2">
-                <select
-                  value={supplierId}
-                  onChange={(e) => setSupplierId(e.target.value)}
-                  className="flex-1 px-3 py-2 h-10 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                >
-                  <option value="">— Chọn NCC —</option>
-                  {suppliers.map((s) => (
-                    <option key={s.supplierId} value={s.supplierId}>
-                      {s.supplierName}
-                    </option>
-                  ))}
-                </select>
-                <a
-                  href="/admin/suppliers"
-                  title="Thêm nhà cung cấp mới"
-                  className="h-10 w-10 shrink-0 grid place-items-center rounded-lg bg-green-500 hover:bg-green-600 text-white transition"
-                >
-                  <FaPlus className="h-3.5 w-3.5" />
-                </a>
-              </div>
-            </div>
-
-            {/* Mã phiếu nhập — nhân viên tự nhập, max 20 ký tự */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
             <InlineInput
               label={
                 <>
-                  Mã phiếu nhập <span className="text-red-500">*</span>
+                  Mã phiếu nhập *
                 </>
               }
               value={receiptCode}
@@ -437,63 +354,113 @@ export default function ImportReceiptCreate() {
               placeholder="VD: PN0001"
             />
 
-            {/* Ngày nhập */}
             <InlineInput
-              label="Ngày nhập"
+              label="Ngày nhập *"
               value={receiptDate}
               onChange={(e) => setReceiptDate(e.target.value)}
               type="date"
             />
-
-            {/* Tổng tiền (readonly, tính tự động) */}
-            <InlineInput
-              label="Tổng tiền"
-              value={totalAmount > 0 ? formatCurrency(totalAmount) : ""}
-              placeholder="Tự động tính"
-              readOnly
-            />
           </div>
         </div>
 
-        {/* ── HÀNG 2: Tìm kiếm thuốc + nhập thông tin lô ── */}
+        {/* Nhà cung cấp + Thuốc + ĐVT + Số lượng + Giá nhập + Thêm  */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-6 py-4">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_100px_140px_150px_150px_110px_130px_auto] gap-3 items-end">
+          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_90px_110px_130px_auto] gap-3 items-end">
+            {/* Nhà cung cấp */}
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-gray-500 font-medium">
+                Nhà cung cấp *
+              </span>
+              <div className="flex items-center gap-2">
+                <select
+                  value={supplierId}
+                  onChange={(e) => setSupplierId(e.target.value)}
+                  className="flex-1 px-3 py-2 h-10 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
+                  <option value=""> Chọn NCC </option>
+                  {suppliers.map((s) => (
+                    <option key={s.supplierId} value={s.supplierId}>
+                      {s.supplierName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             {/* Tìm kiếm thuốc */}
             <div className="flex flex-col gap-1">
               <span className="text-xs text-gray-500 font-medium">
-                Tìm kiếm thuốc
+                Tìm kiếm thuốc *
               </span>
-              <MedicineSearchInput
-                medicines={medicines}
-                onSelect={handleSelectMedicine}
-              />
+              <MedicineSearchInput onSelect={handleSelectMedicine} />
             </div>
 
             {/* Đơn vị tính */}
             <InlineInput
-              label="ĐVT"
+              label="ĐVT *"
               value={row.unit}
               onChange={(e) => setRow((p) => ({ ...p, unit: e.target.value }))}
               placeholder="Đơn vị"
             />
 
-            {/* Số lô — blur → gọi /batches/check */}
+            {/* Số lượng */}
             <InlineInput
-              label="Số lô"
+              label="Số lượng *"
+              value={row.quantity}
+              onChange={(e) =>
+                setRow((p) => ({ ...p, quantity: e.target.value }))
+              }
+              placeholder="1"
+              type="number"
+              noSpinner
+            />
+
+            {/* Giá nhập */}
+            <InlineInput
+              label="Giá nhập *"
+              value={row.importPrice}
+              onChange={(e) =>
+                setRow((p) => ({ ...p, importPrice: e.target.value }))
+              }
+              placeholder="0"
+              type="number"
+              noSpinner
+            />
+
+            {/* Nút Thêm */}
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-transparent select-none">.</span>
+              <button
+                onClick={handleAddItem}
+                className="btn-gradient h-10 px-4 text-sm font-semibold flex items-center gap-2 whitespace-nowrap"
+              >
+                <FaPlus className="h-3.5 w-3.5" />
+                Thêm
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Số lô + NSX + HSD */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-6 py-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+            {/* Số lô */}
+            <InlineInput
+              label="Số lô *"
               value={row.batchNumber}
               onChange={handleBatchNumberChange}
               onBlur={handleBatchNumberBlur}
               placeholder="Số lô"
             />
 
-            {/* Ngày sản xuất — readonly nếu lô cũ */}
+            {/* Ngày sản xuất */}
             <InlineInput
               label={
                 row.isOldBatch ? (
                   "Ngày SX (lô cũ)"
                 ) : (
                   <>
-                    Ngày SX <span className="text-red-500">*</span>
+                    NSX *
                   </>
                 )
               }
@@ -506,14 +473,14 @@ export default function ImportReceiptCreate() {
               readOnly={row.isOldBatch}
             />
 
-            {/* Hạn sử dụng — readonly nếu lô cũ */}
+            {/* Hạn sử dụng */}
             <InlineInput
               label={
                 row.isOldBatch ? (
-                  "Hạn dùng (lô cũ)"
+                  "Hạn sử dụng (lô cũ)"
                 ) : (
                   <>
-                    Hạn dùng <span className="text-red-500">*</span>
+                    HSD *
                   </>
                 )
               }
@@ -525,71 +492,37 @@ export default function ImportReceiptCreate() {
               type="date"
               readOnly={row.isOldBatch}
             />
-
-            {/* Số lượng */}
-            <InlineInput
-              label="Số lượng"
-              value={row.quantity}
-              onChange={(e) =>
-                setRow((p) => ({ ...p, quantity: e.target.value }))
-              }
-              placeholder="1"
-              type="number"
-            />
-
-            {/* Giá nhập */}
-            <InlineInput
-              label="Giá nhập"
-              value={row.importPrice}
-              onChange={(e) =>
-                setRow((p) => ({ ...p, importPrice: e.target.value }))
-              }
-              placeholder="0"
-              type="number"
-            />
-
-            {/* Nút Thêm */}
-            <div className="flex flex-col gap-1">
-              <span className="text-xs text-transparent select-none">.</span>
-              <button
-                onClick={handleAddItem}
-                className="h-10 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold transition flex items-center gap-2 whitespace-nowrap"
-              >
-                <FaPlus className="h-3.5 w-3.5" />
-                Thêm
-              </button>
-            </div>
           </div>
 
           {/* Badge lô cũ / lô mới */}
           {row.batchChecked && (
-            <div className="mt-2">
+            <div className="mt-3">
               {row.isOldBatch ? (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
-                  ● Lô cũ — ngày SX và hạn dùng đã được điền tự động
+                  Lô cũ, NSX và HSD đã được điền tự động từ dữ liệu được lưu trữ
                 </span>
               ) : (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200">
-                  ● Lô mới — vui lòng nhập ngày SX và hạn dùng
+                  Lô mới, vui lòng nhập NSX và HSD
                 </span>
               )}
             </div>
           )}
         </div>
 
-        {/* ── HÀNG 3: Bảng danh sách thuốc đã thêm ── */}
+        {/* ── Bảng danh sách thuốc đã thêm ── */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex-1">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-100 text-gray-600 text-sm uppercase tracking-wider">
-                  <th className="px-4 py-3 font-semibold">Mã SP</th>
+                <tr className="bg-blue-600 border-b border-blue-800 text-white text-sm uppercase tracking-wider">
+                  <th className="px-4 py-3 font-semibold">Mã Thuốc</th>
                   <th className="px-4 py-3 font-semibold">Tên thuốc</th>
                   <th className="px-4 py-3 font-semibold">ĐVT</th>
                   <th className="px-4 py-3 font-semibold">Số lô</th>
-                  <th className="px-4 py-3 font-semibold">Ngày SX</th>
-                  <th className="px-4 py-3 font-semibold">Hạn dùng</th>
-                  <th className="px-4 py-3 font-semibold text-right">SL</th>
+                  <th className="px-4 py-3 font-semibold">NSX</th>
+                  <th className="px-4 py-3 font-semibold">HSD</th>
+                  <th className="px-4 py-3 font-semibold text-right">SL Nhập</th>
                   <th className="px-4 py-3 font-semibold text-right">
                     Giá nhập
                   </th>
@@ -616,7 +549,7 @@ export default function ImportReceiptCreate() {
                       className="hover:bg-gray-50 transition text-sm"
                     >
                       <td className="px-4 py-3">
-                        <span className="text-xs font-mono text-teal-600 bg-teal-50 px-2 py-0.5 rounded border border-teal-100">
+                        <span className="text-xs font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
                           {item.medicineCode}
                         </span>
                       </td>
@@ -639,10 +572,10 @@ export default function ImportReceiptCreate() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-gray-600">
-                        {item.productionDate || "—"}
+                        {item.productionDate || "chưa cập nhật"}
                       </td>
                       <td className="px-4 py-3 text-gray-600">
-                        {item.expiryDate || "—"}
+                        {item.expiryDate || "chưa cập nhật"}
                       </td>
                       <td className="px-4 py-3 text-right text-gray-800">
                         {item.importQuantity}
@@ -686,17 +619,17 @@ export default function ImportReceiptCreate() {
           </div>
         </div>
 
-        {/* ── HÀNG 4: Nút hành động ── */}
+        {/* Nút hành động */}
         <div className="flex justify-end gap-3">
           <button
             onClick={handleCancel}
-            className="px-8 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold text-sm tracking-wide transition"
+            className="btn-cancel px-8 py-2.5 font-semibold text-sm tracking-wide"
           >
             HỦY BỎ
           </button>
           <button
             onClick={handleSubmit}
-            className="px-8 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm tracking-wide transition"
+            className="btn-gradient px-8 py-2.5 font-semibold text-sm tracking-wide"
           >
             LƯU PHIẾU
           </button>

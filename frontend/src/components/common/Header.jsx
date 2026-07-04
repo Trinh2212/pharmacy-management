@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FaSearch, FaUser, FaBars, FaHandHoldingHeart, FaHandsHelping, FaBriefcaseMedical, FaShieldAlt } from "react-icons/fa";
+import { useAuth } from "../../contexts/AuthContext";
 
 function DesktopHeader() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const [text, setText] = useState(searchParams.get("search") || "");
 
@@ -55,7 +57,7 @@ function DesktopHeader() {
             />
             <button
               type="submit"
-              className="btn-submit-gradient !py-1.5 !px-4 !rounded-full !w-auto text-sm font-semibold text-white whitespace-nowrap"
+              className="btn-gradient w-auto px-4 py-1.5 rounded-full text-sm whitespace-nowrap"
             >
               Tìm kiếm
             </button>
@@ -64,13 +66,27 @@ function DesktopHeader() {
 
         {/* User */}
         <div className="flex items-center gap-2">
-          <Link
-            to="/login"
-            className="group flex items-center gap-2 px-3 py-2 rounded-full text-md font-medium text-slate-900 bg-transparent transition-colors duration-200 ease-in-out hover:bg-gradient-to-r hover:from-blue-600 hover:to-cyan-500 hover:text-white hover:shadow-lg hover:shadow-blue-600/20"
-          >
-            <FaUser className="h-4 w-4 text-slate-700 transition-colors group-hover:text-white" />
-            <span>Đăng nhập</span>
-          </Link>
+          {user ? (
+            <Link
+              to="/admin/profile"
+              className="flex items-center gap-2 px-3 py-2 rounded-full text-md font-medium text-slate-900 hover:bg-blue-50 transition-colors"
+            >
+              <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center text-white shrink-0">
+                <FaUser className="h-4 w-4" />
+              </div>
+              <span className="max-w-[120px] truncate">
+                {user.fullName || "Ẩn danh"}
+              </span>
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className="group flex items-center gap-2 px-3 py-2 rounded-full text-md font-medium text-slate-900 bg-transparent transition-colors duration-200 ease-in-out hover:bg-gradient-to-r hover:from-blue-600 hover:to-cyan-500 hover:text-white hover:shadow-lg hover:shadow-blue-600/20"
+            >
+              <FaUser className="h-4 w-4 text-slate-700 transition-colors group-hover:text-white" />
+              <span>Đăng nhập</span>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -101,6 +117,7 @@ function DesktopHeader() {
 function MobileHeader() {
   const [openMenu, setOpenMenu] = useState(false);
   const [searchParams] = useSearchParams();
+  const { user } = useAuth();
 
   const [text, setText] = useState(searchParams.get("search") || "");
   const navigate = useNavigate();
@@ -148,12 +165,23 @@ function MobileHeader() {
           </div>
         </Link>
 
-        <Link
-          to="/login"
-          className="p-2 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors text-slate-900"
-        >
-          <FaUser className="h-5 w-5" />
-        </Link>
+        {user ? (
+          <Link
+            to="/profile"
+            className="p-1 rounded-full hover:bg-blue-100 transition-colors text-slate-900"
+          >
+            <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center text-white">
+              <FaUser className="h-4 w-4" />
+            </div>
+          </Link>
+        ) : (
+          <Link
+            to="/login"
+            className="p-2 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors text-slate-900"
+          >
+            <FaUser className="h-5 w-5" />
+          </Link>
+        )}
       </div>
 
       {/* thanh search */}
