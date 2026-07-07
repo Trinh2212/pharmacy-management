@@ -8,7 +8,7 @@ export default function Footer() {
           <div className="flex items-center gap-2 mb-4">
             <div className="h-10 w-10 overflow-hidden rounded-xl shadow-md bg-white">
               <img
-                src="img/logo.png"
+                src="/img/logo.png"
                 alt="CareMind Pharma"
                 className="h-full w-full object-contain"
               />

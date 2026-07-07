@@ -90,16 +90,6 @@ const employeeControllers = {
     
     const keyword = search.trim();
 
-    // let filter = {};
-
-    // if (keyword !== "") {
-    //   filter = {
-    //     [Op.or]: [
-    //       {fullName: {[Op.like]: `%${keyword}%`}},
-    //       {employeeCode: {[Op.like]: `%${keyword}%`}}
-    //     ]
-    //   }
-    // }
     const filter = keyword
       ? {
           [Op.or]: [

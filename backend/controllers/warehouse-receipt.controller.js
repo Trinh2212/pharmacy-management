@@ -14,10 +14,8 @@ const warehouseReceiptControllers = {
       });
     }
 
-    // ── PHASE 1: VALIDATE NGHIỆP VỤ (cần query DB)
     const errors = [];
 
-    // 1a. Mã phiếu trùng không?
     const codeTaken = await db.WarehouseReceipt.findOne({
       where: { receiptCode },
     });
@@ -27,20 +25,17 @@ const warehouseReceiptControllers = {
         .json({ message: `Mã phiếu nhập "${receiptCode}" đã tồn tại` });
     }
 
-    // 1b. Nhà cung cấp tồn tại không?
     const supplier = await db.Supplier.findByPk(supplierId);
     if (!supplier) {
       return res.status(404).json({ message: "Không tìm thấy nhà cung cấp" });
     }
 
-    // 1c. Tất cả medicineId trong details có tồn tại không?
     const medicineIds = [...new Set(details.map((d) => d.medicineId))];
     const medicines = await db.Medicine.findAll({
       where: { medicineId: { [Op.in]: medicineIds } },
     });
     const medicineMap = new Map(medicines.map((m) => [m.medicineId, m]));
 
-    // 1d. Kiểm tra trùng dòng trong cùng phiếu (cùng medicineId + batchNumber)
     const seenLines = new Set();
     details.forEach((line, idx) => {
       const lineNo = idx + 1;
@@ -65,7 +60,6 @@ const warehouseReceiptControllers = {
       return res.status(400).json({ message: "Dữ liệu không hợp lệ", errors });
     }
 
-    // 1e. Với mỗi lô: xác định mới/cũ — lô mới bắt buộc có productionDate + expiryDate
     const lineResolutions = await Promise.all(
       details.map(async (line) => {
         const existingBatch = await db.Batch.findOne({
@@ -103,7 +97,6 @@ const warehouseReceiptControllers = {
         .json({ message: "Dữ liệu không hợp lệ", errors: resolutionErrors });
     }
 
-    // ── PHASE 2: GHI DỮ LIỆU TRONG TRANSACTION ─────────────────────────────
     const totalPrice = details.reduce(
       (sum, d) => sum + d.importQuantity * d.importPrice,
       0,
@@ -126,13 +119,13 @@ const warehouseReceiptControllers = {
         let batch = existingBatch;
 
         if (batch) {
-          // Lô cũ → chỉ cộng dồn stockQuantity, KHÔNG đổi productionDate / expiryDate
+          // Lô cũ, cộng dồn stockQuantity,  vẫn giữ productionDate / expiryDate
           await batch.increment("stockQuantity", {
             by: line.importQuantity,
             transaction: t,
           });
         } else {
-          // Lô mới → tạo mới
+          // Lô mới thì tạo mới
           batch = await db.Batch.create(
             {
               medicineId: line.medicineId,
@@ -252,6 +245,34 @@ const warehouseReceiptControllers = {
       where: { receiptCode: code },
     });
     return res.json({ exists: !!existing });
+  },
+
+  getImportCostTrend: async (req, res) => {
+    const months = parseInt(req.query.months, 10) || 6;
+
+    const fromDate = new Date();
+    fromDate.setMonth(fromDate.getMonth() - (months - 1));
+    fromDate.setDate(1);
+    fromDate.setHours(0, 0, 0, 0);
+
+    const results = await db.WarehouseReceipt.findAll({
+      attributes: [
+        [
+          sequelize.fn("DATE_FORMAT", sequelize.col("receipt_date"), "%Y-%m"),
+          "month",
+        ],
+        [sequelize.fn("SUM", sequelize.col("total_price")), "totalCost"],
+      ],
+      where: { receiptDate: { [Op.gte]: fromDate } },
+      group: ["month"],
+      order: [[sequelize.literal("month"), "ASC"]],
+      raw: true,
+    });
+
+    return res.status(200).json({
+      message: "Lấy dữ liệu chi phí nhập thuốc theo thời gian thành công",
+      data: results,
+    });
   },
 };
 

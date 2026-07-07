@@ -29,7 +29,7 @@ function DesktopHeader() {
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <div className="h-10 w-10 overflow-hidden rounded-xl shadow-md bg-white p-0.5 border border-slate-100">
             <img
-              src="img/logo.png"
+              src="/img/logo.png"
               alt="CareMind Pharma"
               className="h-full w-full object-contain"
             />
@@ -152,7 +152,7 @@ function MobileHeader() {
         >
           <div className="h-9 w-9 overflow-hidden rounded-lg bg-white shadow flex items-center justify-center p-0.5 shrink-0 border border-slate-100">
             <img
-              src="img/logo.png"
+              src="/img/logo.png"
               alt="logo"
               className="h-full w-full object-contain"
             />

@@ -8,6 +8,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import Login from "../pages/Login";
 import Home from "../pages/Home";
 import Medicines from "../pages/Medicines";
+import MedicineDetail from "../pages/MedicineDetail";
 import Contact from "../pages/Contact";
 import About from "../pages/About";
 import Ingredient from "../pages/Ingredients";
@@ -23,7 +24,7 @@ import EmployeeManagement from "../pages/admin/EmployeeManagement";
 import Profile from "../pages/admin/Profile";
 import AddReceipt from "../pages/admin/AddReceipt";
 import WarehouseManagement from "../pages/admin/WarehouseManagement";
-
+import BatchManagement from "../pages/admin/BatchManagement";
 
 function AppRouters() {
   return (
@@ -33,6 +34,10 @@ function AppRouters() {
       <Route element={<CommonLayout />}>
         <Route index element={<Home />} />
         <Route path="medicines" element={<Medicines />} />
+        <Route
+          path="medicines/medicine-detail/:id"
+          element={<MedicineDetail />}
+        />
         <Route path="ingredients" element={<Ingredient />} />
         <Route path="contact" element={<Contact />} />
         <Route path="about" element={<About />} />
@@ -43,7 +48,10 @@ function AppRouters() {
           <Route index element={<Dashboard />} />
           <Route path="medicine-management" element={<MedicineManagement />} />
           <Route path="medicine/add-medicine" element={<AddMedicine />} />
-          <Route path="medicine/update-medicine/:id" element={<UpdateMedicine />} />
+          <Route
+            path="medicine/update-medicine/:id"
+            element={<UpdateMedicine />}
+          />
           <Route path="group-management" element={<GroupManagement />} />
           <Route
             path="ingredient-management"
@@ -51,7 +59,11 @@ function AppRouters() {
           />
           <Route path="supplier-management" element={<SupplierManagement />} />
           <Route path="warehouse/add-receipt" element={<AddReceipt />} />
-          <Route path="warehouse-management" element={<WarehouseManagement />} />
+          <Route
+            path="warehouse-management"
+            element={<WarehouseManagement />}
+          />
+          <Route path="batch-management" element={<BatchManagement />} />
           <Route path="profile" element={<Profile />} />
 
           {/* chỉ admin mới vào được /admin/employees */}

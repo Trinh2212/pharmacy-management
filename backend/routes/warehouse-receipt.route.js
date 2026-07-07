@@ -8,16 +8,15 @@ const asyncHandler = require("../middlewares/asyncHandler");
 
 router.use(verifyToken);
 
-// GET /api/warehouse-receipts?page=1&limit=10
 router.get("/", asyncHandler(warehouseReceiptControllers.getAllReceipts));
 
-// GET /api/warehouse-receipts/check-code?code=PN0001
 router.get(
   "/check-code",
   asyncHandler(warehouseReceiptControllers.checkReceiptCode),
 );
 
-// GET /api/warehouse-receipts/:id
+router.get("/cost-trend", asyncHandler(warehouseReceiptControllers.getImportCostTrend));
+
 router.get("/:id", asyncHandler(warehouseReceiptControllers.getReceiptById));
 
 router.post(

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { FaChartPie, FaMedkit, FaFlask, FaUsers, FaHome, FaLayerGroup, FaTruck, FaBoxes, FaChevronDown, FaFileAlt, FaList} from "react-icons/fa";
+import { FaChartPie, FaMedkit, FaCapsules, FaFlask, FaUsers, FaHome, FaLayerGroup, FaTruck, FaArchive, FaBoxes, FaChevronDown, FaFileAlt, FaList} from "react-icons/fa";
 import { useAuth } from "../../contexts/AuthContext"; 
 
 const NAV_ITEMS = [
@@ -14,7 +14,7 @@ const NAV_ITEMS = [
     label: "Danh mục thuốc",
     icon: FaMedkit,
     children: [
-      { to: "/admin/medicine-management", label: "Thuốc", icon: FaMedkit },
+      { to: "/admin/medicine-management", label: "Thuốc", icon: FaCapsules },
       {
         to: "/admin/group-management",
         label: "Nhóm thuốc",
@@ -34,6 +34,11 @@ const NAV_ITEMS = [
     label: "Nhân viên",
     icon: FaUsers,
     roles: ["admin"],
+  },
+  {
+    to: "/admin/batch-management",
+    label: "Lô thuốc",
+    icon: FaArchive,
   },
   {
     label: "Nhập kho thuốc",

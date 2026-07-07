@@ -6,10 +6,12 @@ const asyncHandler = require("../middlewares/asyncHandler");
 
 router.use(verifyToken);
 
-// GET /api/batches/check?medicineId=1&batchNumber=LOT001
+router.get("/", asyncHandler(batchControllers.getAllBatches));
+
+router.get("/stats", asyncHandler(batchControllers.getBatchStats));
+
 router.get("/check", asyncHandler(batchControllers.checkBatch));
 
-// GET /api/batches/by-medicine/:medicineId
 router.get(
   "/by-medicine/:medicineId",
   asyncHandler(batchControllers.getBatchesByMedicine),
