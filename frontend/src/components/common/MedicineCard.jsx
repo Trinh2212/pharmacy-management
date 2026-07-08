@@ -54,7 +54,7 @@ export function MedicineCard({ p }) {
           </div>
 
           <Link
-            to={`medicine-detail/${p.medicineId}`}
+            to={`/medicine-detail/${p.medicineId}`}
             className="group w-full bg-blue-50 text-blue-600 rounded-xl py-2.5 text-sm font-bold flex items-center justify-center gap-2 transition-none duration-0 hover:bg-gradient-to-r hover:from-blue-600 hover:to-cyan-500 hover:text-white hover:shadow-lg hover:shadow-blue-600/20 active:scale-[0.98]"
           >
             <FiEye className="text-lg text-blue-600 transition-none duration-0 group-hover:text-white" />

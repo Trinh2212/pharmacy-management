@@ -35,7 +35,7 @@ function AppRouters() {
         <Route index element={<Home />} />
         <Route path="medicines" element={<Medicines />} />
         <Route
-          path="medicines/medicine-detail/:id"
+          path="/medicine-detail/:id"
           element={<MedicineDetail />}
         />
         <Route path="ingredients" element={<Ingredient />} />
