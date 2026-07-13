@@ -59,7 +59,16 @@ const employeeControllers = {
         });
       }
     }
-    const updateData = { fullName, phoneNumber, dob, gender, address, email, hireDate };
+    
+    const updateData = {};
+    if (fullName !== undefined) updateData.fullName = fullName;
+    if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
+    if (dob !== undefined) updateData.dob = dob;
+    if (gender !== undefined) updateData.gender = gender;
+    if (address !== undefined) updateData.address = address;
+    if (email !== undefined) updateData.email = email;
+    if (hireDate !== undefined) updateData.hireDate = hireDate;
+
     if (req.file){
       if (employee.avatarUrl){
         const oldAvatar = path.join(

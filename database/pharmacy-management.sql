@@ -64,6 +64,7 @@ CREATE TABLE medicines (
     price           DECIMAL(12,2) NOT NULL CHECK (price >= 0),
     registration_number VARCHAR(50)   NOT NULL UNIQUE,
     unit            ENUM('Viên','Vỉ','Hộp','Chai','Lọ','Tuýp','Gói','Ống','Bình xịt','Miếng dán')   NOT NULL,                        
+	embedding_vector JSON,
 
     created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

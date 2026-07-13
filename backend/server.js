@@ -15,6 +15,8 @@ const employeeRoute = require("./routes/employee.route");
 const authRoute = require("./routes/auth.route");
 const ocrRoute = require("./routes/ocr.route");
 
+const chatbotRoute = require("./routes/chatbot.route");
+
 const app = express();
 
 app.use(cors());
@@ -31,6 +33,8 @@ app.use("/api/warehouse-receipts", warehouseReceiptRoute);
 app.use("/api/batches", batchRoute);
 app.use("/api/employees", employeeRoute);
 app.use("/api/ocr", ocrRoute);
+
+app.use("/api/chatbot", chatbotRoute);
 
 const PORT = process.env.PORT || 5000;
 

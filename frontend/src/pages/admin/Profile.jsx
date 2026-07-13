@@ -172,12 +172,13 @@ export default function Profile() {
     setSavingProfile(true);
     try {
       const form = new FormData();
-      form.append("fullName", profileForm.fullName);
-      form.append("dob", profileForm.dob);
-      form.append("gender", profileForm.gender);
-      form.append("email", profileForm.email);
-      form.append("phoneNumber", profileForm.phoneNumber);
-      form.append("address", profileForm.address);
+      if (profileForm.fullName) form.append("fullName", profileForm.fullName);
+      if (profileForm.dob) form.append("dob", profileForm.dob);
+      if (profileForm.gender) form.append("gender", profileForm.gender);
+      if (profileForm.email) form.append("email", profileForm.email);
+      if (profileForm.phoneNumber)
+        form.append("phoneNumber", profileForm.phoneNumber);
+      if (profileForm.address) form.append("address", profileForm.address);
       if (avatarFile) form.append("avatar", avatarFile);
 
       const res = await axiosClient.put("/employees/updateProfile", form, {

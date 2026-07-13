@@ -93,6 +93,10 @@ Medicine.init(
       ),
       allowNull: false,
     },
+    embeddingVector: {
+      type: DataTypes.JSON,
+      field: "embedding_vector",
+    },
   },
   {
     sequelize,

@@ -1,6 +1,7 @@
 const { sequelize } = require("../config/database");
 const db = require("../models/index.model");
 const {Op} = require("sequelize");
+const { generateEmbedding } = require("../service/rag/embeddingService");
 
 const medicineControllers = {
   getAllMedicines: async (req, res) => {
@@ -149,9 +150,15 @@ const medicineControllers = {
 
     let finalUsageData = usageData || null;
 
+    let textToEmbed = `${medicineData.brandName || ""} ${medicineData.medicineCode || ""}`;
+    if (finalUsageData) {
+      textToEmbed += ` ${finalUsageData.dosageForm || ""} ${finalUsageData.packaging || ""} ${finalUsageData.uses || ""}  ${finalUsageData.contraindications || ""}  ${finalUsageData.sideEffects || ""}  ${finalUsageData.dosageAdministration || ""} ${finalUsageData.storageCondition || ""} ${finalUsageData.warning || ""}`;
+    }
+    const vector = await generateEmbedding(textToEmbed.trim());
+
     const result = await db.sequelize.transaction(async (t) => {
       const newMedicine = await db.Medicine.create(
-        { ...medicineData, imageUrl },
+        { ...medicineData, imageUrl, embeddingVector: vector },
         { transaction: t },
       );
 
@@ -221,7 +228,6 @@ const medicineControllers = {
 
   updateMedicine: async (req, res) => {
     const { id } = req.params;
-
     const { groupIds, ingredients, usageData, ...medicineData } = req.body;
 
     const medicine = await db.Medicine.findByPk(id);
@@ -232,45 +238,60 @@ const medicineControllers = {
       });
     }
 
-    // kiểm tra nhóm thuốc
-    const groups = await db.MedicineGroup.findAll({
-      where: {
-        groupId: {
-          [Op.in]: groupIds,
-        },
-      },
-    });
-
-    if (groups.length !== groupIds.length) {
-      return res.status(400).json({
-        message: "có nhóm thuốc không tồn tại",
+    // kiểm tra trùng medicineCode 
+    if (
+      medicineData.medicineCode &&
+      medicineData.medicineCode !== medicine.medicineCode
+    ) {
+      const existedCode = await db.Medicine.findOne({
+        where: { medicineCode: medicineData.medicineCode },
       });
+      if (existedCode) {
+        return res.status(400).json({
+          message: "mã thuốc đã tồn tại",
+        });
+      }
+    }
+    // kiểm tra nhóm thuốc 
+    if (groupIds !== undefined) {
+      const groups = await db.MedicineGroup.findAll({
+        where: {
+          groupId: {
+            [Op.in]: groupIds,
+          },
+        },
+      });
+
+      if (groups.length !== groupIds.length) {
+        return res.status(400).json({
+          message: "có nhóm thuốc không tồn tại",
+        });
+      }
+    }
+    // kiểm tra hoạt chất 
+    if (ingredients !== undefined) {
+      const ingredientIds = ingredients.map((item) => item.ingredientId);
+
+      const existedIngredients = await db.ActiveIngredient.findAll({
+        where: {
+          ingredientId: {
+            [Op.in]: ingredientIds,
+          },
+        },
+      });
+
+      if (existedIngredients.length !== ingredientIds.length) {
+        return res.status(400).json({
+          message: "có hoạt chất không tồn tại",
+        });
+      }
     }
 
-    // kiểm tra hoạt chất
-    const ingredientIds = ingredients.map((item) => item.ingredientId);
-
-    const existedIngredients = await db.ActiveIngredient.findAll({
-      where: {
-        ingredientId: {
-          [Op.in]: ingredientIds,
-        },
-      },
-    });
-
-    if (existedIngredients.length !== ingredientIds.length) {
-      return res.status(400).json({
-        message: "có hoạt chất không tồn tại",
-      });
-    }
-
-    // ── Ảnh hiển thị thuốc ──
     let imageUrl = medicine.imageUrl;
     if (req.files?.medicine?.[0]) {
       imageUrl = `/uploads/medicines/${req.files.medicine[0].filename}`;
     }
 
-    // ── Ảnh tờ hướng dẫn sử dụng ──
     let documentUrl =
       req.body.documentPath ||
       (req.files?.document?.[0]
@@ -279,40 +300,58 @@ const medicineControllers = {
 
     let finalUsageData = usageData || null;
 
+    const finalBrandName = medicineData.brandName || medicine.brandName || "";
+    const finalCode = medicineData.medicineCode || medicine.medicineCode || "";
+    let textToEmbed = `${finalBrandName} ${finalCode}`;
+
+    if (finalUsageData) {
+      textToEmbed += ` ${finalUsageData.dosageForm || ""} ${finalUsageData.packaging || ""} ${finalUsageData.uses || ""}  ${finalUsageData.contraindications || ""}  ${finalUsageData.sideEffects || ""}  ${finalUsageData.dosageAdministration || ""} ${finalUsageData.storageCondition || ""} ${finalUsageData.warning || ""}`;
+    } else {
+      // Trường hợp cập nhật  không sửa Hướng dẫn sử dụng, lấy Hướng dẫn cũ 
+      const oldUsage = await db.UsageInstruction.findOne({
+        where: { medicineId: medicine.medicineId },
+      });
+      if (oldUsage) {
+        textToEmbed += `${oldUsage.dosageForm || ""} ${oldUsage.packaging || ""} ${oldUsage.uses || ""}  ${oldUsage.contraindications || ""}  ${oldUsage.sideEffects || ""}  ${oldUsage.dosageAdministration || ""} ${oldUsage.storageCondition || ""} ${oldUsage.warning || ""}`;
+      }
+    }
+    const vector = await generateEmbedding(textToEmbed.trim());
+
     const result = await db.sequelize.transaction(async (t) => {
-      // 1. update medicine
       await medicine.update(
         {
           ...medicineData,
           imageUrl,
+          embeddingVector: vector,
         },
         { transaction: t },
       );
 
       const medicineId = medicine.medicineId;
 
-      // 2. update groups (xóa cũ + thêm mới)
-      await medicine.setMedicineGroupInfo(groupIds, {
-        transaction: t,
-      });
+      if (groupIds !== undefined) {
+        await medicine.setMedicineGroupInfo(groupIds, {
+          transaction: t,
+        });
+      }
 
-      // 3. update ingredients (xóa cũ + thêm mới)
-      await db.MedicineIngredientDetail.destroy({
-        where: { medicineId },
-        transaction: t,
-      });
+      if (ingredients !== undefined) {
+        await db.MedicineIngredientDetail.destroy({
+          where: { medicineId },
+          transaction: t,
+        });
 
-      const ingredientEntries = ingredients.map((item) => ({
-        medicineId,
-        ingredientId: item.ingredientId,
-        strength: item.strength,
-      }));
+        const ingredientEntries = ingredients.map((item) => ({
+          medicineId,
+          ingredientId: item.ingredientId,
+          strength: item.strength,
+        }));
 
-      await db.MedicineIngredientDetail.bulkCreate(ingredientEntries, {
-        transaction: t,
-      });
+        await db.MedicineIngredientDetail.bulkCreate(ingredientEntries, {
+          transaction: t,
+        });
+      }
 
-      // 4. update usageData
       if (finalUsageData || documentUrl) {
         const usage = await db.UsageInstruction.findOne({
           where: { medicineId },
@@ -337,7 +376,6 @@ const medicineControllers = {
       return medicine;
     });
 
-    // 5. lấy lại data đầy đủ
     const finalMedicine = await db.Medicine.findByPk(result.medicineId, {
       include: [
         {

@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
+import ChatbotWidget from "../components/common/chatbot";
 
 export default function CommonLayout() {
   return (
@@ -10,6 +11,8 @@ export default function CommonLayout() {
         <Outlet />
       </main>
       <Footer />
+
+      <ChatbotWidget />
     </div>
   );
 }
