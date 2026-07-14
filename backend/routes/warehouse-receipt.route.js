@@ -25,4 +25,10 @@ router.post(
   asyncHandler(warehouseReceiptControllers.createReceipt),
 );
 
+router.put(
+  "/:id",
+  validate(warehouseValidation.updateReceipt),
+  asyncHandler(warehouseReceiptControllers.updateReceipt),
+);
+
 module.exports = router;

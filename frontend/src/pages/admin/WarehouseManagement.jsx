@@ -4,7 +4,7 @@ import { Topbar } from "../../components/admin/TopBar";
 import axiosClient from "../../api/axiosClient";
 import { alertError } from "../../utils/SwalAlert";
 
-import { FaBoxesStacked, FaXmark, FaFlask, FaUser, FaTruck, FaCalendarDays} from "react-icons/fa6";
+import { FaBoxesStacked, FaXmark, FaFlask, FaUser, FaTruck, FaCalendarDays, FaPen } from "react-icons/fa6";
 
 function Modal({ title, onClose, children }) {
   return (
@@ -128,6 +128,12 @@ export default function WarehouseManagement() {
 
   const openCreate = () => navigate("/admin/warehouse/add-receipt");
 
+  // TODO: xác nhận lại path chính xác khi có AppRouter — đang tạm suy theo pattern của openCreate
+  const openEditSelected = () => {
+    if (!selectedReceipt) return;
+    navigate(`/admin/warehouse/update-receipt/${selectedReceipt.receiptId}`);
+  };
+
   const openViewSelected = async () => {
     if (!selectedReceipt) return;
     try {
@@ -166,6 +172,7 @@ export default function WarehouseManagement() {
         actions={{
           onCreate: openCreate,
           onView: openViewSelected,
+          onEdit: openEditSelected,
         }}
       />
 
@@ -297,7 +304,7 @@ export default function WarehouseManagement() {
         </div>
       </div>
 
-      {/* ── Detail Modal ── */}
+      {/*  Detail Modal  */}
       {(detailReceipt || detailLoading) && (
         <Modal
           title="CHI TIẾT PHIẾU NHẬP KHO"
@@ -392,6 +399,16 @@ export default function WarehouseManagement() {
               className="btn-cancel px-4 py-2 text-sm font-medium"
             >
               Đóng
+            </button>
+            <button
+              onClick={() => {
+                setDetailReceipt(null);
+                openEditSelected();
+              }}
+              className="btn-gradient px-4 py-2 text-sm font-medium flex items-center gap-1.5"
+            >
+              <FaPen className="h-3.5 w-3.5" />
+              Chỉnh sửa
             </button>
           </div>
         </Modal>

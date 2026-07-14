@@ -68,6 +68,32 @@ const warehouseValidation = {
       "any.required": "Danh sách thuốc nhập là bắt buộc",
     }),
   }),
+  updateReceipt: Joi.object({
+    receiptCode: Joi.string().trim().max(20).required().messages({
+      "string.base": "Mã phiếu nhập phải là chuỗi ký tự",
+      "string.empty": "Mã phiếu nhập không được để trống",
+      "string.max": "Mã phiếu nhập tối đa 20 ký tự",
+      "any.required": "Mã phiếu nhập là bắt buộc",
+    }),
+
+    receiptDate: Joi.date().iso().optional().messages({
+      "date.base": "Ngày nhập không hợp lệ",
+      "date.format": "Ngày nhập phải theo định dạng YYYY-MM-DD",
+    }),
+
+    supplierId: Joi.number().integer().positive().required().messages({
+      "number.base": "supplierId phải là số",
+      "number.integer": "supplierId phải là số nguyên",
+      "number.positive": "Vui lòng chọn nhà cung cấp hợp lệ",
+      "any.required": "Vui lòng chọn nhà cung cấp",
+    }),
+
+    details: Joi.array().items(detailSchema).min(1).required().messages({
+      "array.base": "Danh sách thuốc nhập không hợp lệ",
+      "array.min": "Phiếu nhập phải có ít nhất 1 dòng thuốc",
+      "any.required": "Danh sách thuốc nhập là bắt buộc",
+    }),
+  }),
 };
 
 module.exports = warehouseValidation;

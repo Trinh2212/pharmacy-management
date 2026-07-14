@@ -23,6 +23,7 @@ import SupplierManagement from "../pages/admin/SupplierManagement";
 import EmployeeManagement from "../pages/admin/EmployeeManagement";
 import Profile from "../pages/admin/Profile";
 import AddReceipt from "../pages/admin/AddReceipt";
+import UpdateReceipt from "../pages/admin/UpdateReceipt";
 import WarehouseManagement from "../pages/admin/WarehouseManagement";
 import BatchManagement from "../pages/admin/BatchManagement";
 
@@ -34,10 +35,7 @@ function AppRouters() {
       <Route element={<CommonLayout />}>
         <Route index element={<Home />} />
         <Route path="medicines" element={<Medicines />} />
-        <Route
-          path="/medicine-detail/:id"
-          element={<MedicineDetail />}
-        />
+        <Route path="/medicine-detail/:id" element={<MedicineDetail />} />
         <Route path="ingredients" element={<Ingredient />} />
         <Route path="contact" element={<Contact />} />
         <Route path="about" element={<About />} />
@@ -59,6 +57,7 @@ function AppRouters() {
           />
           <Route path="supplier-management" element={<SupplierManagement />} />
           <Route path="warehouse/add-receipt" element={<AddReceipt />} />
+          <Route path="warehouse/update-receipt/:id" element={<UpdateReceipt />} />
           <Route
             path="warehouse-management"
             element={<WarehouseManagement />}
