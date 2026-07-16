@@ -29,7 +29,7 @@ async function createAdmin() {
           isLocked: false,
         });
 
-        console.log("Đã nâng cấp tài khoản thành admin");
+        console.log("Đã thay đổi vai trò thành admin");
       } else {
         console.log("Tài khoản đã là admin");
       }
@@ -39,7 +39,7 @@ async function createAdmin() {
       const employee = await db.Employee.create({
         employeeCode: "admin000",
         fullName: "System Administrator",
-        phoneNumber: "0999999999",
+        phoneNumber: "0912345678",
         email: ADMIN_EMAIL,
         password: hashedPassword,
         role: "admin",
@@ -51,11 +51,9 @@ async function createAdmin() {
       );
     }
 
-    console.log("────────────────────────────");
     console.log(`Email    : ${ADMIN_EMAIL}`);
     console.log(`Password : ${ADMIN_PASSWORD}`);
     console.log(`Role     : admin`);
-    console.log("────────────────────────────");
   } catch (error) {
     console.error("Lỗi:", error);
   } finally {

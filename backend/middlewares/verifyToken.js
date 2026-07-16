@@ -8,12 +8,12 @@ const verifyToken = (req, res, next) => {
         // console.log(req.headers.authorization);
         jwt.verify(token, process.env.JWT_ACCESS_KEY, (err, employee) => {
             if(err) 
-                return res.status(401).json("Token không hợp lệ hoặc đã hết hạn ")
+                return res.status(401).json("Token không hợp lệ hoặc đã hết hạn ");
             req.employee = employee;
             next()
         });
     } else {
-        return res.status(401).json("bạn chưa được xác thực đâu")
+        return res.status(401).json("bạn chưa được xác thực đâu" );
     }
 }
 

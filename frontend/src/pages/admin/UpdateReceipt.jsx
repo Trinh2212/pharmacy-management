@@ -456,10 +456,10 @@ export default function UpdateReceipt() {
   return (
     <>
       <Topbar
-        title="Cập nhật Phiếu nhập Thuốc"
+        title="Cập nhật phiếu nhập thuốc"
         subtitle="Chỉnh sửa thông tin phiếu nhập đã lập"
       />
-      <div className="p-6 bg-gray-50 min-h-screen flex flex-col gap-4">
+      <div className="p-6 min-h-screen flex flex-col gap-4">
         {/* Mã phiếu nhập , Ngày nhập */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-6 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
@@ -479,20 +479,22 @@ export default function UpdateReceipt() {
           </div>
         </div>
 
-        {/* Nhà cung cấp + Thuốc + ĐVT + Số lượng + Giá nhập + Thêm/Cập nhật */}
+        {/* Nhà cung cấp + Thuốc (hàng 1) / ĐVT + Số lượng + Giá nhập + Thêm-Cập nhật (hàng 2) */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-6 py-4">
           {editingKey && (
             <div className="mb-3 flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 w-fit">
-              Đang sửa dòng "{row.medicineLabel}" — bấm "Cập nhật dòng" để lưu hoặc
+              Đang sửa "{row.medicineLabel}"
               <button
                 onClick={handleCancelEdit}
                 className="inline-flex items-center gap-1 font-semibold underline underline-offset-2"
               >
-                <FaXmark className="h-3 w-3" /> hủy sửa
+                <FaXmark className="h-3 w-3" /> bỏ chỉnh sửa
               </button>
             </div>
           )}
-          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_90px_110px_130px_auto] gap-3 items-end">
+
+          {/* Hàng 1: Nhà cung cấp + Tìm kiếm thuốc */}
+          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-3 items-end">
             {/* Nhà cung cấp */}
             <div className="flex flex-col gap-1">
               <span className="text-xs text-gray-500 font-medium">
@@ -522,7 +524,10 @@ export default function UpdateReceipt() {
                 onSelect={handleSelectMedicine}
               />
             </div>
+          </div>
 
+          {/* Hàng 2: ĐVT + Số lượng + Giá nhập + Nút Thêm/Cập nhật, chia đều khoảng cách */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end mt-3">
             {/* Đơn vị tính */}
             <InlineInput
               label="ĐVT *"
@@ -559,7 +564,7 @@ export default function UpdateReceipt() {
                 className="btn-gradient h-10 px-4 text-sm font-semibold flex items-center gap-2 whitespace-nowrap"
               >
                 <FaPlus className="h-3.5 w-3.5" />
-                {editingKey ? "Cập nhật dòng" : "Thêm"}
+                {editingKey ? "Cập nhật" : "Thêm"}
               </button>
             </div>
           </div>

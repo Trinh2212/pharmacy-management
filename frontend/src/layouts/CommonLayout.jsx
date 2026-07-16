@@ -5,7 +5,7 @@ import ChatbotWidget from "../components/common/chatbot";
 
 export default function CommonLayout() {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-blue-500 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 via-sky-50 to-blue-50 text-slate-900 selection:bg-blue-500 selection:text-white">
       <Header />
       <main className="flex-1">
         <Outlet />

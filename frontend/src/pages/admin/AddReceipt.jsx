@@ -339,7 +339,7 @@ export default function ImportReceiptCreate() {
         title="Phiếu nhập Thuốc"
         subtitle="Lập phiếu nhập Thuốc theo giấy tờ đã hoàn tất kiểm tra"
       />
-      <div className="p-6 bg-gray-50 min-h-screen flex flex-col gap-4">
+      <div className="p-6 min-h-screen flex flex-col gap-4">
         {/*Mã phiếu nhập , Ngày nhập  */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-6 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
@@ -363,9 +363,10 @@ export default function ImportReceiptCreate() {
           </div>
         </div>
 
-        {/* Nhà cung cấp + Thuốc + ĐVT + Số lượng + Giá nhập + Thêm  */}
+        {/* Nhà cung cấp + Thuốc (hàng 1) / ĐVT + Số lượng + Giá nhập + Thêm (hàng 2) */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-6 py-4">
-          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_90px_110px_130px_auto] gap-3 items-end">
+          {/* Hàng 1: Nhà cung cấp + Tìm kiếm thuốc */}
+          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-3 items-end">
             {/* Nhà cung cấp */}
             <div className="flex flex-col gap-1">
               <span className="text-xs text-gray-500 font-medium">
@@ -394,7 +395,10 @@ export default function ImportReceiptCreate() {
               </span>
               <MedicineSearchInput onSelect={handleSelectMedicine} />
             </div>
+          </div>
 
+          {/* Hàng 2: ĐVT + Số lượng + Giá nhập + Nút Thêm, chia đều khoảng cách */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end mt-3">
             {/* Đơn vị tính */}
             <InlineInput
               label="ĐVT *"

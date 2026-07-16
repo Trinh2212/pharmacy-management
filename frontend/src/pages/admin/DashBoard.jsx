@@ -140,7 +140,7 @@ export default function Dashboard() {
   return (
     <>
       <Topbar title="Dashboard" subtitle="Tổng quan hoạt động hệ thống" />
-      <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="p-6 min-h-screen">
         {/* ── Thẻ thống kê ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           <StatCard

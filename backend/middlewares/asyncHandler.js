@@ -6,7 +6,8 @@ const asyncHandler = (fn) => {
       await fn(req, res, next);
     } catch (error) {
       return res.status(500).json({
-        message: "lỗi server",
+        message: error.message,
+        // message: "lỗi server 500",
         error: process.env.NODE_ENV === "development" ? error.message : "", //tránh lộ db
       });
     }

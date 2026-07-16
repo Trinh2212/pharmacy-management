@@ -3,11 +3,9 @@ const {sequelize} = require("../config/database");
 const db = require("../models/index.model");
 const { Op } = require("sequelize");
 const bcrypt = require("bcrypt")
-const fs = require("fs");
-const path = require("path");
+const { deleteFile } = require("../utils/deleteFile");
 
 const employeeControllers = {
-  
   getProfile: async (req, res) => {
     const employeeId = req.employee.employeeId;
 
@@ -24,6 +22,7 @@ const employeeControllers = {
     }
 
     return res.status(200).json({
+      message: "lấy thông tin nhân viên thành công",
       employee,
     });
   },
@@ -36,8 +35,8 @@ const employeeControllers = {
         message: "không tìm thấy nhân viên",
       });
     }
-    const {fullName, dob, gender, address, phoneNumber, email, hireDate} = req.body;
-    if (email && email != employee.email) {
+    const { fullName, dob, gender, address, phoneNumber, email } = req.body;
+    if (email && email !== employee.email) {
       const existedEmail = await db.Employee.findOne({
         where: { email },
       });
@@ -59,27 +58,17 @@ const employeeControllers = {
         });
       }
     }
-    
+
     const updateData = {};
     if (fullName !== undefined) updateData.fullName = fullName;
     if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
-    if (dob !== undefined) updateData.dob = dob;
+    if (dob !== undefined) updateData.dob = dob === "" ? null : dob;
     if (gender !== undefined) updateData.gender = gender;
     if (address !== undefined) updateData.address = address;
     if (email !== undefined) updateData.email = email;
-    if (hireDate !== undefined) updateData.hireDate = hireDate;
 
-    if (req.file){
-      if (employee.avatarUrl){
-        const oldAvatar = path.join(
-          process.cwd(),
-          employee.avatarUrl.replace(/^\//, "")
-        )
-
-        if (fs.existsSync(oldAvatar)) {
-          fs.unlinkSync(oldAvatar);
-        }
-      }
+    if (req.file) {
+      deleteFile(employee.avatarUrl);
       updateData.avatarUrl = `/uploads/avatars/${req.file.filename}`;
     }
 
@@ -94,9 +83,9 @@ const employeeControllers = {
     });
   },
 
-  getAllEmployees: async (req, res ) => {
-    const {search = ""} = req.query;
-    
+  getAllEmployees: async (req, res) => {
+    const { search = "" } = req.query;
+
     const keyword = search.trim();
 
     const filter = keyword
@@ -110,20 +99,20 @@ const employeeControllers = {
 
     const employeeList = await db.Employee.findAll({
       attributes: {
-        exclude: ["password"]
+        exclude: ["password"],
       },
       where: filter,
-      order: [["employeeCode", "ASC"]]
-    })
+      order: [["employeeCode", "ASC"]],
+    });
 
     return res.status(200).json({
       message: "lấy danh sách nhân viên thành công",
-      data: employeeList
-    })
+      data: employeeList,
+    });
   },
 
   createEmployeeByAdmin: async (req, res) => {
-    const {fullName, phoneNumber, email, password, role} = req.body;
+    const { fullName, phoneNumber, email, password, role } = req.body;
 
     const existedEmail = await db.Employee.findOne({
       where: { email },
@@ -145,15 +134,15 @@ const employeeControllers = {
         message: "số điện thoại này đã tồn tại rồi",
       });
     }
-    // sinh mã nhân viên tự động theo mã cuối cùng 
+    // sinh mã theo mã lớn nhất tính cả đã xóa mềm
     const lastEmployee = await db.Employee.findOne({
+      paranoid: false,
       order: [["employeeId", "DESC"]],
-    })
+    });
     const nextCode = lastEmployee ? lastEmployee.employeeId + 1 : 1;
     const employeeCode = "NV" + String(nextCode).padStart(3, "0");
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const employee = await db.Employee.create({
       employeeCode,
@@ -161,44 +150,47 @@ const employeeControllers = {
       phoneNumber,
       email,
       password: hashedPassword,
-      role: role || "employee"
-    })
+      role: role || "employee",
+    });
 
     const employeeData = employee.toJSON();
     delete employeeData.password;
 
     return res.status(201).json({
       message: "tạo nhân viên thành công",
-      employee: employeeData
-    })
+      employee: employeeData,
+    });
   },
-// bởi admin có thể sửa đc all nv và all info liên quan, khác với bên chính họ thì không bao gồm role
+  // bởi admin có thể sửa đc all nv và all info liên quan, khác với bên chính họ thì không bao gồm role
   updateEmployeeByAdmin: async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
     const updateData = { ...req.body };
 
     const employee = await db.Employee.findByPk(id);
 
     if (!employee) {
       return res.status(404).json({
-        message: "không tìm thấy nhân viên"
-      })
+        message: "không tìm thấy nhân viên",
+      });
     }
 
     if (updateData.email && updateData.email !== employee.email) {
       const existedEmail = await db.Employee.findOne({
         where: {
-          email: updateData.email
-        }
-      })
+          email: updateData.email,
+        },
+      });
       if (existedEmail) {
         return res.status(409).json({
-          message: "email đã tồn tại"
-        })
+          message: "email đã tồn tại",
+        });
       }
     }
 
-    if (updateData.phoneNumber && updateData.phoneNumber !== employee.phoneNumber) {
+    if (
+      updateData.phoneNumber &&
+      updateData.phoneNumber !== employee.phoneNumber
+    ) {
       const existed = await db.Employee.findOne({
         where: {
           phoneNumber: updateData.phoneNumber,
@@ -211,8 +203,21 @@ const employeeControllers = {
       }
     }
 
-    if(updateData.password) {
-      updateData.password = await bcrypt.hash(updateData.password, 10)
+    if (updateData.password) {
+      updateData.password = await bcrypt.hash(updateData.password, 10);
+    }
+
+    if (updateData.dob === "") updateData.dob = null;
+    if (updateData.hireDate === "") updateData.hireDate = null;
+
+    if (
+      employee.role === "admin" &&
+      updateData.role &&
+      updateData.role !== "admin"
+    ) {
+      return res.status(403).json({
+        message: "Không thể hạ quyền tài khoản admin",
+      });
     }
 
     await employee.update(updateData);
@@ -223,11 +228,10 @@ const employeeControllers = {
     return res.status(200).json({
       message: "cập nhật nhân viên thành công",
       data: employeeData,
-    })
+    });
   },
-
   deleteEmployee: async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
     const employee = await db.Employee.findByPk(id);
 
     if (!employee) {
@@ -236,7 +240,7 @@ const employeeControllers = {
       });
     }
 
-    if (employee.role === 'admin')
+    if (employee.role === "admin")
       return res.status(403).json({
         message: "không thể xóa tài khoản admin được",
       });
@@ -244,18 +248,19 @@ const employeeControllers = {
     await employee.destroy();
 
     return res.status(200).json({
-      message: "đã xóa tài khoản thành công"
-    })
+      message: "đã xóa tài khoản thành công",
+    });
   },
 
-  toggleLock : async (req, res) => {
+  toggleLock: async (req, res) => {
     const employee = await db.Employee.findByPk(req.params.id);
 
-    if (!employee) return res.status(404).json({
-      message: "không tìm thấy tài khoản"
-    });
+    if (!employee)
+      return res.status(404).json({
+        message: "không tìm thấy tài khoản",
+      });
 
-    if (employee.role === "admin") 
+    if (employee.role === "admin")
       return res.status(403).json({
         message: "không thể khóa admin nè",
       });
@@ -263,12 +268,14 @@ const employeeControllers = {
     await employee.save();
 
     return res.status(200).json({
-      message: employee.isLocked ? "tài khoản đã bị khóa rồi" : "tài khoản đã được mở khóa",
+      message: employee.isLocked
+        ? "tài khoản đã bị khóa rồi"
+        : "tài khoản đã được mở khóa",
       isLocked: employee.isLocked,
     });
   },
 
-  changePassword: async(req, res) => {
+  changePassword: async (req, res) => {
     const { oldPassword, newPassword } = req.body;
     const employee = await db.Employee.findByPk(req.employee.employeeId);
     const validPassword = await bcrypt.compare(oldPassword, employee.password);
@@ -276,15 +283,14 @@ const employeeControllers = {
       return res.status(400).json({
         message: "mật khẩu cũ không đúng, nhớ lại coi",
       });
-    const salt = await bcrypt.genSalt(10);
-    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     employee.password = hashedNewPassword;
     await employee.save();
     return res.status(200).json({
       message: "đã đổi mật khẩu thành công",
     });
-  }
+  },
 };
-
 
 module.exports = employeeControllers;

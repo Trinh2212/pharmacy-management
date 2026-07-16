@@ -29,7 +29,7 @@ const features = [
 
 export function Features() {
   return (
-    <section className="bg-blue-50 pt-10 pb-20 font-['Inter',system-ui,sans-serif]">
+    <section className="bg-blue-100 pt-10 pb-20 font-['Inter',system-ui,sans-serif]">
       <div className="max-w-[1250px] mx-auto px-5 py-10">
         <div className="text-center mb-[50px]">
           <h2 className="text-[#2d4271] text-[2.5rem] font-extrabold mb-[15px] tracking-[-0.5px]">

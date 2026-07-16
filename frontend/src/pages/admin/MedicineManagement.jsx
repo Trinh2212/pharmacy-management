@@ -213,7 +213,7 @@ export default function MedicineList() {
         }}
       />
 
-      <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="p-6 min-h-screen">
         {/* Dropdown lọc theo nhóm thuốc */}
         <div className="mb-4 flex items-center gap-3">
           <label className="text-sm font-medium text-gray-800 flex items-center gap-1.5">

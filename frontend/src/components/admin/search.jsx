@@ -2,8 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
 import axiosClient from "../../api/axiosClient";
 
-const inputClass =
-  "w-full py-3 px-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/20 transition-all";
+const inputClass = "w-full py-3 px-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/20 transition-all";
 const labelClass = "block text-sm font-bold text-slate-700 mb-2";
 
 // Debounce dùng chung cho ô tìm kiếm.

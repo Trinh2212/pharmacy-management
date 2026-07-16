@@ -4,7 +4,6 @@ import { FiArrowRight, FiArrowLeft, FiSearch, FiCheckCircle, FiUploadCloud, FiFi
 import SearchMultiSelect from "../../components/admin/search";
 import { alertWarning, alertError, alertSuccess } from "../../utils/SwalAlert";
 
-
 const initMedicine = {
   medicineCode: "",
   brandName: "",
@@ -15,7 +14,7 @@ const initMedicine = {
   unit: "Viên",
 };
 
-const init_usage = {
+const initUsage = {
   dosageForm: "",
   packaging: "",
   uses: "",
@@ -32,7 +31,7 @@ const labelClass = "block text-sm font-bold text-slate-700 mb-2";
 const AddMedicine = () => {
   const [step, setStep] = useState(1);
   const [basicForm, setBasicForm] = useState(initMedicine);
-  const [ocrForm, setOcrForm] = useState(init_usage);
+  const [ocrForm, setOcrForm] = useState(initUsage);
 
   const [medicineImageFile, setMedicineImageFile] = useState(null);
   const [medicinePreview, setMedicinePreview] = useState(null);
@@ -98,7 +97,6 @@ const AddMedicine = () => {
         warning: res.data.warning || "",
       });
     } catch (error) {
-      console.error("OCR lỗi:", error.response?.data || error.message);
       alertError("OCR thất bại, vui lòng thử lại!");
     } finally {
       setOcrLoading(false);
@@ -147,7 +145,7 @@ const AddMedicine = () => {
       alertSuccess("Thêm thuốc thành công!");
       setStep(1);
       setBasicForm(initMedicine);
-      setOcrForm(init_usage);
+      setOcrForm(initUsage);
       setSelectedGroups([]);
       setSelectedIngredients([]);
       setMedicineImageFile(null);

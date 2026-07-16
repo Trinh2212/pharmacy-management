@@ -2,18 +2,20 @@ const validate = (schema, source = "body") => {
   return (req, res, next) => {
     const { error, value } = schema.validate(req[source], {
       abortEarly: false,
-      convert: true, // ép "1" → 1 cho id đến từ params/query (luôn là string)
+      convert: true, 
       stripUnknown: true,
     });
 
     if (error) {
+      const customMessage = error.details[0].message;
       return res.status(400).json({
-        message: "lỗi phía client, dữ liệu chưa hợp lệ",
-        error: error.details[0].message,
+        message: customMessage,
+        error: customMessage,
+        // message: "lỗi phía client, dữ liệu chưa hợp lệ",
+        // error: error.details[0].message,
       });
     }
 
-    // Gán lại value đã được Joi làm sạch (convert, trim) vào đúng source
     req[source] = value;
     next();
   };

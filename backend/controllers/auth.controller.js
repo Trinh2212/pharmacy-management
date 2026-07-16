@@ -34,7 +34,6 @@ const authControllers = {
         return res.status(400).json({
             message: "mật khẩu không chính xác",
             username,
-            password
         })
     }
 
@@ -45,7 +44,7 @@ const authControllers = {
         },
         process.env.JWT_ACCESS_KEY,
         {
-            expiresIn: "1h",
+            expiresIn: "4h",
         }
     );
     const employeeData = employee.toJSON();

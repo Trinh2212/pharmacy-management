@@ -148,7 +148,7 @@ export default function BatchManagement() {
         searchPlaceholder="Tìm theo số lô, tên/mã thuốc…"
       />
 
-      <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="p-6 min-h-screen">
         {/* Bộ lọc trạng thái + lọc theo thuốc */}
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <button

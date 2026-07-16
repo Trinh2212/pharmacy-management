@@ -52,14 +52,18 @@ Gọi khi khách muốn tìm/tra cứu thuốc theo: tên thuốc.
 Ví dụ: "thông tin về thuốc Amoxicillin", "cách sử dụng Amoxicillin?"
 
 ## TOOL 3 — Chi tiết thuốc → get_medicine_details
-Gọi khi khách hỏi sâu về 1 thuốc: tên, liều dùng, chỉ định, tác dụng phụ, cảnh báo.
+Gọi khi khách hỏi về: mã thuốc, xuất xứ, giá, đơn vị, trạng thái, tồn kho, nhóm thuốc, THÀNH PHẦN HOẠT CHẤT của một thuốc cụ thể.
+Ví dụ: "Panadol giá bao nhiêu?", "Thuốc này chứa hoạt chất gì?", "Amoxicillin còn hàng không?"
 
 ## TOOL 4 — Hướng dẫn sử dụng → get_usage_instructions
-Gọi khi khách hỏi: "Dùng như thế nào?", "Liều dùng bao nhiêu?", "Khi nào dùng?", "Ai không nên dùng?"
+Gọi khi khách hỏi: liều dùng, cách dùng, chỉ định, chống chỉ định, tác dụng phụ, bảo quản, cảnh báo/thận trọng.
 
 ## TOOL 5 — Tìm kiếm theo hoạt chất → search_ingredient
 Gọi khi khách hỏi: "Thuốc nào chứa Paracetamol?", "Có thuốc gì chứa Vitamin C?"
 
+## Phân biệt TOOL 3 và TOOL 5 (QUAN TRỌNG)
+- Khách đã có TÊN THUỐC, hỏi thuốc đó chứa hoạt chất/thành phần gì → get_medicine_details
+- Khách đưa TÊN HOẠT CHẤT, hỏi có (những) thuốc nào chứa hoạt chất đó → search_ingredient
 `;
 
 const tools = [
@@ -91,7 +95,7 @@ const tools = [
     type: "function",
     function: {
       name: "get_medicine_details",
-      description: "Lấy thông tin chi tiết một thuốc cụ thể: tên, xuất xứ, số đăng ký, giá, đơn vị và trạng thái ",
+      description: "Lấy thông tin chi tiết một thuốc cụ thể: mã thuốc, xuất xứ, giá, đơn vị, trạng thái, tồn kho, nhóm thuốc và THÀNH PHẦN HOẠT CHẤT (dùng khi khách hỏi thuốc X chứa hoạt chất/thành phần gì).",
       parameters: {
         type: "object",
         properties: {
@@ -188,11 +192,11 @@ const pharmacyAiAgentService = {
       );
 
       const completion = await groq.chat.completions.create({
-        model: "openai/gpt-oss-120b",
+        model: "llama-3.3-70b-versatile",
         messages: groqMessages,
         tools: tools,
         tool_choice: "auto",
-        temperature: 0.5,
+        temperature: 0.1,
         max_tokens: 2048,
       });
 
@@ -229,7 +233,7 @@ const pharmacyAiAgentService = {
 
         // Get final response từ AI
         const finalCompletion = await groq.chat.completions.create({
-          model: "openai/gpt-oss-120b",
+          model: "llama-3.3-70b-versatile",
           messages: groqMessages,
           temperature: 0.5,
           max_tokens: 2048,
@@ -253,6 +257,54 @@ const pharmacyAiAgentService = {
       };
     } catch (error) {
       console.error("[PHARMACY AI SERVICE ERROR]", error);
+
+      if (error?.error?.error?.code === "tool_use_failed") {
+        const raw = error.error.error.failed_generation || "";
+        const match = raw.match(/<function=(\w+)(\{.*\})<\/function>/);
+        if (match) {
+          const recoveredToolName = match[1];
+          let recoveredArgs = {};
+          try {
+            recoveredArgs = JSON.parse(match[2]);
+          } catch (_) {}
+
+          console.log(
+            `[PHARMACY AI] Tự phục hồi tool: ${recoveredToolName}`,
+            recoveredArgs,
+          );
+          const toolResult = await executeTool(
+            recoveredToolName,
+            recoveredArgs,
+            userId,
+          );
+
+          const finalCompletion = await groq.chat.completions.create({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+              { role: "system", content: systemInstruction },
+              { role: "user", content: userMessage },
+              {
+                role: "assistant",
+                content: `Đã tra cứu bằng ${recoveredToolName}.`,
+              },
+              {
+                role: "tool",
+                tool_call_id: "recovered_call",
+                name: recoveredToolName,
+                content: JSON.stringify(toolResult),
+              },
+            ],
+            temperature: 0.5,
+            max_tokens: 2048,
+          });
+
+          return {
+            reply: finalCompletion.choices[0].message.content,
+            thinkingType: "slow (recovered)",
+            toolUsed: recoveredToolName,
+          };
+        }
+      }
 
       if (error.status === 429) {
         return {

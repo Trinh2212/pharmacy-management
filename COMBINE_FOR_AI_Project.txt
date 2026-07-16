@@ -69,7 +69,7 @@ CẤU TRÚC THƯ MỤC DỰ ÁN
 │       │   ├── supplier.validation.js
 │       │   └── warehouse.validation.js
 │       └── responses/
-├── chatbotCombineProject.js
+├── CombineProject.js
 ├── COMBINE_FOR_AI_Project.txt
 ├── database/
 │   ├── cao/
@@ -1326,68 +1326,68 @@ CẤU TRÚC THƯ MỤC DỰ ÁN
 │   │       └── requirements.txt
 │   ├── pharmacy-management.sql
 │   └── seed.sql
-├── frontend/
-│   ├── .gitignore
-│   ├── eslint.config.js
-│   ├── index.html
-│   ├── package.json
-│   ├── README.md
-│   ├── src/
-│   │   ├── api/
-│   │   │   └── axiosClient.js
-│   │   ├── App.jsx
-│   │   ├── assets/
-│   │   ├── components/
-│   │   │   ├── admin/
-│   │   │   │   ├── search.jsx
-│   │   │   │   ├── SideBar.jsx
-│   │   │   │   └── TopBar.jsx
-│   │   │   └── common/
-│   │   │       ├── BestSeller.jsx
-│   │   │       ├── chatbot.jsx
-│   │   │       ├── Feature.jsx
-│   │   │       ├── Footer.jsx
-│   │   │       ├── Group.jsx
-│   │   │       ├── Header.jsx
-│   │   │       ├── HeroSection.jsx
-│   │   │       ├── MedicineCard.jsx
-│   │   │       └── Promotion.jsx
-│   │   ├── contexts/
-│   │   │   └── AuthContext.jsx
-│   │   ├── index.css
-│   │   ├── layouts/
-│   │   │   ├── AdminLayout.jsx
-│   │   │   └── CommonLayout.jsx
-│   │   ├── main.jsx
-│   │   ├── pages/
-│   │   │   ├── About.jsx
-│   │   │   ├── admin/
-│   │   │   │   ├── AddMedicine.jsx
-│   │   │   │   ├── AddReceipt.jsx
-│   │   │   │   ├── BatchManagement.jsx
-│   │   │   │   ├── DashBoard.jsx
-│   │   │   │   ├── EmployeeManagement.jsx
-│   │   │   │   ├── GroupManagement.jsx
-│   │   │   │   ├── IngredientManagement.jsx
-│   │   │   │   ├── MedicineManagement.jsx
-│   │   │   │   ├── Profile.jsx
-│   │   │   │   ├── SupplierManagement.jsx
-│   │   │   │   ├── UpdateMedicine.jsx
-│   │   │   │   └── WarehouseManagement.jsx
-│   │   │   ├── Contact.jsx
-│   │   │   ├── Home.jsx
-│   │   │   ├── Ingredients.jsx
-│   │   │   ├── Login.jsx
-│   │   │   ├── MedicineDetail.jsx
-│   │   │   └── Medicines.jsx
-│   │   ├── routes/
-│   │   │   ├── AppRouters.jsx
-│   │   │   └── ProtectedRouter.jsx
-│   │   └── utils/
-│   │       ├── FileUrl.js
-│   │       └── SwalAlert.jsx
-│   └── vite.config.js
-└── note.txt
+└── frontend/
+    ├── .gitignore
+    ├── eslint.config.js
+    ├── index.html
+    ├── package.json
+    ├── README.md
+    ├── src/
+    │   ├── api/
+    │   │   └── axiosClient.js
+    │   ├── App.jsx
+    │   ├── assets/
+    │   ├── components/
+    │   │   ├── admin/
+    │   │   │   ├── search.jsx
+    │   │   │   ├── SideBar.jsx
+    │   │   │   └── TopBar.jsx
+    │   │   └── common/
+    │   │       ├── BestSeller.jsx
+    │   │       ├── chatbot.jsx
+    │   │       ├── Feature.jsx
+    │   │       ├── Footer.jsx
+    │   │       ├── Group.jsx
+    │   │       ├── Header.jsx
+    │   │       ├── HeroSection.jsx
+    │   │       ├── MedicineCard.jsx
+    │   │       └── Promotion.jsx
+    │   ├── contexts/
+    │   │   └── AuthContext.jsx
+    │   ├── index.css
+    │   ├── layouts/
+    │   │   ├── AdminLayout.jsx
+    │   │   └── CommonLayout.jsx
+    │   ├── main.jsx
+    │   ├── pages/
+    │   │   ├── About.jsx
+    │   │   ├── admin/
+    │   │   │   ├── AddMedicine.jsx
+    │   │   │   ├── AddReceipt.jsx
+    │   │   │   ├── BatchManagement.jsx
+    │   │   │   ├── DashBoard.jsx
+    │   │   │   ├── EmployeeManagement.jsx
+    │   │   │   ├── GroupManagement.jsx
+    │   │   │   ├── IngredientManagement.jsx
+    │   │   │   ├── MedicineManagement.jsx
+    │   │   │   ├── Profile.jsx
+    │   │   │   ├── SupplierManagement.jsx
+    │   │   │   ├── UpdateMedicine.jsx
+    │   │   │   ├── UpdateReceipt.jsx
+    │   │   │   └── WarehouseManagement.jsx
+    │   │   ├── Contact.jsx
+    │   │   ├── Home.jsx
+    │   │   ├── Ingredients.jsx
+    │   │   ├── Login.jsx
+    │   │   ├── MedicineDetail.jsx
+    │   │   └── Medicines.jsx
+    │   ├── routes/
+    │   │   ├── AppRouters.jsx
+    │   │   └── ProtectedRouter.jsx
+    │   └── utils/
+    │       ├── FileUrl.js
+    │       └── SwalAlert.jsx
+    └── vite.config.js
 
 
 ========================================
@@ -1454,128 +1454,136 @@ module.exports = {
 
 const db = require("../models/index.model");
 const { Op } = require("sequelize");
+
 const ingredientControllers = {
-  getActiveIngredient : async (req, res) => {
-      const { search = "" } = req.query;
-      const keyword = search.trim();
-  
-      let filter = {};
-  
-      if (keyword !== "") {
-        filter = {
+  getActiveIngredient: async (req, res) => {
+    const { search = "" } = req.query;
+    const keyword = search.trim();
+
+    const filter = keyword
+      ? {
           ingredientName: {
             [Op.like]: `%${keyword}%`,
           },
-        };
-      }
-  
-      const ingredientList = await db.ActiveIngredient.findAll({
-        where: filter,
-        order: [["ingredientName", "ASC"]],
-      });
-  
+        }
+      : {};
+
+    const ingredientList = await db.ActiveIngredient.findAll({
+      where: filter,
+      order: [["ingredientName", "ASC"]],
+    });
+
     return res.status(200).json({
       message: "Lấy danh sách hoạt chất thành công",
-      data: ingredientList
+      data: ingredientList,
     });
   },
-  
-  getActiveIngredientById : async (req, res) => {
+
+  getActiveIngredientById: async (req, res) => {
     const { id } = req.params;
-  
+
     const ingredient = await db.ActiveIngredient.findByPk(id);
-  
+
     if (!ingredient) {
       return res.status(404).json({
         message: "không tìm thấy hoạt chất",
       });
     }
-  
+
     return res.status(200).json({
       message: "Lấy thông tin hoạt chất thành công",
-      data: ingredient
+      data: ingredient,
     });
   },
-  
-  createActiveIngredient : async (req, res) => {
+
+  createActiveIngredient: async (req, res) => {
     const { ingredientName } = req.body;
-  
+
     const existed = await db.ActiveIngredient.findOne({
       where: {
         ingredientName,
       },
     });
-  
+
     if (existed) {
       return res.status(409).json({
         message: "hoạt chất đã tồn tại",
       });
     }
-  
+
     const ingredient = await db.ActiveIngredient.create(req.body);
-  
+
     return res.status(201).json({
       message: "Thêm hoạt chất mới thành công",
       data: ingredient,
     });
   },
-  
-  updateActiveIngredient : async (req, res) => {
+
+  updateActiveIngredient: async (req, res) => {
     const { id } = req.params;
     const { ingredientName } = req.body;
-  
+
     const ingredient = await db.ActiveIngredient.findByPk(id);
-  
+
     if (!ingredient) {
       return res.status(404).json({
         message: "không tìm thấy hoạt chất",
       });
     }
-  
+
     if (ingredientName) {
       const existed = await db.ActiveIngredient.findOne({
         where: {
           ingredientName,
         },
       });
-  
+
       if (existed && existed.ingredientId !== ingredient.ingredientId) {
         return res.status(409).json({
           message: "hoạt chất đã tồn tại",
         });
       }
     }
-  
+
     await ingredient.update(req.body);
-  
+
     return res.status(200).json({
       message: "Cập nhật hoạt chất thành công",
       data: ingredient,
     });
   },
-  
-  deleteActiveIngredient : async (req, res) => {
+
+  deleteActiveIngredient: async (req, res) => {
     const { id } = req.params;
-  
+
     const ingredient = await db.ActiveIngredient.findByPk(id);
-  
+
     if (!ingredient) {
       return res.status(404).json({
         message: "không tìm thấy hoạt chất",
       });
     }
-  
+
+    const usageCount = await db.MedicineIngredientDetail.count({
+      where: { ingredientId: id },
+    });
+
+    if (usageCount > 0) {
+      return res.status(409).json({
+        message: `Không thể xóa, hoạt chất này đang được sử dụng bởi ${usageCount} thuốc`,
+      });
+    }
+
     await ingredient.destroy();
-  
+
     return res.status(200).json({
       message: "Xóa hoạt chất thành công",
-      data: ingredient
+      data: ingredient,
     });
-  }
-}
+  },
+};
 
 module.exports = ingredientControllers;
-
 
 --- KẾT THÚC FILE: backend/controllers/active-ingredient.controller.js ---
 
@@ -1618,7 +1626,6 @@ const authControllers = {
         return res.status(400).json({
             message: "mật khẩu không chính xác",
             username,
-            password
         })
     }
 
@@ -1629,7 +1636,7 @@ const authControllers = {
         },
         process.env.JWT_ACCESS_KEY,
         {
-            expiresIn: "1h",
+            expiresIn: "4h",
         }
     );
     const employeeData = employee.toJSON();
@@ -1656,7 +1663,6 @@ module.exports = authControllers;
 const db = require("../models/index.model");
 const { Op } = require("sequelize");
 
-
 function getDateBoundaries() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -1667,7 +1673,7 @@ function getDateBoundaries() {
   return { today, thresholdDate };
 }
 
-function computeBatchStatus(expiryDate, today, thresholdDate) {
+function checkBatchStatus(expiryDate, today, thresholdDate) {
   const expiry = new Date(expiryDate);
   if (expiry < today) return "expired";
   if (expiry <= thresholdDate) return "expiring";
@@ -1676,13 +1682,7 @@ function computeBatchStatus(expiryDate, today, thresholdDate) {
 
 const batchControllers = {
   getAllBatches: async (req, res) => {
-    const {
-      search = "",
-      status = "all",
-      medicineId,
-      page = 1,
-      limit = 10,
-    } = req.query;
+    const { search = "", status = "all", medicineId, page = 1, limit = 10 } = req.query;
 
     const parsedLimit = parseInt(limit, 10);
     const parsedPage = parseInt(page, 10);
@@ -1742,7 +1742,7 @@ const batchControllers = {
       const plain = row.toJSON();
       return {
         ...plain,
-        batchStatus: computeBatchStatus(plain.expiryDate, today, thresholdDate),
+        batchStatus: checkBatchStatus(plain.expiryDate, today, thresholdDate),
       };
     });
 
@@ -1755,7 +1755,7 @@ const batchControllers = {
     });
   },
 
-  // GET /api/batches/stats — dùng cho dashboard
+  // dùng cho dashboard
   getBatchStats: async (req, res) => {
     const { today, thresholdDate } = getDateBoundaries();
 
@@ -1784,7 +1784,7 @@ const batchControllers = {
       const plain = row.toJSON();
       return {
         ...plain,
-        batchStatus: computeBatchStatus(plain.expiryDate, today, thresholdDate),
+        batchStatus: checkBatchStatus(plain.expiryDate, today, thresholdDate),
       };
     });
 
@@ -1823,7 +1823,6 @@ const batchControllers = {
     return res.json({ data: batches });
   },
 
-  // GET /api/batches/check?medicineId=1&batchNumber=LOT001
   checkBatch: async (req, res) => {
     const { medicineId, batchNumber } = req.query;
 
@@ -1838,8 +1837,8 @@ const batchControllers = {
       ],
     });
 
-    // exists=true  → lô cũ, frontend tự điền productionDate + expiryDate
-    // exists=false → lô mới, nhân viên nhập tay
+    // exists=true lô cũ, frontend tự điền productionDate + expiryDate
+    // exists=false lô mới, nhân viên nhập tay
     return res.json({ exists: !!batch, batch: batch || null });
   },
 };
@@ -1898,7 +1897,6 @@ const fs = require("fs");
 const path = require("path");
 
 const employeeControllers = {
-  
   getProfile: async (req, res) => {
     const employeeId = req.employee.employeeId;
 
@@ -1915,6 +1913,7 @@ const employeeControllers = {
     }
 
     return res.status(200).json({
+      message: "lấy thông tin nhân viên thành công",
       employee,
     });
   },
@@ -1927,8 +1926,8 @@ const employeeControllers = {
         message: "không tìm thấy nhân viên",
       });
     }
-    const {fullName, dob, gender, address, phoneNumber, email, hireDate} = req.body;
-    if (email && email != employee.email) {
+    const { fullName, dob, gender, address, phoneNumber, email } = req.body;
+    if (email && email !== employee.email) {
       const existedEmail = await db.Employee.findOne({
         where: { email },
       });
@@ -1950,7 +1949,7 @@ const employeeControllers = {
         });
       }
     }
-    
+
     const updateData = {};
     if (fullName !== undefined) updateData.fullName = fullName;
     if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
@@ -1958,14 +1957,13 @@ const employeeControllers = {
     if (gender !== undefined) updateData.gender = gender;
     if (address !== undefined) updateData.address = address;
     if (email !== undefined) updateData.email = email;
-    if (hireDate !== undefined) updateData.hireDate = hireDate;
 
-    if (req.file){
-      if (employee.avatarUrl){
+    if (req.file) {
+      if (employee.avatarUrl) {
         const oldAvatar = path.join(
           process.cwd(),
-          employee.avatarUrl.replace(/^\//, "")
-        )
+          employee.avatarUrl.replace(/^\//, ""),
+        );
 
         if (fs.existsSync(oldAvatar)) {
           fs.unlinkSync(oldAvatar);
@@ -1985,9 +1983,9 @@ const employeeControllers = {
     });
   },
 
-  getAllEmployees: async (req, res ) => {
-    const {search = ""} = req.query;
-    
+  getAllEmployees: async (req, res) => {
+    const { search = "" } = req.query;
+
     const keyword = search.trim();
 
     const filter = keyword
@@ -2001,20 +1999,20 @@ const employeeControllers = {
 
     const employeeList = await db.Employee.findAll({
       attributes: {
-        exclude: ["password"]
+        exclude: ["password"],
       },
       where: filter,
-      order: [["employeeCode", "ASC"]]
-    })
+      order: [["employeeCode", "ASC"]],
+    });
 
     return res.status(200).json({
       message: "lấy danh sách nhân viên thành công",
-      data: employeeList
-    })
+      data: employeeList,
+    });
   },
 
   createEmployeeByAdmin: async (req, res) => {
-    const {fullName, phoneNumber, email, password, role} = req.body;
+    const { fullName, phoneNumber, email, password, role } = req.body;
 
     const existedEmail = await db.Employee.findOne({
       where: { email },
@@ -2036,15 +2034,15 @@ const employeeControllers = {
         message: "số điện thoại này đã tồn tại rồi",
       });
     }
-    // sinh mã nhân viên tự động theo mã cuối cùng 
+    // sinh mã theo mã lớn nhất tính cả đã xóa mềm
     const lastEmployee = await db.Employee.findOne({
+      paranoid: false,
       order: [["employeeId", "DESC"]],
-    })
+    });
     const nextCode = lastEmployee ? lastEmployee.employeeId + 1 : 1;
     const employeeCode = "NV" + String(nextCode).padStart(3, "0");
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const employee = await db.Employee.create({
       employeeCode,
@@ -2052,44 +2050,47 @@ const employeeControllers = {
       phoneNumber,
       email,
       password: hashedPassword,
-      role: role || "employee"
-    })
+      role: role || "employee",
+    });
 
     const employeeData = employee.toJSON();
     delete employeeData.password;
 
     return res.status(201).json({
       message: "tạo nhân viên thành công",
-      employee: employeeData
-    })
+      employee: employeeData,
+    });
   },
-// bởi admin có thể sửa đc all nv và all info liên quan, khác với bên chính họ thì không bao gồm role
+  // bởi admin có thể sửa đc all nv và all info liên quan, khác với bên chính họ thì không bao gồm role
   updateEmployeeByAdmin: async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
     const updateData = { ...req.body };
 
     const employee = await db.Employee.findByPk(id);
 
     if (!employee) {
       return res.status(404).json({
-        message: "không tìm thấy nhân viên"
-      })
+        message: "không tìm thấy nhân viên",
+      });
     }
 
     if (updateData.email && updateData.email !== employee.email) {
       const existedEmail = await db.Employee.findOne({
         where: {
-          email: updateData.email
-        }
-      })
+          email: updateData.email,
+        },
+      });
       if (existedEmail) {
         return res.status(409).json({
-          message: "email đã tồn tại"
-        })
+          message: "email đã tồn tại",
+        });
       }
     }
 
-    if (updateData.phoneNumber && updateData.phoneNumber !== employee.phoneNumber) {
+    if (
+      updateData.phoneNumber &&
+      updateData.phoneNumber !== employee.phoneNumber
+    ) {
       const existed = await db.Employee.findOne({
         where: {
           phoneNumber: updateData.phoneNumber,
@@ -2102,8 +2103,18 @@ const employeeControllers = {
       }
     }
 
-    if(updateData.password) {
-      updateData.password = await bcrypt.hash(updateData.password, 10)
+    if (updateData.password) {
+      updateData.password = await bcrypt.hash(updateData.password, 10);
+    }
+
+    if (
+      employee.role === "admin" &&
+      updateData.role &&
+      updateData.role !== "admin"
+    ) {
+      return res.status(403).json({
+        message: "Không thể hạ quyền tài khoản admin",
+      });
     }
 
     await employee.update(updateData);
@@ -2114,11 +2125,10 @@ const employeeControllers = {
     return res.status(200).json({
       message: "cập nhật nhân viên thành công",
       data: employeeData,
-    })
+    });
   },
-
   deleteEmployee: async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
     const employee = await db.Employee.findByPk(id);
 
     if (!employee) {
@@ -2127,7 +2137,7 @@ const employeeControllers = {
       });
     }
 
-    if (employee.role === 'admin')
+    if (employee.role === "admin")
       return res.status(403).json({
         message: "không thể xóa tài khoản admin được",
       });
@@ -2135,18 +2145,19 @@ const employeeControllers = {
     await employee.destroy();
 
     return res.status(200).json({
-      message: "đã xóa tài khoản thành công"
-    })
+      message: "đã xóa tài khoản thành công",
+    });
   },
 
-  toggleLock : async (req, res) => {
+  toggleLock: async (req, res) => {
     const employee = await db.Employee.findByPk(req.params.id);
 
-    if (!employee) return res.status(404).json({
-      message: "không tìm thấy tài khoản"
-    });
+    if (!employee)
+      return res.status(404).json({
+        message: "không tìm thấy tài khoản",
+      });
 
-    if (employee.role === "admin") 
+    if (employee.role === "admin")
       return res.status(403).json({
         message: "không thể khóa admin nè",
       });
@@ -2154,12 +2165,14 @@ const employeeControllers = {
     await employee.save();
 
     return res.status(200).json({
-      message: employee.isLocked ? "tài khoản đã bị khóa rồi" : "tài khoản đã được mở khóa",
+      message: employee.isLocked
+        ? "tài khoản đã bị khóa rồi"
+        : "tài khoản đã được mở khóa",
       isLocked: employee.isLocked,
     });
   },
 
-  changePassword: async(req, res) => {
+  changePassword: async (req, res) => {
     const { oldPassword, newPassword } = req.body;
     const employee = await db.Employee.findByPk(req.employee.employeeId);
     const validPassword = await bcrypt.compare(oldPassword, employee.password);
@@ -2167,19 +2180,17 @@ const employeeControllers = {
       return res.status(400).json({
         message: "mật khẩu cũ không đúng, nhớ lại coi",
       });
-    const salt = await bcrypt.genSalt(10);
-    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+    const hashedNewPassword = await bcrypt.hash(password, 10);
     employee.password = hashedNewPassword;
     await employee.save();
     return res.status(200).json({
       message: "đã đổi mật khẩu thành công",
     });
-  }
+  },
 };
 
-
 module.exports = employeeControllers;
-
 
 --- KẾT THÚC FILE: backend/controllers/employee.controller.js ---
 
@@ -2189,22 +2200,19 @@ module.exports = employeeControllers;
 const db = require("../models/index.model");
 const { Op } = require("sequelize");
 
-
 const medicineGroupControllers = {
   getMedicineGroup : async (req, res) => {
     const { search = ""} = req.query;
     const keyword = search.trim();
-  
-    let filter = {};
-  
-    if (keyword !== "") {
-      filter = {
-        [Op.or]: [
-          { groupName: { [Op.like]: `%${keyword}%` } },
-          { description: { [Op.like]: `%${keyword}%` } },
-        ],
-      };
-    }
+
+    const filter = keyword
+      ? {
+          [Op.or]: [
+            { groupName: { [Op.like]: `%${keyword}%` } },
+            { description: { [Op.like]: `%${keyword}%` } },
+          ],
+        }
+      : {};
   
     const medicineGroup = await db.MedicineGroup.findAll({
       where: filter,
@@ -2326,14 +2334,14 @@ const medicineControllers = {
     const offset = (parsedPage - 1) * parsedLimit;
     const keyword = search.trim();
 
-    const filter = {};
-
-    if (keyword) {
-      filter[Op.or] = [
-        { medicineCode: { [Op.like]: `%${keyword}%` } },
-        { brandName: { [Op.like]: `%${keyword}%` } },
-      ];
-    }
+    const filter = keyword
+      ? {
+          [Op.or]: [
+            { medicineCode: { [Op.like]: `%${keyword}%` } },
+            { brandName: { [Op.like]: `%${keyword}%` } },
+          ],
+        }
+      : {};
 
     const { count, rows } = await db.Medicine.findAndCountAll({
       where: filter,
@@ -2451,7 +2459,7 @@ const medicineControllers = {
       });
     }
 
-    let imageUrl = "default-medicine.jpg";
+    let imageUrl = "/img/default/default-medicine.jpg";
     if (req.files?.medicine?.[0]) {
       imageUrl = `/uploads/medicines/${req.files.medicine[0].filename}`;
     }
@@ -2464,9 +2472,9 @@ const medicineControllers = {
 
     let finalUsageData = usageData || null;
 
-    let textToEmbed = `${medicineData.brandName || ""} ${medicineData.medicineCode || ""}`;
+    let textToEmbed = `${medicineData.brandName} ${medicineData.medicineCode}`;
     if (finalUsageData) {
-      textToEmbed += ` ${finalUsageData.dosageForm || ""} ${finalUsageData.packaging || ""} ${finalUsageData.uses || ""}  ${finalUsageData.contraindications || ""}  ${finalUsageData.sideEffects || ""}  ${finalUsageData.dosageAdministration || ""} ${finalUsageData.storageCondition || ""} ${finalUsageData.warning || ""}`;
+      textToEmbed += ` ${finalUsageData.dosageForm} ${finalUsageData.packaging} ${finalUsageData.uses}  ${finalUsageData.contraindications}  ${finalUsageData.sideEffects}  ${finalUsageData.dosageAdministration} ${finalUsageData.storageCondition} ${finalUsageData.warning}`;
     }
     const vector = await generateEmbedding(textToEmbed.trim());
 
@@ -2614,19 +2622,19 @@ const medicineControllers = {
 
     let finalUsageData = usageData || null;
 
-    const finalBrandName = medicineData.brandName || medicine.brandName || "";
-    const finalCode = medicineData.medicineCode || medicine.medicineCode || "";
+    const finalBrandName = medicineData.brandName || medicine.brandName;
+    const finalCode = medicineData.medicineCode || medicine.medicineCode;
     let textToEmbed = `${finalBrandName} ${finalCode}`;
 
     if (finalUsageData) {
-      textToEmbed += ` ${finalUsageData.dosageForm || ""} ${finalUsageData.packaging || ""} ${finalUsageData.uses || ""}  ${finalUsageData.contraindications || ""}  ${finalUsageData.sideEffects || ""}  ${finalUsageData.dosageAdministration || ""} ${finalUsageData.storageCondition || ""} ${finalUsageData.warning || ""}`;
+      textToEmbed += ` ${finalUsageData.dosageForm} ${finalUsageData.packaging} ${finalUsageData.uses}  ${finalUsageData.contraindications}  ${finalUsageData.sideEffects}  ${finalUsageData.dosageAdministration} ${finalUsageData.storageCondition} ${finalUsageData.warning}`;
     } else {
-      // Trường hợp cập nhật  không sửa Hướng dẫn sử dụng, lấy Hướng dẫn cũ 
+      // không sửa Hướng dẫn sử dụng, lấy Hướng dẫn cũ 
       const oldUsage = await db.UsageInstruction.findOne({
         where: { medicineId: medicine.medicineId },
       });
       if (oldUsage) {
-        textToEmbed += `${oldUsage.dosageForm || ""} ${oldUsage.packaging || ""} ${oldUsage.uses || ""}  ${oldUsage.contraindications || ""}  ${oldUsage.sideEffects || ""}  ${oldUsage.dosageAdministration || ""} ${oldUsage.storageCondition || ""} ${oldUsage.warning || ""}`;
+        textToEmbed += `${oldUsage.dosageForm} ${oldUsage.packaging} ${oldUsage.uses}  ${oldUsage.contraindications}  ${oldUsage.sideEffects}  ${oldUsage.dosageAdministration} ${oldUsage.storageCondition} ${oldUsage.warning}`;
       }
     }
     const vector = await generateEmbedding(textToEmbed.trim());
@@ -2785,12 +2793,12 @@ const supplierControllers = {
  getSupplier : async (req, res) => {
     const { search = "" } = req.query;
     const keyword = search.trim();
-    let filter = {};
-    if (keyword !== "") {
-      filter = {
-        supplierName: { [Op.like]: `%${keyword}%` },
-      };
-    }
+  
+    const filter = keyword
+      ? {
+          supplierName: { [Op.like]: `%${keyword}%` },
+        }
+      : {};
   
     const supplierList = await db.Supplier.findAll({
       where: filter,
@@ -3079,6 +3087,270 @@ const warehouseReceiptControllers = {
       .json({ message: "Tạo phiếu nhập thành công", data: fullReceipt });
   },
 
+  updateReceipt: async (req, res) => {
+    const receiptId = req.params.id;
+    const { receiptCode, receiptDate, supplierId, details } = req.body;
+
+    const receipt = await db.WarehouseReceipt.findByPk(receiptId, {
+      include: [
+        {
+          model: db.WarehouseReceiptDetail,
+          as: "detailInfo",
+          include: [{ model: db.Batch, as: "batchInfo" }],
+        },
+      ],
+    });
+
+    if (!receipt) {
+      return res.status(404).json({ message: "Không tìm thấy phiếu nhập" });
+    }
+
+    // Đổi mã phiếu -> check trùng với phiếu khác (loại trừ chính nó)
+    if (receiptCode !== receipt.receiptCode) {
+      const codeTaken = await db.WarehouseReceipt.findOne({
+        where: { receiptCode, receiptId: { [Op.ne]: receiptId } },
+      });
+      if (codeTaken) {
+        return res
+          .status(409)
+          .json({ message: `Mã phiếu nhập "${receiptCode}" đã tồn tại` });
+      }
+    }
+
+    const supplier = await db.Supplier.findByPk(supplierId);
+    if (!supplier) {
+      return res.status(404).json({ message: "Không tìm thấy nhà cung cấp" });
+    }
+
+    const medicineIds = [...new Set(details.map((d) => d.medicineId))];
+    const medicines = await db.Medicine.findAll({
+      where: { medicineId: { [Op.in]: medicineIds } },
+    });
+    const medicineMap = new Map(medicines.map((m) => [m.medicineId, m]));
+
+    const errors = [];
+    const seenLines = new Set();
+
+    details.forEach((line, idx) => {
+      const lineNo = idx + 1;
+
+      if (!medicineMap.has(line.medicineId)) {
+        errors.push(
+          `Dòng ${lineNo}: không tìm thấy thuốc (medicineId=${line.medicineId})`,
+        );
+        return;
+      }
+
+      const dedupKey = `${line.medicineId}__${line.batchNumber.toLowerCase()}`;
+      if (seenLines.has(dedupKey)) {
+        errors.push(
+          `Dòng ${lineNo}: trùng lô thuốc với dòng khác trong phiếu, vui lòng check lại`,
+        );
+      }
+      seenLines.add(dedupKey);
+    });
+
+    if (errors.length > 0) {
+      return res.status(400).json({ message: "Dữ liệu không hợp lệ", errors });
+    }
+
+    // Khóa chính của WarehouseReceiptDetail là (receiptId, batchId) -> mỗi lô chỉ
+    // xuất hiện tối đa 1 lần trong 1 phiếu, nên có thể xác định "danh tính" của
+    // 1 dòng chi tiết chỉ bằng batchId, không cần thêm 1 id riêng.
+    const existingByBatchId = new Map(
+      receipt.detailInfo.map((d) => [d.batchId, d]),
+    );
+
+    // Resolve lô đích cho từng dòng gửi lên (giống hệt logic tạo mới)
+    const lineResolutions = [];
+    for (let idx = 0; idx < details.length; idx++) {
+      const line = details[idx];
+      const lineNo = idx + 1;
+
+      const targetBatch = await db.Batch.findOne({
+        where: { medicineId: line.medicineId, batchNumber: line.batchNumber },
+      });
+
+      // Chỉ cần NSX/HSD khi lô đích thật sự chưa tồn tại trong DB
+      if (!targetBatch) {
+        if (!line.productionDate) {
+          lineResolutions.push({
+            error: `Dòng ${lineNo}: lô "${line.batchNumber}" là lô mới, cần nhập ngày sản xuất`,
+          });
+          continue;
+        }
+        if (!line.expiryDate) {
+          lineResolutions.push({
+            error: `Dòng ${lineNo}: lô "${line.batchNumber}" là lô mới, cần nhập hạn sử dụng`,
+          });
+          continue;
+        }
+        if (new Date(line.expiryDate) <= new Date(line.productionDate)) {
+          lineResolutions.push({
+            error: `Dòng ${lineNo}: lô "${line.batchNumber}": hạn sử dụng phải sau ngày sản xuất`,
+          });
+          continue;
+        }
+      }
+
+      lineResolutions.push({ line, targetBatch });
+    }
+
+    const resolutionErrors = lineResolutions
+      .filter((r) => r.error)
+      .map((r) => r.error);
+    if (resolutionErrors.length > 0) {
+      return res
+        .status(400)
+        .json({ message: "Dữ liệu không hợp lệ", errors: resolutionErrors });
+    }
+
+    const totalPrice = details.reduce(
+      (sum, d) => sum + d.importQuantity * d.importPrice,
+      0,
+    );
+
+    try {
+      await sequelize.transaction(async (t) => {
+        // batchId nào vẫn còn được dùng lại sau khi sửa (để bước 2 biết dòng nào cần xóa)
+        const keptBatchIds = new Set();
+
+        // 1) Xử lý từng dòng gửi lên: giữ nguyên lô cũ (chỉnh SL/giá) hoặc là dòng mới
+        for (const { line, targetBatch } of lineResolutions) {
+          const existingDetail = targetBatch
+            ? existingByBatchId.get(targetBatch.batchId)
+            : null;
+
+          if (existingDetail) {
+            // Dòng vẫn dùng đúng lô đã có sẵn trong phiếu -> chỉ chỉnh chênh lệch SL/giá
+            keptBatchIds.add(targetBatch.batchId);
+            const qtyDelta =
+              line.importQuantity - existingDetail.importQuantity;
+
+            if (qtyDelta !== 0) {
+              const batch = await db.Batch.findByPk(targetBatch.batchId, {
+                transaction: t,
+                lock: t.LOCK.UPDATE,
+              });
+              if (batch.stockQuantity + qtyDelta < 0) {
+                throw new Error(
+                  `Tồn kho lô "${batch.batchNumber}" sẽ bị âm, vui lòng kiểm tra lại số lượng`,
+                );
+              }
+              await batch.increment("stockQuantity", {
+                by: qtyDelta,
+                transaction: t,
+              });
+            }
+
+            await existingDetail.update(
+              {
+                importQuantity: line.importQuantity,
+                importPrice: line.importPrice,
+              },
+              { transaction: t },
+            );
+            continue;
+          }
+
+          // Dòng mới đối với phiếu này (lô có thể đã tồn tại từ phiếu khác, hoặc hoàn toàn mới)
+          let destBatch;
+          if (targetBatch) {
+            destBatch = await db.Batch.findByPk(targetBatch.batchId, {
+              transaction: t,
+              lock: t.LOCK.UPDATE,
+            });
+            await destBatch.increment("stockQuantity", {
+              by: line.importQuantity,
+              transaction: t,
+            });
+          } else {
+            destBatch = await db.Batch.create(
+              {
+                medicineId: line.medicineId,
+                batchNumber: line.batchNumber,
+                productionDate: line.productionDate,
+                expiryDate: line.expiryDate,
+                stockQuantity: line.importQuantity,
+              },
+              { transaction: t },
+            );
+          }
+
+          await db.WarehouseReceiptDetail.create(
+            {
+              receiptId: receipt.receiptId,
+              batchId: destBatch.batchId,
+              importQuantity: line.importQuantity,
+              importPrice: line.importPrice,
+            },
+            { transaction: t },
+          );
+        }
+
+        // 2) Lô nào trước đây có trong phiếu nhưng giờ không còn -> hoàn tồn kho + xóa dòng
+        //    (đây cũng chính là "vế cũ" của 1 dòng bị đổi sang lô khác ở bước 1)
+        for (const oldDetail of receipt.detailInfo) {
+          if (keptBatchIds.has(oldDetail.batchId)) continue;
+
+          const batch = await db.Batch.findByPk(oldDetail.batchId, {
+            transaction: t,
+            lock: t.LOCK.UPDATE,
+          });
+          if (batch) {
+            if (batch.stockQuantity - oldDetail.importQuantity < 0) {
+              throw new Error(
+                `Không thể cập nhật: tồn kho lô "${batch.batchNumber}" sẽ bị âm`,
+              );
+            }
+            await batch.decrement("stockQuantity", {
+              by: oldDetail.importQuantity,
+              transaction: t,
+            });
+          }
+          await oldDetail.destroy({ transaction: t });
+        }
+
+        // 3) Cập nhật thông tin phiếu
+        await receipt.update(
+          {
+            receiptCode,
+            receiptDate: receiptDate || receipt.receiptDate,
+            supplierId,
+            totalPrice,
+          },
+          { transaction: t },
+        );
+      });
+    } catch (err) {
+      return res
+        .status(400)
+        .json({ message: err.message || "Lỗi khi cập nhật phiếu nhập" });
+    }
+
+    const fullReceipt = await db.WarehouseReceipt.findByPk(receiptId, {
+      include: [
+        { model: db.Supplier, as: "supplierInfo" },
+        { model: db.Employee, as: "employeeInfo" },
+        {
+          model: db.WarehouseReceiptDetail,
+          as: "detailInfo",
+          include: [
+            {
+              model: db.Batch,
+              as: "batchInfo",
+              include: [{ model: db.Medicine, as: "medicineInfo" }],
+            },
+          ],
+        },
+      ],
+    });
+
+    return res
+      .status(200)
+      .json({ message: "Cập nhật phiếu nhập thành công", data: fullReceipt });
+  },
+
   // GET /api/warehouse-receipts?page=1&limit=10
   getAllReceipts: async (req, res) => {
     const { search = "", page = 1, limit = 10 } = req.query;
@@ -3219,7 +3491,7 @@ async function createAdmin() {
           isLocked: false,
         });
 
-        console.log("Đã nâng cấp tài khoản thành admin");
+        console.log("Đã thay đổi vai trò thành admin");
       } else {
         console.log("Tài khoản đã là admin");
       }
@@ -3229,7 +3501,7 @@ async function createAdmin() {
       const employee = await db.Employee.create({
         employeeCode: "admin000",
         fullName: "System Administrator",
-        phoneNumber: "0999999999",
+        phoneNumber: "0912345678",
         email: ADMIN_EMAIL,
         password: hashedPassword,
         role: "admin",
@@ -3241,11 +3513,9 @@ async function createAdmin() {
       );
     }
 
-    console.log("────────────────────────────");
     console.log(`Email    : ${ADMIN_EMAIL}`);
     console.log(`Password : ${ADMIN_PASSWORD}`);
     console.log(`Role     : admin`);
-    console.log("────────────────────────────");
   } catch (error) {
     console.error("Lỗi:", error);
   } finally {
@@ -3257,7 +3527,6 @@ async function createAdmin() {
 }
 
 createAdmin();
-
 
 --- KẾT THÚC FILE: backend/createAdmin.js ---
 
@@ -3352,7 +3621,7 @@ const asyncHandler = (fn) => {
       await fn(req, res, next);
     } catch (error) {
       return res.status(500).json({
-        message: "lỗi server",
+        message: "lỗi server 500",
         error: process.env.NODE_ENV === "development" ? error.message : "", //tránh lộ db
       });
     }
@@ -3436,7 +3705,7 @@ const validate = (schema, source = "body") => {
   return (req, res, next) => {
     const { error, value } = schema.validate(req[source], {
       abortEarly: false,
-      convert: true, // ép "1" → 1 cho id đến từ params/query (luôn là string)
+      convert: true, 
       stripUnknown: true,
     });
 
@@ -3447,7 +3716,6 @@ const validate = (schema, source = "body") => {
       });
     }
 
-    // Gán lại value đã được Joi làm sạch (convert, trim) vào đúng source
     req[source] = value;
     next();
   };
@@ -3470,12 +3738,12 @@ const verifyToken = (req, res, next) => {
         // console.log(req.headers.authorization);
         jwt.verify(token, process.env.JWT_ACCESS_KEY, (err, employee) => {
             if(err) 
-                return res.status(401).json("Token không hợp lệ hoặc đã hết hạn ")
+                return res.status(401).json("Token không hợp lệ hoặc đã hết hạn ");
             req.employee = employee;
             next()
         });
     } else {
-        return res.status(401).json("bạn chưa được xác thực đâu")
+        return res.status(401).json("bạn chưa được xác thực đâu" );
     }
 }
 
@@ -4380,21 +4648,25 @@ const ingredientControllers = require("../controllers/active-ingredient.controll
 const IngredientValidations = require("../validations/requests/activeIngre.validation");
 const validate = require("../middlewares/validate");
 const asyncHandler = require("../middlewares/asyncHandler");
+const {verifyToken} = require("../middlewares/verifyToken");
 
 router.get("/", asyncHandler(ingredientControllers.getActiveIngredient));
 router.get("/:id", asyncHandler(ingredientControllers.getActiveIngredientById));
 router.post(
   "/",
+  verifyToken,
   validate(IngredientValidations.createIngredient),
   asyncHandler(ingredientControllers.createActiveIngredient),
 );
 router.put(
   "/:id",
+  verifyToken,
   validate(IngredientValidations.updateIngredient),
   asyncHandler(ingredientControllers.updateActiveIngredient),
 );
 router.delete(
   "/:id",
+  verifyToken,
   asyncHandler(ingredientControllers.deleteActiveIngredient),
 );
 
@@ -4434,16 +4706,12 @@ const batchControllers = require("../controllers/batch.controller");
 const { verifyToken } = require("../middlewares/verifyToken");
 const asyncHandler = require("../middlewares/asyncHandler");
 
-router.use(verifyToken);
-
-router.get("/", asyncHandler(batchControllers.getAllBatches));
-
-router.get("/stats", asyncHandler(batchControllers.getBatchStats));
-
-router.get("/check", asyncHandler(batchControllers.checkBatch));
-
+router.get("/",verifyToken, asyncHandler(batchControllers.getAllBatches));
+router.get("/stats",verifyToken, asyncHandler(batchControllers.getBatchStats));
+router.get("/check",verifyToken, asyncHandler(batchControllers.checkBatch));
 router.get(
   "/by-medicine/:medicineId",
+  verifyToken,
   asyncHandler(batchControllers.getBatchesByMedicine),
 );
 
@@ -4493,7 +4761,18 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + "-" + file.originalname);
   },
 });
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // tối đa 10MB
+  fileFilter: (req, file, cb) => {
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if (allowed.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Chỉ chấp nhận file ảnh JPG, PNG, WEBP"));
+    }
+  },
+});
 
 router.get(
   "/getProfile",
@@ -4553,6 +4832,7 @@ const router = express.Router();
 
 const medicineGroupControllers = require("../controllers/medicine-group.controller");
 const medicineGValidations = require("../validations/requests/medicineGroup.validation");
+const { verifyToken } = require("../middlewares/verifyToken");
 
 const validate = require("../middlewares/validate");
 const asyncHandler = require("../middlewares/asyncHandler");
@@ -4561,16 +4841,19 @@ router.get("/", asyncHandler(medicineGroupControllers.getMedicineGroup));
 router.get("/:id", asyncHandler(medicineGroupControllers.getMedicineGroupById));
 router.post(
   "/",
+  verifyToken,
   validate(medicineGValidations.createGroup),
   asyncHandler(medicineGroupControllers.createMedicineGroup),
 );
 router.put(
   "/:id",
+  verifyToken,
   validate(medicineGValidations.updateGroup),
   asyncHandler(medicineGroupControllers.updateMedicineGroup),
 );
 router.delete(
   "/:id",
+  verifyToken,
   asyncHandler(medicineGroupControllers.deleteMedicineGroup),
 );
 
@@ -4661,9 +4944,8 @@ const express = require("express");
 const router = express.Router();
 
 const supplierControllers = require("../controllers/supplier.controller");
-
 const supplierValidations = require("../validations/requests/supplier.validation");
-
+const { verifyToken } = require("../middlewares/verifyToken");
 const validate = require("../middlewares/validate");
 const asyncHandler = require("../middlewares/asyncHandler")
 
@@ -4671,15 +4953,17 @@ router.get("/", asyncHandler(supplierControllers.getSupplier));
 router.get("/:id", asyncHandler(supplierControllers.getSupplierById));
 router.post(
   "/",
+  verifyToken,
   validate(supplierValidations.createSupplier),
   asyncHandler(supplierControllers.createSupplier),
 );
 router.put(
   "/:id",
+  verifyToken,
   validate(supplierValidations.updateSupplier),
   asyncHandler(supplierControllers.updateSupplier),
 );
-router.delete("/:id", asyncHandler(supplierControllers.deleteSupplier));
+router.delete("/:id", verifyToken, asyncHandler(supplierControllers.deleteSupplier));
 
 module.exports = router;
 
@@ -4697,23 +4981,30 @@ const { verifyToken } = require("../middlewares/verifyToken");
 const validate = require("../middlewares/validate");
 const asyncHandler = require("../middlewares/asyncHandler");
 
-router.use(verifyToken);
-
-router.get("/", asyncHandler(warehouseReceiptControllers.getAllReceipts));
+router.get("/",verifyToken, asyncHandler(warehouseReceiptControllers.getAllReceipts));
 
 router.get(
   "/check-code",
+  verifyToken,
   asyncHandler(warehouseReceiptControllers.checkReceiptCode),
 );
 
-router.get("/cost-trend", asyncHandler(warehouseReceiptControllers.getImportCostTrend));
+router.get("/cost-trend",verifyToken, asyncHandler(warehouseReceiptControllers.getImportCostTrend));
 
-router.get("/:id", asyncHandler(warehouseReceiptControllers.getReceiptById));
+router.get("/:id",verifyToken, asyncHandler(warehouseReceiptControllers.getReceiptById));
 
 router.post(
   "/",
+  verifyToken,
   validate(warehouseValidation.createReceipt),
   asyncHandler(warehouseReceiptControllers.createReceipt),
+);
+
+router.put(
+  "/:id",
+  verifyToken,
+  validate(warehouseValidation.updateReceipt),
+  asyncHandler(warehouseReceiptControllers.updateReceipt),
 );
 
 module.exports = router;
@@ -4828,14 +5119,18 @@ Gọi khi khách muốn tìm/tra cứu thuốc theo: tên thuốc.
 Ví dụ: "thông tin về thuốc Amoxicillin", "cách sử dụng Amoxicillin?"
 
 ## TOOL 3 — Chi tiết thuốc → get_medicine_details
-Gọi khi khách hỏi sâu về 1 thuốc: tên, liều dùng, chỉ định, tác dụng phụ, cảnh báo.
+Gọi khi khách hỏi về: mã thuốc, xuất xứ, giá, đơn vị, trạng thái, tồn kho, nhóm thuốc, THÀNH PHẦN HOẠT CHẤT của một thuốc cụ thể.
+Ví dụ: "Panadol giá bao nhiêu?", "Thuốc này chứa hoạt chất gì?", "Amoxicillin còn hàng không?"
 
 ## TOOL 4 — Hướng dẫn sử dụng → get_usage_instructions
-Gọi khi khách hỏi: "Dùng như thế nào?", "Liều dùng bao nhiêu?", "Khi nào dùng?", "Ai không nên dùng?"
+Gọi khi khách hỏi: liều dùng, cách dùng, chỉ định, chống chỉ định, tác dụng phụ, bảo quản, cảnh báo/thận trọng.
 
 ## TOOL 5 — Tìm kiếm theo hoạt chất → search_ingredient
 Gọi khi khách hỏi: "Thuốc nào chứa Paracetamol?", "Có thuốc gì chứa Vitamin C?"
 
+## Phân biệt TOOL 3 và TOOL 5 (QUAN TRỌNG)
+- Khách đã có TÊN THUỐC, hỏi thuốc đó chứa hoạt chất/thành phần gì → get_medicine_details
+- Khách đưa TÊN HOẠT CHẤT, hỏi có (những) thuốc nào chứa hoạt chất đó → search_ingredient
 `;
 
 const tools = [
@@ -4867,7 +5162,7 @@ const tools = [
     type: "function",
     function: {
       name: "get_medicine_details",
-      description: "Lấy thông tin chi tiết một thuốc cụ thể: tên, xuất xứ, số đăng ký, giá, đơn vị và trạng thái ",
+      description: "Lấy thông tin chi tiết một thuốc cụ thể: mã thuốc, xuất xứ, giá, đơn vị, trạng thái, tồn kho, nhóm thuốc và THÀNH PHẦN HOẠT CHẤT (dùng khi khách hỏi thuốc X chứa hoạt chất/thành phần gì).",
       parameters: {
         type: "object",
         properties: {
@@ -4964,11 +5259,11 @@ const pharmacyAiAgentService = {
       );
 
       const completion = await groq.chat.completions.create({
-        model: "openai/gpt-oss-120b",
+        model: "llama-3.3-70b-versatile",
         messages: groqMessages,
         tools: tools,
         tool_choice: "auto",
-        temperature: 0.5,
+        temperature: 0.1,
         max_tokens: 2048,
       });
 
@@ -5005,7 +5300,7 @@ const pharmacyAiAgentService = {
 
         // Get final response từ AI
         const finalCompletion = await groq.chat.completions.create({
-          model: "openai/gpt-oss-120b",
+          model: "llama-3.3-70b-versatile",
           messages: groqMessages,
           temperature: 0.5,
           max_tokens: 2048,
@@ -5029,6 +5324,54 @@ const pharmacyAiAgentService = {
       };
     } catch (error) {
       console.error("[PHARMACY AI SERVICE ERROR]", error);
+
+      if (error?.error?.error?.code === "tool_use_failed") {
+        const raw = error.error.error.failed_generation || "";
+        const match = raw.match(/<function=(\w+)(\{.*\})<\/function>/);
+        if (match) {
+          const recoveredToolName = match[1];
+          let recoveredArgs = {};
+          try {
+            recoveredArgs = JSON.parse(match[2]);
+          } catch (_) {}
+
+          console.log(
+            `[PHARMACY AI] Tự phục hồi tool: ${recoveredToolName}`,
+            recoveredArgs,
+          );
+          const toolResult = await executeTool(
+            recoveredToolName,
+            recoveredArgs,
+            userId,
+          );
+
+          const finalCompletion = await groq.chat.completions.create({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+              { role: "system", content: systemInstruction },
+              { role: "user", content: userMessage },
+              {
+                role: "assistant",
+                content: `Đã tra cứu bằng ${recoveredToolName}.`,
+              },
+              {
+                role: "tool",
+                tool_call_id: "recovered_call",
+                name: recoveredToolName,
+                content: JSON.stringify(toolResult),
+              },
+            ],
+            temperature: 0.5,
+            max_tokens: 2048,
+          });
+
+          return {
+            reply: finalCompletion.choices[0].message.content,
+            thinkingType: "slow (recovered)",
+            toolUsed: recoveredToolName,
+          };
+        }
+      }
 
       if (error.status === 429) {
         return {
@@ -5135,37 +5478,43 @@ const pharmacyTools = {
       if (!medicines || medicines.length === 0) {
         console.log("[TOOL] Fallback Fuzzy Search MySQL...");
         const keyword = query.trim();
+        const groupKeyword = (medicineGroup && medicineGroup.trim()) || keyword;
 
-        const filter = {
-          [Op.or]: [
-            { medicineCode: { [Op.like]: `%${keyword}%` } },
-            { brandName: { [Op.like]: `%${keyword}%` } }
-          ]
-        };
-
-        filter.status = "đang cung cấp"; 
-
+        const commonFilter = { status: "đang cung cấp" };
         if (maxPrice) {
-          filter.price = { [Op.lte]: parseFloat(maxPrice) };
+          commonFilter.price = { [Op.lte]: parseFloat(maxPrice) };
         }
 
-        const rows = await db.Medicine.findAll({
-          where: filter,
+        // 1) Thử tra theo NHÓM THUỐC trước (khớp groupName với medicineGroup hoặc chính keyword)
+        let rows = await db.Medicine.findAll({
+          where: commonFilter,
           limit: 5,
           order: [["brandName", "ASC"]],
           include: [
             {
               model: db.MedicineGroup,
               as: "medicineGroupInfo",
-              ...(medicineGroup && {
-                where: {
-                  groupName: { [Op.like]: `%${medicineGroup}%` },
-                },
-                required: true,
-              }),
+              where: { groupName: { [Op.like]: `%${groupKeyword}%` } },
+              required: true,
             },
           ],
         });
+
+        // 2) Nếu không ra theo nhóm, fallback tra theo tên/mã thuốc như cũ
+        if (rows.length === 0) {
+          rows = await db.Medicine.findAll({
+            where: {
+              ...commonFilter,
+              [Op.or]: [
+                { medicineCode: { [Op.like]: `%${keyword}%` } },
+                { brandName: { [Op.like]: `%${keyword}%` } },
+              ],
+            },
+            limit: 5,
+            order: [["brandName", "ASC"]],
+            include: [{ model: db.MedicineGroup, as: "medicineGroupInfo" }],
+          });
+        }
 
         medicines = rows.map(r => r.toJSON());
       }
@@ -5654,7 +6003,6 @@ const employeeValidations = {
       .pattern(/^[0-9]+$/)
       .length(10),
     email: Joi.string().email().max(100),
-    hireDate: Joi.date(),
   }).unknown(false),
 
   login: Joi.object({
@@ -5676,7 +6024,6 @@ module.exports = employeeValidations;
 --- BẮT ĐẦU FILE: backend/validations/requests/medicine.validation.js ---
 
 const Joi = require("joi");
-const { changeStatus } = require("../../controllers/medicine.controller");
 
 const medicineValidations = {
   createMedicine: Joi.object({
@@ -5686,7 +6033,6 @@ const medicineValidations = {
     status: Joi.string().valid("đang cung cấp", "ngừng cung cấp"),
     price: Joi.number().positive().precision(2).required(),
     registrationNumber: Joi.string().max(50).required(),
-    imageUrl: "",
     unit: Joi.string().valid(
       "Viên",
       "Vỉ",
@@ -5893,6 +6239,32 @@ const warehouseValidation = {
       "any.required": "Danh sách thuốc nhập là bắt buộc",
     }),
   }),
+  updateReceipt: Joi.object({
+    receiptCode: Joi.string().trim().max(20).required().messages({
+      "string.base": "Mã phiếu nhập phải là chuỗi ký tự",
+      "string.empty": "Mã phiếu nhập không được để trống",
+      "string.max": "Mã phiếu nhập tối đa 20 ký tự",
+      "any.required": "Mã phiếu nhập là bắt buộc",
+    }),
+
+    receiptDate: Joi.date().iso().optional().messages({
+      "date.base": "Ngày nhập không hợp lệ",
+      "date.format": "Ngày nhập phải theo định dạng YYYY-MM-DD",
+    }),
+
+    supplierId: Joi.number().integer().positive().required().messages({
+      "number.base": "supplierId phải là số",
+      "number.integer": "supplierId phải là số nguyên",
+      "number.positive": "Vui lòng chọn nhà cung cấp hợp lệ",
+      "any.required": "Vui lòng chọn nhà cung cấp",
+    }),
+
+    details: Joi.array().items(detailSchema).min(1).required().messages({
+      "array.base": "Danh sách thuốc nhập không hợp lệ",
+      "array.min": "Phiếu nhập phải có ít nhất 1 dòng thuốc",
+      "any.required": "Danh sách thuốc nhập là bắt buộc",
+    }),
+  }),
 };
 
 module.exports = warehouseValidation;
@@ -5901,7 +6273,7 @@ module.exports = warehouseValidation;
 --- KẾT THÚC FILE: backend/validations/requests/warehouse.validation.js ---
 
 
---- BẮT ĐẦU FILE: chatbotCombineProject.js ---
+--- BẮT ĐẦU FILE: CombineProject.js ---
 
 const fs = require("fs");
 const path = require("path");
@@ -5994,7 +6366,7 @@ console.log(
 );
 
 
---- KẾT THÚC FILE: chatbotCombineProject.js ---
+--- KẾT THÚC FILE: CombineProject.js ---
 
 
 --- BẮT ĐẦU FILE: database/cao/CrawData_Drug/.venv/Lib/site-packages/urllib3/contrib/emscripten/emscripten_fetch_worker.js ---

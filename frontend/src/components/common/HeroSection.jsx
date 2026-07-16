@@ -4,8 +4,8 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 const banners = [
   "img/banner/banner4.jpg",
   "img/banner/banner2.webp",
-  "img/banner/banner3.jpg",
   "img/banner/banner1.png",
+  "img/banner/banner3.jpg",
 ];
 
 export function HeroSection() {

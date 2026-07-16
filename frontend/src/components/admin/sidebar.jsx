@@ -83,7 +83,7 @@ function AccordionItem({ item }) {
           ${
             isChildActive
               ? "btn-gradient text-white font-semibold shadow-md"
-              : "text-gray-700 hover:bg-gray-100"
+              : "text-black-900 hover:bg-blue-100"
           }`}
       >
         <item.icon className="h-4 w-4 shrink-0" />
@@ -105,8 +105,8 @@ function AccordionItem({ item }) {
                 `flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition
                 ${
                   isActive
-                    ? "bg-blue-50 text-blue-700 font-semibold"
-                    : "text-gray-600 hover:bg-gray-100"
+                    ? "bg-blue-100 text-blue-700 font-semibold"
+                    : "text-black-900 hover:bg-blue-100"
                 }`
               }
             >
@@ -125,7 +125,7 @@ export function Sidebar() {
   const userRole = user?.role;
 
   return (
-    <aside className="hidden md:flex w-64 shrink-0 flex-col h-screen sticky top-0 bg-sidebar border-r border-sidebar-border overflow-y-auto">
+    <aside className="hidden md:flex w-64 shrink-0 flex-col h-screen sticky top-0 bg-sidebar border-r border-sidebar-border overflow-y-auto ">
       {/* Logo */}
       <div className="p-5 shrink-0">
         <Link to="/" className="flex items-center gap-2">
@@ -163,7 +163,7 @@ export function Sidebar() {
                 ${
                   isActive
                     ? "btn-gradient text-white shadow-md"
-                    : "text-gray-700 hover:bg-gray-100"
+                    : "text-black-900 hover:bg-blue-100"
                 }`
               }
             >
@@ -176,7 +176,7 @@ export function Sidebar() {
       <div className="p-3 shrink-0">
         <Link
           to="/"
-          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 text-black-900 hover:bg-blue-100 hover:text-blue-900"
         >
           <FaHome className="h-4 w-4" /> Trang chủ
         </Link>

@@ -71,37 +71,43 @@ const pharmacyTools = {
       if (!medicines || medicines.length === 0) {
         console.log("[TOOL] Fallback Fuzzy Search MySQL...");
         const keyword = query.trim();
+        const groupKeyword = (medicineGroup && medicineGroup.trim()) || keyword;
 
-        const filter = {
-          [Op.or]: [
-            { medicineCode: { [Op.like]: `%${keyword}%` } },
-            { brandName: { [Op.like]: `%${keyword}%` } }
-          ]
-        };
-
-        filter.status = "đang cung cấp"; 
-
+        const commonFilter = { status: "đang cung cấp" };
         if (maxPrice) {
-          filter.price = { [Op.lte]: parseFloat(maxPrice) };
+          commonFilter.price = { [Op.lte]: parseFloat(maxPrice) };
         }
 
-        const rows = await db.Medicine.findAll({
-          where: filter,
+        // 1) Thử tra theo NHÓM THUỐC trước (khớp groupName với medicineGroup hoặc chính keyword)
+        let rows = await db.Medicine.findAll({
+          where: commonFilter,
           limit: 5,
           order: [["brandName", "ASC"]],
           include: [
             {
               model: db.MedicineGroup,
               as: "medicineGroupInfo",
-              ...(medicineGroup && {
-                where: {
-                  groupName: { [Op.like]: `%${medicineGroup}%` },
-                },
-                required: true,
-              }),
+              where: { groupName: { [Op.like]: `%${groupKeyword}%` } },
+              required: true,
             },
           ],
         });
+
+        // 2) Nếu không ra theo nhóm, fallback tra theo tên/mã thuốc như cũ
+        if (rows.length === 0) {
+          rows = await db.Medicine.findAll({
+            where: {
+              ...commonFilter,
+              [Op.or]: [
+                { medicineCode: { [Op.like]: `%${keyword}%` } },
+                { brandName: { [Op.like]: `%${keyword}%` } },
+              ],
+            },
+            limit: 5,
+            order: [["brandName", "ASC"]],
+            include: [{ model: db.MedicineGroup, as: "medicineGroupInfo" }],
+          });
+        }
 
         medicines = rows.map(r => r.toJSON());
       }

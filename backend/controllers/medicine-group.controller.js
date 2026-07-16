@@ -1,22 +1,19 @@
 const db = require("../models/index.model");
 const { Op } = require("sequelize");
 
-
 const medicineGroupControllers = {
   getMedicineGroup : async (req, res) => {
     const { search = ""} = req.query;
     const keyword = search.trim();
-  
-    let filter = {};
-  
-    if (keyword !== "") {
-      filter = {
-        [Op.or]: [
-          { groupName: { [Op.like]: `%${keyword}%` } },
-          { description: { [Op.like]: `%${keyword}%` } },
-        ],
-      };
-    }
+
+    const filter = keyword
+      ? {
+          [Op.or]: [
+            { groupName: { [Op.like]: `%${keyword}%` } },
+            { description: { [Op.like]: `%${keyword}%` } },
+          ],
+        }
+      : {};
   
     const medicineGroup = await db.MedicineGroup.findAll({
       where: filter,

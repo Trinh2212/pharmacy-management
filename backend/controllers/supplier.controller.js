@@ -5,12 +5,12 @@ const supplierControllers = {
  getSupplier : async (req, res) => {
     const { search = "" } = req.query;
     const keyword = search.trim();
-    let filter = {};
-    if (keyword !== "") {
-      filter = {
-        supplierName: { [Op.like]: `%${keyword}%` },
-      };
-    }
+  
+    const filter = keyword
+      ? {
+          supplierName: { [Op.like]: `%${keyword}%` },
+        }
+      : {};
   
     const supplierList = await db.Supplier.findAll({
       where: filter,

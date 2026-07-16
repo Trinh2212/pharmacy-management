@@ -1,6 +1,7 @@
 const { sequelize } = require("../config/database");
 const db = require("../models/index.model");
 const {Op} = require("sequelize");
+const { deleteFile } = require("../utils/deleteFile");
 const { generateEmbedding } = require("../service/rag/embeddingService");
 
 const medicineControllers = {
@@ -12,14 +13,14 @@ const medicineControllers = {
     const offset = (parsedPage - 1) * parsedLimit;
     const keyword = search.trim();
 
-    const filter = {};
-
-    if (keyword) {
-      filter[Op.or] = [
-        { medicineCode: { [Op.like]: `%${keyword}%` } },
-        { brandName: { [Op.like]: `%${keyword}%` } },
-      ];
-    }
+    const filter = keyword
+      ? {
+          [Op.or]: [
+            { medicineCode: { [Op.like]: `%${keyword}%` } },
+            { brandName: { [Op.like]: `%${keyword}%` } },
+          ],
+        }
+      : {};
 
     const { count, rows } = await db.Medicine.findAndCountAll({
       where: filter,
@@ -137,7 +138,7 @@ const medicineControllers = {
       });
     }
 
-    let imageUrl = "default-medicine.jpg";
+    let imageUrl = "/img/default/default-medicine.jpg";
     if (req.files?.medicine?.[0]) {
       imageUrl = `/uploads/medicines/${req.files.medicine[0].filename}`;
     }
@@ -150,9 +151,9 @@ const medicineControllers = {
 
     let finalUsageData = usageData || null;
 
-    let textToEmbed = `${medicineData.brandName || ""} ${medicineData.medicineCode || ""}`;
+    let textToEmbed = `${medicineData.brandName} ${medicineData.medicineCode}`;
     if (finalUsageData) {
-      textToEmbed += ` ${finalUsageData.dosageForm || ""} ${finalUsageData.packaging || ""} ${finalUsageData.uses || ""}  ${finalUsageData.contraindications || ""}  ${finalUsageData.sideEffects || ""}  ${finalUsageData.dosageAdministration || ""} ${finalUsageData.storageCondition || ""} ${finalUsageData.warning || ""}`;
+      textToEmbed += ` ${finalUsageData.dosageForm} ${finalUsageData.packaging} ${finalUsageData.uses}  ${finalUsageData.contraindications}  ${finalUsageData.sideEffects}  ${finalUsageData.dosageAdministration} ${finalUsageData.storageCondition} ${finalUsageData.warning}`;
     }
     const vector = await generateEmbedding(textToEmbed.trim());
 
@@ -287,6 +288,8 @@ const medicineControllers = {
       }
     }
 
+    const oldImageUrl = medicine.imageUrl;
+
     let imageUrl = medicine.imageUrl;
     if (req.files?.medicine?.[0]) {
       imageUrl = `/uploads/medicines/${req.files.medicine[0].filename}`;
@@ -300,20 +303,20 @@ const medicineControllers = {
 
     let finalUsageData = usageData || null;
 
-    const finalBrandName = medicineData.brandName || medicine.brandName || "";
-    const finalCode = medicineData.medicineCode || medicine.medicineCode || "";
+    const existingUsage = await db.UsageInstruction.findOne({
+      where: { medicineId: medicine.medicineId },
+    });
+    const oldDocumentUrl = existingUsage?.document || null;
+
+    const finalBrandName = medicineData.brandName || medicine.brandName;
+    const finalCode = medicineData.medicineCode || medicine.medicineCode;
     let textToEmbed = `${finalBrandName} ${finalCode}`;
 
     if (finalUsageData) {
-      textToEmbed += ` ${finalUsageData.dosageForm || ""} ${finalUsageData.packaging || ""} ${finalUsageData.uses || ""}  ${finalUsageData.contraindications || ""}  ${finalUsageData.sideEffects || ""}  ${finalUsageData.dosageAdministration || ""} ${finalUsageData.storageCondition || ""} ${finalUsageData.warning || ""}`;
-    } else {
-      // Trường hợp cập nhật  không sửa Hướng dẫn sử dụng, lấy Hướng dẫn cũ 
-      const oldUsage = await db.UsageInstruction.findOne({
-        where: { medicineId: medicine.medicineId },
-      });
-      if (oldUsage) {
-        textToEmbed += `${oldUsage.dosageForm || ""} ${oldUsage.packaging || ""} ${oldUsage.uses || ""}  ${oldUsage.contraindications || ""}  ${oldUsage.sideEffects || ""}  ${oldUsage.dosageAdministration || ""} ${oldUsage.storageCondition || ""} ${oldUsage.warning || ""}`;
-      }
+      textToEmbed += ` ${finalUsageData.dosageForm} ${finalUsageData.packaging} ${finalUsageData.uses}  ${finalUsageData.contraindications}  ${finalUsageData.sideEffects}  ${finalUsageData.dosageAdministration} ${finalUsageData.storageCondition} ${finalUsageData.warning}`;
+    } else if (existingUsage) {
+      // không sửa Hướng dẫn sử dụng, lấy Hướng dẫn cũ
+        textToEmbed += `${existingUsage.dosageForm} ${existingUsage.packaging} ${existingUsage.uses}  ${existingUsage.contraindications}  ${existingUsage.sideEffects}  ${existingUsage.dosageAdministration} ${existingUsage.storageCondition} ${existingUsage.warning}`;
     }
     const vector = await generateEmbedding(textToEmbed.trim());
 
@@ -372,9 +375,17 @@ const medicineControllers = {
           );
         }
       }
-
       return medicine;
     });
+
+    if (imageUrl !== oldImageUrl &&
+      oldImageUrl !== "/img/default/default-medicine.jpg"
+    ) {
+      deleteFile(oldImageUrl);
+    }
+    if (documentUrl && oldDocumentUrl && documentUrl !== oldDocumentUrl) {
+      deleteFile(oldDocumentUrl);
+    }
 
     const finalMedicine = await db.Medicine.findByPk(result.medicineId, {
       include: [

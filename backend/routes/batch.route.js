@@ -4,16 +4,12 @@ const batchControllers = require("../controllers/batch.controller");
 const { verifyToken } = require("../middlewares/verifyToken");
 const asyncHandler = require("../middlewares/asyncHandler");
 
-router.use(verifyToken);
-
-router.get("/", asyncHandler(batchControllers.getAllBatches));
-
-router.get("/stats", asyncHandler(batchControllers.getBatchStats));
-
-router.get("/check", asyncHandler(batchControllers.checkBatch));
-
+router.get("/",verifyToken, asyncHandler(batchControllers.getAllBatches));
+router.get("/stats",verifyToken, asyncHandler(batchControllers.getBatchStats));
+router.get("/check",verifyToken, asyncHandler(batchControllers.checkBatch));
 router.get(
   "/by-medicine/:medicineId",
+  verifyToken,
   asyncHandler(batchControllers.getBatchesByMedicine),
 );
 

@@ -6,27 +6,28 @@ const { verifyToken } = require("../middlewares/verifyToken");
 const validate = require("../middlewares/validate");
 const asyncHandler = require("../middlewares/asyncHandler");
 
-router.use(verifyToken);
-
-router.get("/", asyncHandler(warehouseReceiptControllers.getAllReceipts));
+router.get("/",verifyToken, asyncHandler(warehouseReceiptControllers.getAllReceipts));
 
 router.get(
   "/check-code",
+  verifyToken,
   asyncHandler(warehouseReceiptControllers.checkReceiptCode),
 );
 
-router.get("/cost-trend", asyncHandler(warehouseReceiptControllers.getImportCostTrend));
+router.get("/cost-trend",verifyToken, asyncHandler(warehouseReceiptControllers.getImportCostTrend));
 
-router.get("/:id", asyncHandler(warehouseReceiptControllers.getReceiptById));
+router.get("/:id",verifyToken, asyncHandler(warehouseReceiptControllers.getReceiptById));
 
 router.post(
   "/",
+  verifyToken,
   validate(warehouseValidation.createReceipt),
   asyncHandler(warehouseReceiptControllers.createReceipt),
 );
 
 router.put(
   "/:id",
+  verifyToken,
   validate(warehouseValidation.updateReceipt),
   asyncHandler(warehouseReceiptControllers.updateReceipt),
 );

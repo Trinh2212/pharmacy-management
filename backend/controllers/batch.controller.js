@@ -1,7 +1,6 @@
 const db = require("../models/index.model");
 const { Op } = require("sequelize");
 
-
 function getDateBoundaries() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -12,7 +11,7 @@ function getDateBoundaries() {
   return { today, thresholdDate };
 }
 
-function computeBatchStatus(expiryDate, today, thresholdDate) {
+function checkBatchStatus(expiryDate, today, thresholdDate) {
   const expiry = new Date(expiryDate);
   if (expiry < today) return "expired";
   if (expiry <= thresholdDate) return "expiring";
@@ -21,13 +20,7 @@ function computeBatchStatus(expiryDate, today, thresholdDate) {
 
 const batchControllers = {
   getAllBatches: async (req, res) => {
-    const {
-      search = "",
-      status = "all",
-      medicineId,
-      page = 1,
-      limit = 10,
-    } = req.query;
+    const { search = "", status = "all", medicineId, page = 1, limit = 10 } = req.query;
 
     const parsedLimit = parseInt(limit, 10);
     const parsedPage = parseInt(page, 10);
@@ -87,7 +80,7 @@ const batchControllers = {
       const plain = row.toJSON();
       return {
         ...plain,
-        batchStatus: computeBatchStatus(plain.expiryDate, today, thresholdDate),
+        batchStatus: checkBatchStatus(plain.expiryDate, today, thresholdDate),
       };
     });
 
@@ -100,7 +93,7 @@ const batchControllers = {
     });
   },
 
-  // GET /api/batches/stats — dùng cho dashboard
+  // dùng cho dashboard
   getBatchStats: async (req, res) => {
     const { today, thresholdDate } = getDateBoundaries();
 
@@ -129,7 +122,7 @@ const batchControllers = {
       const plain = row.toJSON();
       return {
         ...plain,
-        batchStatus: computeBatchStatus(plain.expiryDate, today, thresholdDate),
+        batchStatus: checkBatchStatus(plain.expiryDate, today, thresholdDate),
       };
     });
 
@@ -168,7 +161,6 @@ const batchControllers = {
     return res.json({ data: batches });
   },
 
-  // GET /api/batches/check?medicineId=1&batchNumber=LOT001
   checkBatch: async (req, res) => {
     const { medicineId, batchNumber } = req.query;
 
@@ -183,8 +175,8 @@ const batchControllers = {
       ],
     });
 
-    // exists=true  → lô cũ, frontend tự điền productionDate + expiryDate
-    // exists=false → lô mới, nhân viên nhập tay
+    // exists=true lô cũ, frontend tự điền productionDate + expiryDate
+    // exists=false lô mới, nhân viên nhập tay
     return res.json({ exists: !!batch, batch: batch || null });
   },
 };
