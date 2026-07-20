@@ -5,22 +5,7 @@ import axiosClient from "../../api/axiosClient";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer} from "recharts";
 import { FaCapsules, FaTruck, FaUsers, FaTriangleExclamation, FaCalendarDays, FaClock, FaBoxesStacked} from "react-icons/fa6";
 import { BiChevronsRight } from "react-icons/bi";
-function formatCurrency(value) {
-  const n = Number(value);
-  if (!value && value !== 0) return "0đ";
-  if (Number.isNaN(n)) return "0đ";
-  return n.toLocaleString("vi-VN") + "đ";
-}
-
-function formatDate(value) {
-  return value ? new Date(value).toLocaleDateString("vi-VN") : "chưa cập nhật";
-}
-
-function formatMonthLabel(monthStr) {
-  if (!monthStr) return "";
-  const [year, month] = monthStr.split("-");
-  return `Th${month}/${year}`;
-}
+import { formatDate, formatCurrency, formatMonthLabel } from "../../utils/Format";
 
 function extractCount(resData, totalFieldCandidates = []) {
   if (!resData) return 0;
@@ -141,7 +126,7 @@ export default function Dashboard() {
     <>
       <Topbar title="Dashboard" subtitle="Tổng quan hoạt động hệ thống" />
       <div className="p-6 min-h-screen">
-        {/* ── Thẻ thống kê ── */}
+        {/* Thẻ thống kê  */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           <StatCard
             icon={FaCapsules}

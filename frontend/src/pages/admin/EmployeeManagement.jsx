@@ -2,10 +2,9 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Topbar } from "../../components/admin/topbar";
 import axiosClient from "../../api/axiosClient";
 import { alertSuccess, alertError, alertWarning, alertConfirm, alertToast} from "../../utils/SwalAlert";
-import { FaEnvelope, FaPhone, FaVenusMars, FaCakeCandles, FaLocationDot, FaCalendarDays, FaCircleInfo, FaShieldHalved, FaUser, FaXmark,
-FaBan, FaCircleCheck, FaLock, FaLockOpen } from "react-icons/fa6";
-
-const DEFAULT_AVATAR = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+import { FaEnvelope, FaPhone, FaVenusMars, FaCakeCandles, FaLocationDot, FaCalendarDays, FaCircleInfo, FaShieldHalved, FaUser, FaXmark,FaBan, FaCircleCheck, FaLock, FaLockOpen } from "react-icons/fa6";
+import {fileUrl} from "../../utils/FileUrl";
+import {formatDate} from "../../utils/Format"
 
 function Field({ label, name, value, onChange, type = "text", placeholder = "" }) {
   return (
@@ -47,23 +46,20 @@ function SelectField({ label, name, value, onChange, options }) {
 function Modal({ title, onClose, children }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm px-4 animate-[fadeIn_0.15s_ease-out]"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col max-h-[90vh]"
+        className="bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden animate-[scaleIn_0.15s_ease-out]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
-          <div className="w-5"></div>{" "}
-          <h3 className="text-xl font-bold text-slate-800 text-center">
-            {title}
-          </h3>
+        <div className="relative px-6 py-5 bg-gradient-to-r from-blue-600 to-blue-500 shrink-0">
+          <h3 className="text-xl font-bold text-white text-center pr-8">{title}</h3>
           <button
             onClick={onClose}
-            className="p-1 text-gray-400 hover:text-gray-600 transition"
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-white/80 hover:text-white hover:bg-white/15 transition"
           >
-            <FaXmark className="h-5 w-5" />
+            <FaXmark className="h-4 w-4" />
           </button>
         </div>
         <div className="flex flex-col overflow-y-auto">{children}</div>
@@ -332,6 +328,7 @@ export default function EmployeeManagement() {
                       colSpan="5"
                       className="px-6 py-12 text-center text-gray-400"
                     >
+                      {" "}
                       Không tìm thấy nhân viên phù hợp!
                     </td>
                   </tr>
@@ -346,16 +343,13 @@ export default function EmployeeManagement() {
                           ${isSelected ? "bg-blue-100 ring-1 ring-inset ring-blue-50" : "hover:bg-gray-100"}
                           ${u.isLocked ? "bg-red-50/30" : ""}`}
                       >
-                        {/* Cột 1: Avatar + Mã NV */}
+                        {/* Avatar + Mã NV */}
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <img
                               src={
-                                u.avatarUrl
-                                  ? u.avatarUrl.startsWith("/uploads")
-                                    ? `http://localhost:5000${u.avatarUrl}`
-                                    : u.avatarUrl
-                                  : DEFAULT_AVATAR
+                                fileUrl(u.avatarUrl) ||
+                                "/img/default/default-avt.png"
                               }
                               alt="avatar"
                               className="w-10 h-10 rounded-full object-cover border border-gray-200 shrink-0"
@@ -366,12 +360,13 @@ export default function EmployeeManagement() {
                           </div>
                         </td>
 
-                        {/* Cột 2: Họ tên */}
+                        {/* Họ tên */}
                         <td className="px-6 py-4 font-medium text-black">
+                          {" "}
                           {u.fullName}
                         </td>
 
-                        {/* Cột 3: Liên hệ */}
+                        {/* Liên hệ */}
                         <td className="px-6 py-4 text-sm text-gray-600">
                           <div className="flex items-center gap-1.5 mb-1">
                             <FaEnvelope className="text-gray-500 shrink-0" />
@@ -383,7 +378,7 @@ export default function EmployeeManagement() {
                           </div>
                         </td>
 
-                        {/* Cột 4: Vai trò */}
+                        {/* Vai trò */}
                         <td
                           className="px-6 py-4"
                           onClick={(e) => e.stopPropagation()}
@@ -408,7 +403,7 @@ export default function EmployeeManagement() {
                           </select>
                         </td>
 
-                        {/* Cột 5: Trạng thái  */}
+                        {/* Trạng thái  */}
                         <td
                           className="px-6 py-4"
                           onClick={(e) => e.stopPropagation()}
@@ -472,7 +467,7 @@ export default function EmployeeManagement() {
         </div>
       </div>
 
-      {/* ── Modal Thêm nhân viên ── */}
+      {/* Modal Thêm nhân viên*/}
       {showCreate && (
         <Modal title="THÊM TÀI KHOẢN MỚI" onClose={() => setShowCreate(false)}>
           <form onSubmit={handleSubmitCreate} className="flex flex-col">
@@ -550,7 +545,7 @@ export default function EmployeeManagement() {
         </Modal>
       )}
 
-      {/* ── Modal Sửa nhân viên ── */}
+      {/* Modal Sửa nhân viên*/}
       {showEdit && editTarget && (
         <Modal title="CẬP NHẬT THÔNG TIN" onClose={() => setShowEdit(false)}>
           <form onSubmit={handleSubmitEdit} className="flex flex-col">
@@ -661,38 +656,35 @@ export default function EmployeeManagement() {
         </Modal>
       )}
 
-      {/* ── Detail Modal ── */}
+      {/* Detail Modal */}
       {detailEmployee && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm px-4"
           onClick={() => setDetailEmployee(null)}
         >
           <div
-            className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden"
+            className="bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 w-full max-w-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-gradient-to-r from-blue-600 to-blue-400 px-6 py-5 flex items-center gap-4">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-8 flex items-center gap-4">
               <img
                 src={
-                  detailEmployee.avatarUrl
-                    ? detailEmployee.avatarUrl.startsWith("/uploads")
-                      ? `http://localhost:5000${detailEmployee.avatarUrl}`
-                      : detailEmployee.avatarUrl
-                    : DEFAULT_AVATAR
+                  fileUrl(detailEmployee.avatarUrl) ||
+                  "/img/default/default-avt.png"
                 }
                 alt="avatar"
-                className="w-16 h-16 rounded-full object-cover border-2 border-white/60"
+                className="w-20 h-20 rounded-full object-cover ring-4 ring-white/30 shadow-lg shrink-0"
               />
-              <div>
-                <div className="text-white font-bold text-lg leading-tight">
+              <div className="min-w-0">
+                <div className="text-white font-bold text-xl leading-tight truncate">
                   {detailEmployee.fullName}
                 </div>
-                <div className="text-white text-sm mt-0.5">
+                <div className="text-blue-100 text-sm mt-1 font-mono">
                   {detailEmployee.employeeCode}
                 </div>
                 <span
-                  className={`inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-xs font-medium
-                  ${detailEmployee.role === "admin" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}
+                  className={`inline-flex items-center gap-1.5 mt-2.5 px-2.5 py-1 rounded-full text-xs font-semibold
+                  ${detailEmployee.role === "admin" ? "bg-purple-100 text-purple-700" : "bg-white text-blue-700"}`}
                 >
                   {detailEmployee.role === "admin" ? (
                     <FaShieldHalved />
@@ -706,7 +698,7 @@ export default function EmployeeManagement() {
               </div>
             </div>
 
-            <div className="px-6 py-5 grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
+            <div className="px-6 py-7 grid grid-cols-2 sm:grid-cols-3 gap-6 text-sm">
               {[
                 {
                   icon: <FaEnvelope />,
@@ -726,9 +718,7 @@ export default function EmployeeManagement() {
                 {
                   icon: <FaCakeCandles />,
                   label: "Ngày sinh",
-                  value: detailEmployee.dob
-                    ? detailEmployee.dob.split("T")[0]
-                    : "chưa cập nhật",
+                  value: formatDate(detailEmployee.dob),
                 },
                 {
                   icon: <FaLocationDot />,
@@ -738,26 +728,30 @@ export default function EmployeeManagement() {
                 {
                   icon: <FaCalendarDays />,
                   label: "Ngày vào làm",
-                  value: detailEmployee.hireDate
-                    ? detailEmployee.hireDate.split("T")[0]
-                    : "chưa cập nhật",
+                  value: formatDate(detailEmployee.hireDate),
                 },
               ].map(({ icon, label, value }) => (
-                <div key={label}>
-                  <div className="text-gray-400 text-xs mb-0.5 flex items-center gap-1.5">
-                    <span className="shrink-0">{icon}</span> {label}
-                  </div>
-                  <div className="text-gray-800 font-medium truncate">
-                    {value}
+                <div key={label} className="flex items-start gap-3">
+                  <span className="mt-0.5 h-8 w-8 shrink-0 rounded-lg bg-blue-50 text-blue-600 grid place-items-center">
+                    {icon}
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-gray-400 text-xs">{label}</div>
+                    <div className="text-gray-800 font-semibold truncate">
+                      {value}
+                    </div>
                   </div>
                 </div>
               ))}
-              <div className="col-span-2 pt-1 border-t border-gray-100">
-                <div className="text-gray-400 text-xs mb-1 flex items-center gap-1.5">
+            </div>
+
+            <div className="px-6 pb-7">
+              <div className="flex items-center justify-between bg-gray-50 rounded-xl border border-gray-100 px-4 py-4">
+                <span className="text-gray-500 text-xs flex items-center gap-1.5">
                   <FaCircleInfo /> Trạng thái tài khoản
-                </div>
+                </span>
                 <span
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border
                   ${detailEmployee.isLocked ? "bg-red-50 text-red-600 border-red-200" : "bg-green-50 text-green-600 border-green-200"}`}
                 >
                   {detailEmployee.isLocked ? <FaBan /> : <FaCircleCheck />}
@@ -766,7 +760,7 @@ export default function EmployeeManagement() {
               </div>
             </div>
 
-            <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-2">
+            <div className="px-6 py-5 border-t border-gray-100 flex justify-end gap-2 bg-gray-50">
               <button
                 onClick={() => {
                   setDetailEmployee(null);

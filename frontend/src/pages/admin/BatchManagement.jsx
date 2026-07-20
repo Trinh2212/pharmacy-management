@@ -2,11 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Topbar } from "../../components/admin/TopBar";
 import axiosClient from "../../api/axiosClient";
 import { alertError } from "../../utils/SwalAlert";
-import { FaBoxesStacked, FaTriangleExclamation, FaClock, FaCircleCheck, FaCalendarDays} from "react-icons/fa6";
-
-function formatDate(value) {
-  return value ? new Date(value).toLocaleDateString("vi-VN") : "chưa cập nhật";
-}
+import { FaTriangleExclamation, FaClock, FaCircleCheck, FaCalendarDays} from "react-icons/fa6";
+import {formatDate} from "../../utils/Format"
 
 const STATUS_CONFIG = {
   expired: {
@@ -29,7 +26,6 @@ const STATUS_CONFIG = {
 function StatusBadge({ status }) {
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.normal;
   const Icon = config.icon;
-
   return (
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${config.className}`}
@@ -58,8 +54,7 @@ export default function BatchManagement() {
   const [stats, setStats] = useState({ expiredCount: 0, expiringCount: 0 });
 
   useEffect(() => {
-    axiosClient
-      .get("/batches/stats")
+    axiosClient.get("/batches/stats")
       .then((res) =>
         setStats({
           expiredCount: res.data.data?.expiredCount ?? 0,
@@ -191,8 +186,7 @@ export default function BatchManagement() {
                 : "bg-white text-red-600 border-red-200 hover:border-red-400"
             }`}
           >
-            <FaTriangleExclamation className="h-3.5 w-3.5" />
-            Đã hết hạn
+            <FaTriangleExclamation className="h-3.5 w-3.5" /> Đã hết hạn
             <span
               className={`text-xs px-1.5 py-0.5 rounded-full ${
                 statusFilter === "expired"
@@ -272,7 +266,6 @@ export default function BatchManagement() {
 
                         <td className="px-6 py-4 text-right">
                           <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-800">
-                            <FaBoxesStacked className="shrink-0 h-3.5 w-3.5 text-gray-400" />
                             {b.stockQuantity ?? 0}{" "}
                             {b.medicineInfo?.unit || "đơn vị"}
                           </span>

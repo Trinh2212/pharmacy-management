@@ -15,10 +15,10 @@ const detailSchema = Joi.object({
     "any.required": "Vui lòng nhập số lô",
   }),
 
-  // optional — lô mới hay cũ chỉ biết sau khi query DB, controller xử lý tiếp
-  productionDate: Joi.date().iso().optional().messages({
-    "date.base": "Ngày sản xuất không hợp lệ",
-    "date.format": "Ngày sản xuất phải theo định dạng YYYY-MM-DD",
+  productionDate: Joi.date().iso().max("now").optional().messages({
+    "date.base": "NSX không hợp lệ",
+    "date.format": "NSX phải theo định dạng YYYY-MM-DD",
+    "date.max": "NSX không lớn hơn ngày hiện tại",
   }),
 
   expiryDate: Joi.date().iso().optional().messages({
@@ -28,20 +28,20 @@ const detailSchema = Joi.object({
 
   importQuantity: Joi.number().integer().min(1).required().messages({
     "number.base": "Số lượng nhập không hợp lệ",
-    "number.integer": "Số lượng nhập không hợp lệ nguyên",
+    "number.integer": "Số lượng nhập không hợp lệ",
     "number.min": "Số lượng nhập phải >= 1",
     "any.required": "Vui lòng nhập số lượng nhập ",
   }),
 
   importPrice: Joi.number().min(0).required().messages({
     "number.base": "Giá nhập không hợp lệ",
-    "number.min": "Giá nhập không được âm",
+    "number.min": "Giá nhập không âm",
     "any.required": "Vui lòng nhập giá nhập ",
   }),
 });
 
 const warehouseValidation = {
-  // POST /api/warehouse-receipts
+  
   createReceipt: Joi.object({
     receiptCode: Joi.string().trim().max(20).required().messages({
       "string.base": "Mã phiếu nhập không hợp lệ",
@@ -50,9 +50,10 @@ const warehouseValidation = {
       "any.required": "Vui lòng nhập mã phiếu nhập",
     }),
 
-    receiptDate: Joi.date().iso().optional().messages({
+    receiptDate: Joi.date().iso().max("now").optional().messages({
       "date.base": "Ngày nhập không hợp lệ",
       "date.format": "Ngày nhập không hợp lệ",
+      "date.max": "Ngày nhập không lớn hơn ngày hiện tại",
     }),
 
     supplierId: Joi.number().integer().positive().required().messages({
@@ -76,9 +77,10 @@ const warehouseValidation = {
       "any.required": "Vui lòng nhập mã phiếu nhập",
     }),
 
-    receiptDate: Joi.date().iso().optional().messages({
+    receiptDate: Joi.date().iso().max("now").optional().messages({
       "date.base": "Ngày nhập không hợp lệ",
       "date.format": "Ngày nhập không hợp lệ",
+      "date.max": "Ngày nhập không lớn hơn ngày hiện tại",
     }),
 
     supplierId: Joi.number().integer().positive().required().messages({

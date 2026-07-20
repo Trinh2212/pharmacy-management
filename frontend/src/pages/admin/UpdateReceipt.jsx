@@ -3,14 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Topbar } from "../../components/admin/TopBar";
 import axiosClient from "../../api/axiosClient";
 import { alertSuccess, alertError, alertWarning, alertConfirm } from "../../utils/SwalAlert";
+import { formatCurrency, todayISO } from "../../utils/format";
 import { FaPlus, FaTrashCan, FaMagnifyingGlass, FaPen, FaXmark } from "react-icons/fa6";
-
-function formatCurrency(value) {
-  const n = Number(value);
-  if (!value && value !== 0) return "";
-  if (Number.isNaN(n)) return "";
-  return n.toLocaleString("vi-VN") + "đ";
-}
 
 const NO_SPINNER = "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
 
@@ -53,7 +47,6 @@ function MedicineSearchInput({ value, onSelect }) {
   const ref = useRef(null);
   const debounceRef = useRef(null);
 
-  // đồng bộ khi row được nạp lại từ ngoài (VD: bấm "Sửa" 1 dòng có sẵn)
   useEffect(() => {
     setQuery(value || "");
   }, [value]);
@@ -320,6 +313,8 @@ export default function UpdateReceipt() {
 
     if (!row.isOldBatch) {
       if (!productionDate) return alertWarning("Lô mới cần nhập NSX");
+      if (productionDate > todayISO())
+        return alertWarning("Ngày sản xuất không được lớn hơn ngày hiện tại");
       if (!expiryDate) return alertWarning("Lô mới cần nhập HSD");
       if (new Date(expiryDate) <= new Date(productionDate))
         return alertWarning("HSD phải sau NSX");

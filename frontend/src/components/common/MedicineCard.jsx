@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { FiEye } from "react-icons/fi";
 import {fileUrl} from "../../utils/FileUrl";
+import { formatPrice } from "../../utils/Format";
 
 export function MedicineCard({ p }) {
   return (
@@ -8,18 +9,13 @@ export function MedicineCard({ p }) {
       {/* img */}
       <div className="relative aspect-square bg-gray-50 overflow-hidden flex items-center justify-center p-4">
         <img
-          src={ fileUrl(p.imageUrl) || "/img/default/default-medicine-not-found.jpg"
+          src={
+            fileUrl(p.imageUrl) || "/img/default/default-medicine-not-found.jpg"
           }
           alt={p.brandName}
           loading="lazy"
           className="h-full w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
         />
-
-        {/* {p.status === "hết hàng" && (
-          <span className="absolute top-3 right-3 bg-red-500 text-white text-[10px] uppercase font-bold px-2.5 py-1 rounded-md tracking-wider shadow-sm">
-            Hết hàng
-          </span>
-        )} */}
         {p.status === "ngừng cung cấp" && (
           <span className="absolute top-3 right-3 bg-gray-500 text-white text-[10px] uppercase font-bold px-2.5 py-1 rounded-md tracking-wider shadow-sm">
             Ngừng bán
@@ -47,9 +43,7 @@ export function MedicineCard({ p }) {
         <div className="mt-auto pt-4 border-t border-gray-100">
           <div className="flex items-baseline gap-2 mb-3">
             <span className="text-blue-600 font-extrabold text-lg">
-              {p.price > 0
-                ? Number(p.price).toLocaleString("vi-VN") + "đ"
-                : "Liên hệ"}
+              {formatPrice(p.price)}
             </span>
           </div>
 

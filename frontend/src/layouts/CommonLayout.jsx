@@ -11,7 +11,6 @@ export default function CommonLayout() {
         <Outlet />
       </main>
       <Footer />
-
       <ChatbotWidget />
     </div>
   );

@@ -2,21 +2,10 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Topbar } from "../../components/admin/TopBar";
 import axiosClient from "../../api/axiosClient";
 import { alertSuccess, alertError, alertWarning, alertConfirm } from "../../utils/SwalAlert";
+import { formatCurrency, todayISO } from "../../utils/format";
 import { FaPlus, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 
-function formatCurrency(value) {
-  const n = Number(value);
-  if (!value && value !== 0) return "";
-  if (Number.isNaN(n)) return "";
-  return n.toLocaleString("vi-VN") + "đ";
-}
-
-function todayISO() {
-  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-}
-
 const NO_SPINNER = "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
-
 function InlineInput({
   label,
   value,
@@ -156,8 +145,7 @@ export default function ImportReceiptCreate() {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    axiosClient
-      .get("/suppliers")
+    axiosClient.get("/suppliers")
       .then((r) => setSuppliers(r.data.data ?? []))
       .catch(() => alertError("Không thể tải danh sách nhà cung cấp"));
   }, []);
@@ -212,33 +200,33 @@ export default function ImportReceiptCreate() {
   };
 
   const handleAddItem = async () => {
-    const {
-      selectedMedicine,
-      batchNumber,
-      productionDate,
-      expiryDate,
-      quantity,
-      importPrice,
-      isOldBatch,
-    } = row;
+   const {
+     selectedMedicine,
+     batchNumber,
+     productionDate,
+     expiryDate,
+     quantity,
+     importPrice,
+     isOldBatch,
+   } = row;
 
-    if (!selectedMedicine) return alertWarning("Vui lòng chọn thuốc cần nhập");
-    if (!batchNumber.trim()) return alertWarning("Vui lòng nhập số lô");
-    if (!Number.isInteger(Number(quantity)) || Number(quantity) < 1)
-      return alertWarning("Số lượng phải là số nguyên >= 1");
-    if (importPrice === "" || Number(importPrice) < 0)
-      return alertWarning("Vui lòng nhập giá nhập hợp lệ");
+   if (!selectedMedicine) return alertWarning("Vui lòng chọn thuốc cần nhập");
+   if (!batchNumber.trim()) return alertWarning("Vui lòng nhập số lô");
+   if (!Number.isInteger(Number(quantity)) || Number(quantity) < 1)
+     return alertWarning("Số lượng phải là số nguyên >= 1");
+   if (importPrice === "" || Number(importPrice) < 0)
+     return alertWarning("Vui lòng nhập giá nhập hợp lệ");
 
-    if (!row.batchChecked) await handleBatchNumberBlur();
+   if (!row.batchChecked) await handleBatchNumberBlur();
 
-    if (!row.isOldBatch) {
-      if (!productionDate)
-        return alertWarning("Lô mới cần nhập NSX");
-      if (!expiryDate)
-        return alertWarning("Lô mới cần nhập HSD");
-      if (new Date(expiryDate) <= new Date(productionDate))
-        return alertWarning("HSD phải sau NSX");
-    }
+   if (!row.isOldBatch) {
+     if (!productionDate) return alertWarning("Lô mới cần nhập NSX");
+     if (productionDate > todayISO())
+       return alertWarning("Ngày sản xuất không lớn hơn ngày hiện tại");
+     if (!expiryDate) return alertWarning("Lô mới cần nhập HSD");
+     if (new Date(expiryDate) <= new Date(productionDate))
+       return alertWarning("HSD phải sau NSX");
+   }
 
     const dup = items.find(
       (i) =>
@@ -363,9 +351,8 @@ export default function ImportReceiptCreate() {
           </div>
         </div>
 
-        {/* Nhà cung cấp + Thuốc (hàng 1) / ĐVT + Số lượng + Giá nhập + Thêm (hàng 2) */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-6 py-4">
-          {/* Hàng 1: Nhà cung cấp + Tìm kiếm thuốc */}
+          {/* Nhà cung cấp + Tìm kiếm thuốc */}
           <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-3 items-end">
             {/* Nhà cung cấp */}
             <div className="flex flex-col gap-1">
@@ -397,7 +384,7 @@ export default function ImportReceiptCreate() {
             </div>
           </div>
 
-          {/* Hàng 2: ĐVT + Số lượng + Giá nhập + Nút Thêm, chia đều khoảng cách */}
+          {/* ĐVT + Số lượng + Giá nhập + Nút Thêm */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end mt-3">
             {/* Đơn vị tính */}
             <InlineInput
@@ -514,7 +501,7 @@ export default function ImportReceiptCreate() {
           )}
         </div>
 
-        {/* ── Bảng danh sách thuốc đã thêm ── */}
+        {/* Bảng danh sách thuốc đã thêm */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex-1">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -527,12 +514,8 @@ export default function ImportReceiptCreate() {
                   <th className="px-4 py-3 font-semibold">NSX</th>
                   <th className="px-4 py-3 font-semibold">HSD</th>
                   <th className="px-4 py-3 font-semibold text-right">SL Nhập</th>
-                  <th className="px-4 py-3 font-semibold text-right">
-                    Giá nhập
-                  </th>
-                  <th className="px-4 py-3 font-semibold text-right">
-                    Thành tiền
-                  </th>
+                  <th className="px-4 py-3 font-semibold text-right">Giá nhập</th>
+                  <th className="px-4 py-3 font-semibold text-right">Thành tiền</th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>

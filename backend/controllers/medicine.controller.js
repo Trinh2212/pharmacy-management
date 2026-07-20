@@ -212,11 +212,24 @@ const medicineControllers = {
   deleteMedicine: async (req, res) => {
     const { id } = req.params;
 
-    const medicine = await db.Medicine.findByPk(id);
+    const medicine = await db.Medicine.findByPk(id, {
+      include: [{ model: db.Batch, as: "batchInfo", attributes: ["stockQuantity"] }],
+    });
 
     if (!medicine) {
       return res.status(404).json({
         message: "không tìm thấy thuốc",
+      });
+    }
+
+    const totalStock = (medicine.batchInfo || []).reduce(
+      (sum, batch) => sum + (batch.stockQuantity || 0),
+      0,
+    );
+
+    if (totalStock > 0) {
+      return res.status(409).json({
+        message: `Không thể xóa, thuốc này vẫn còn ${totalStock} sản phẩm tồn kho. Vui lòng chuyển trạng thái sang "ngừng cung cấp" nếu muốn ngừng kinh doanh.`,
       });
     }
 

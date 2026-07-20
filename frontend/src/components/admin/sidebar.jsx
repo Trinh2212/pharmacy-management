@@ -70,9 +70,7 @@ function isVisible(item, userRole) {
 
 function AccordionItem({ item }) {
   const location = useLocation();
-  const isChildActive = item.children?.some((c) =>
-    location.pathname.startsWith(c.to),
-  );
+  const isChildActive = item.children?.some((c) => location.pathname.startsWith(c.to));
   const [open, setOpen] = useState(isChildActive);
 
   return (
@@ -80,19 +78,11 @@ function AccordionItem({ item }) {
       <button
         onClick={() => setOpen((prev) => !prev)}
         className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition
-          ${
-            isChildActive
-              ? "btn-gradient text-white font-semibold shadow-md"
-              : "text-black-900 hover:bg-blue-100"
-          }`}
+          ${isChildActive ? "btn-gradient text-white font-semibold shadow-md" : "text-black-900 hover:bg-blue-100"}`}
       >
         <item.icon className="h-4 w-4 shrink-0" />
         <span className="flex-1 text-left">{item.label}</span>
-        <FaChevronDown
-          className={`h-3 w-3 transition-transform duration-200 ${
-            open ? "rotate-180" : ""
-          }`}
-        />
+        <FaChevronDown className={`h-3 w-3 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
 
       {open && (
@@ -103,11 +93,7 @@ function AccordionItem({ item }) {
               to={child.to}
               className={({ isActive }) =>
                 `flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition
-                ${
-                  isActive
-                    ? "bg-blue-100 text-blue-700 font-semibold"
-                    : "text-black-900 hover:bg-blue-100"
-                }`
+                ${isActive ? "bg-blue-100 text-blue-700 font-semibold" : "text-black-900 hover:bg-blue-100"}`
               }
             >
               <child.icon className="h-3.5 w-3.5 shrink-0" />
@@ -130,19 +116,11 @@ export function Sidebar() {
       <div className="p-5 shrink-0">
         <Link to="/" className="flex items-center gap-2">
           <div className="h-10 w-10 rounded-xl grid place-items-center shadow-sm overflow-hidden">
-            <img
-              src="/img/logo.png"
-              alt="caremind pharmacy"
-              className="h-8 w-8 object-contain"
-            />
+            <img src="/img/logo.png" alt="caremind pharmacy" className="h-8 w-8 object-contain" />
           </div>
           <div className="leading-tight">
-            <div className="font-display font-extrabold text-sidebar-primary text-lg">
-              CareMind Pharma
-            </div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              Trang quản trị
-            </div>
+            <div className="font-display font-extrabold text-sidebar-primary text-lg">CareMind Pharma</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Trang quản trị</div>
           </div>
         </Link>
       </div>
@@ -160,11 +138,7 @@ export function Sidebar() {
               end={item.end}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300
-                ${
-                  isActive
-                    ? "btn-gradient text-white shadow-md"
-                    : "text-black-900 hover:bg-blue-100"
-                }`
+                ${isActive ? "btn-gradient text-white shadow-md" : "text-black-900 hover:bg-blue-100"}`
               }
             >
               <item.icon className="h-4 w-4 shrink-0" /> {item.label}

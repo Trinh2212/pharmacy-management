@@ -79,7 +79,7 @@ const SearchMultiSelect = ({
     onChange(selected.filter((s) => s[idKey] !== id));
   };
 
-  return (
+return (
     <div className="mb-8" ref={boxRef}>
       <label className={labelClass}>{label}</label>
       <div className="relative">
@@ -98,18 +98,12 @@ const SearchMultiSelect = ({
         {dropdownOpen && (
           <div className="absolute z-10 mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-56 overflow-y-auto">
             {searchLoading ? (
-              <div className="p-4 text-sm text-slate-400 text-center">
-                Đang tìm...
-              </div>
+              <div className="p-4 text-sm text-slate-400 text-center">Đang tìm...</div>
             ) : results.length === 0 ? (
-              <div className="p-4 text-sm text-slate-400 text-center">
-                Không tìm thấy kết quả phù hợp.
-              </div>
+              <div className="p-4 text-sm text-slate-400 text-center">Không tìm thấy kết quả phù hợp.</div>
             ) : (
               results.map((item) => {
-                const isSelected = selected.some(
-                  (s) => s[idKey] === item[idKey],
-                );
+                const isSelected = selected.some((s) => s[idKey] === item[idKey]);
                 return (
                   <button
                     type="button"
@@ -123,9 +117,7 @@ const SearchMultiSelect = ({
                     }`}
                   >
                     {item[nameKey]}
-                    {isSelected && (
-                      <span className="ml-2 text-xs italic">(đã chọn)</span>
-                    )}
+                    {isSelected && <span className="ml-2 text-xs italic">(đã chọn)</span>}
                   </button>
                 );
               })
@@ -135,11 +127,7 @@ const SearchMultiSelect = ({
       </div>
 
       {selected.length > 0 && (
-        <div
-          className={
-            renderExtra ? "space-y-2 mt-3" : "flex flex-wrap gap-2 mt-3"
-          }
-        >
+        <div className={renderExtra ? "space-y-2 mt-3" : "flex flex-wrap gap-2 mt-3"}>
           {selected.map((item) =>
             renderExtra ? (
               <div
@@ -154,9 +142,7 @@ const SearchMultiSelect = ({
                 >
                   <FiX className="w-4 h-4" />
                 </button>
-                <span className="flex-1 text-sm font-medium text-slate-700">
-                  {item[nameKey]}
-                </span>
+                <span className="flex-1 text-sm font-medium text-slate-700">{item[nameKey]}</span>
                 {renderExtra(item, (value) =>
                   onChange(
                     selected.map((s) =>

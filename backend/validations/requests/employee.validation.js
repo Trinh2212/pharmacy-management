@@ -45,8 +45,10 @@ const employeeValidations = {
       "string.empty": "Họ tên không được để trống",
       "string.max": "Họ tên không được vượt quá 50 ký tự",
     }),
-    dob: Joi.date().allow(null, "").messages({
+    dob: Joi.date().iso().max("now").allow(null, "").messages({
       "date.base": "Ngày sinh không hợp lệ",
+      "date.format": "Ngày sinh phải theo định dạng YYYY-MM-DD",
+      "date.max": "Ngày sinh không lớn hơn ngày hiện tại",
     }),
     gender: Joi.string().valid("nam", "nữ", "khác").messages({
       "string.base": "Giới tính không hợp lệ",
@@ -81,8 +83,9 @@ const employeeValidations = {
       "string.base": "Vai trò không hợp lệ",
       "any.only": "Vai trò không hợp lệ",
     }),
-    hireDate: Joi.date().allow(null, "").messages({
+    hireDate: Joi.date().iso().allow(null, "").messages({
       "date.base": "Ngày vào làm không hợp lệ",
+      "date.format": "Ngày Vào làm phải theo định dạng YYYY-MM-DD",
     }),
   }).unknown(false),
 
@@ -92,8 +95,10 @@ const employeeValidations = {
       "string.empty": "Họ tên không được để trống",
       "string.max": "Họ tên không được vượt quá 50 ký tự",
     }),
-    dob: Joi.date().allow(null, "").messages({
+    dob: Joi.date().iso().max("now").allow(null, "").messages({
       "date.base": "Ngày sinh không hợp lệ",
+      "date.format": "Ngày sinh phải theo định dạng YYYY-MM-DD",
+      "date.max": "Ngày sinh không lớn hơn ngày hiện tại",
     }),
     gender: Joi.string().valid("nam", "nữ", "khác").messages({
       "string.base": "Giới tính không hợp lệ",

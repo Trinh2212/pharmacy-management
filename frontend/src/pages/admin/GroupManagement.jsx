@@ -1,12 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Topbar } from "../../components/admin/TopBar";
 import axiosClient from "../../api/axiosClient";
-import {
-  alertSuccess,
-  alertError,
-  alertWarning,
-  alertConfirm,
-} from "../../utils/SwalAlert";
+import { alertSuccess, alertError, alertWarning, alertConfirm } from "../../utils/SwalAlert";
 import { FaXmark, FaAlignLeft } from "react-icons/fa6";
 
 function Field({
@@ -55,23 +50,20 @@ function TextAreaField({ label, name, value, onChange, placeholder = "" }) {
 function Modal({ title, onClose, children }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm px-4 animate-[fadeIn_0.15s_ease-out]"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col max-h-[90vh]"
+        className="bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden animate-[scaleIn_0.15s_ease-out]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
-          <div className="w-5"></div>{" "}
-          <h3 className="text-xl font-bold text-slate-800 text-center">
-            {title}
-          </h3>
+        <div className="relative px-6 py-5 bg-gradient-to-r from-blue-600 to-blue-500 shrink-0">
+          <h3 className="text-xl font-bold text-white text-center pr-8">{title}</h3>
           <button
             onClick={onClose}
-            className="p-1 text-gray-400 hover:text-gray-600 transition"
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-white/80 hover:text-white hover:bg-white/15 transition"
           >
-            <FaXmark className="h-5 w-5" />
+            <FaXmark className="h-4 w-4" />
           </button>
         </div>
         <div className="flex flex-col overflow-y-auto">{children}</div>
@@ -279,7 +271,7 @@ export default function MedicineGroup() {
                         className={`cursor-pointer transition-colors duration-200 select-none border-b border-gray-100
                           ${isSelected ? "bg-blue-100 ring-1 ring-inset ring-blue-50" : "hover:bg-gray-100"}`}
                       >
-                        {/* Cột 1: Tên nhóm thuốc */}
+                        {/* Tên nhóm thuốc */}
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <span className="font-medium text-black">
@@ -288,7 +280,7 @@ export default function MedicineGroup() {
                           </div>
                         </td>
 
-                        {/* Cột 2: Mô tả */}
+                        {/* Mô tả */}
                         <td className="px-6 py-4 text-sm text-gray-800">
                           <div className="flex items-start gap-1.5">
                             <FaAlignLeft className="text-gray-400 shrink-0 mt-0.5" />
@@ -333,7 +325,7 @@ export default function MedicineGroup() {
         </div>
       </div>
 
-      {/* ── Modal Thêm nhóm thuốc ── */}
+      {/* Modal Thêm nhóm thuốc */}
       {showCreate && (
         <Modal title="THÊM NHÓM THUỐC MỚI" onClose={() => setShowCreate(false)}>
           <form onSubmit={handleSubmitCreate} className="flex flex-col">
@@ -377,7 +369,7 @@ export default function MedicineGroup() {
         </Modal>
       )}
 
-      {/* ── Modal Sửa nhóm thuốc ── */}
+      {/* Modal Sửa nhóm thuốc */}
       {showEdit && editTarget && (
         <Modal title="CẬP NHẬT NHÓM THUỐC" onClose={() => setShowEdit(false)}>
           <form onSubmit={handleSubmitEdit} className="flex flex-col">

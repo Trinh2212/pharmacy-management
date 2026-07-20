@@ -42,9 +42,7 @@ export function BestSellers() {
       {/* title */}
       <div className="flex items-end justify-between mb-8">
         <div>
-          <h2 className="text-[#2d4271] text-2xl md:text-3xl font-extrabold tracking-tight">
-            Sản Phẩm Bán Chạy
-          </h2>
+          <h2 className="text-[#2d4271] text-2xl md:text-3xl font-extrabold tracking-tight">Sản Phẩm Bán Chạy</h2>
         </div>
 
         <Link
@@ -68,9 +66,7 @@ export function BestSellers() {
           ))}
 
           {medicines.length === 0 && (
-            <div className="col-span-full text-center text-gray-500 py-10">
-              Chưa có sản phẩm nào để hiển thị.
-            </div>
+            <div className="col-span-full text-center text-gray-500 py-10">Chưa có sản phẩm nào để hiển thị.</div>
           )}
         </div>
       )}

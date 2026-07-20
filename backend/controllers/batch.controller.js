@@ -1,6 +1,7 @@
 const db = require("../models/index.model");
 const { Op } = require("sequelize");
 
+//lấy mốc tg
 function getDateBoundaries() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -34,7 +35,7 @@ const batchControllers = {
     if (medicineId) {
       filter.medicineId = medicineId;
     }
-
+    //lọc theo status
     if (status === "expired") {
       filter.expiryDate = { [Op.lt]: today };
     } else if (status === "expiring") {

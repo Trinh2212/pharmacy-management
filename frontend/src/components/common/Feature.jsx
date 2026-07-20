@@ -5,25 +5,25 @@ const features = [
     id: 1,
     icon: <FiShield />,
     title: "Chăm Sóc Bằng Tâm",
-    desc: "Lắng nghe và thấu hiểu nhu cầu sức khỏe của mỗi người với sự tận tâm và trách nhiệm.",
+    desc: "Lắng nghe và thấu hiểu nhu cầu sức khoẻ của mỗi người với sự tận tâm và trách nhiệm.",
   },
   {
     id: 2,
     icon: <FiHeart />,
     title: "Tận Tâm Tư Vấn",
-    desc: "Luôn đặt sức khỏe và sự an tâm của bạn lên hàng đầu trong mọi hoạt động tư vấn và hỗ trợ.",
+    desc: "Luôn đặt sức khoẻ và sự an tâm của bạn lên hàng đầu trong mọi hoạt động tư vấn và hỗ trợ.",
   },
   {
     id: 3,
     icon: <FiLifeBuoy />,
     title: "Đồng Hành Lâu Dài",
-    desc: "Không chỉ hỗ trợ hôm nay mà còn hướng đến một hành trình chăm sóc sức khỏe bền vững.",
+    desc: "Không chỉ hỗ trợ hôm nay mà còn hướng đến một hành trình chăm sóc sức khoẻ bền vững.",
   },
   {
     id: 4,
     icon: <FiCheckCircle />,
-    title: "Nâng Cao Nhận Thức Sức Khỏe",
-    desc: "Chia sẻ kiến thức phòng bệnh, chăm sóc sức khỏe và sử dụng thuốc an toàn cho mọi người.",
+    title: "Nâng Cao Nhận Thức Sức khoẻ",
+    desc: "Chia sẻ kiến thức phòng bệnh, chăm sóc sức khoẻ và sử dụng thuốc an toàn cho mọi người.",
   },
 ];
 
@@ -36,7 +36,7 @@ export function Features() {
             Vì Sao Khách Hàng Chọn Chúng Tôi?
           </h2>
           <p className="text-[#7f8c8d] text-[1.15rem]">
-            Nhà thuốc đạt chuẩn GPP - Chăm sóc sức khỏe toàn diện cho gia đình bạn
+            Nhà thuốc đạt chuẩn GPP - Chăm sóc sức khoẻ toàn diện cho gia đình bạn
           </p>
         </div>
 

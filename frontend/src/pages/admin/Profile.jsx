@@ -6,7 +6,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { alertSuccess, alertError, alertWarning } from "../../utils/SwalAlert";
 import { FiCamera, FiLoader, FiUser, FiEdit2, FiLock, FiLogOut } from "react-icons/fi";
 import { FaXmark } from "react-icons/fa6";
-const DEFAULT_AVATAR = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+import { formatDate } from "../../utils/Format";
+import { fileUrl } from "../../utils/FileUrl";
 
 function Field({ label, name, value, onChange, type = "text", disabled = false }) {
   return (
@@ -237,11 +238,7 @@ export default function Profile() {
           <div className="relative h-32 w-32 mx-auto">
             <img
               src={
-                employee?.avatarUrl
-                  ? employee.avatarUrl.startsWith("/uploads")
-                    ? `http://localhost:5000${employee.avatarUrl}`
-                    : employee.avatarUrl
-                  : DEFAULT_AVATAR
+                fileUrl(employee.avatarUrl) || "/img/default/default-avt.png"
               }
               alt="avatar"
               className="h-32 w-32 rounded-full object-cover border-4 border-white shadow"
@@ -287,24 +284,19 @@ export default function Profile() {
             <div className="grid sm:grid-cols-2 gap-5">
               <InfoRow label="Mã nhân viên" value={employee?.employeeCode} />
               <InfoRow label="Họ và tên" value={employee?.fullName} />
-              <InfoRow
-                label="Ngày sinh"
-                value={employee?.dob ? employee.dob.split("T")[0] : null}
-              />
+              <InfoRow label="Ngày sinh" value={formatDate(employee?.dob)} />
               <InfoRow label="Giới tính" value={employee?.gender} />
               <InfoRow label="Số điện thoại" value={employee?.phoneNumber} />
               <InfoRow label="Email" value={employee?.email} />
               <InfoRow
                 label="Ngày vào làm"
-                value={
-                  employee?.hireDate ? employee.hireDate.split("T")[0] : null
-                }
+                value={formatDate(employee?.hireDate)}
               />
               <InfoRow label="Địa chỉ" value={employee?.address} />
             </div>
           </div>
 
-          {/* Nút đăng xuất - canh giữa so với ô thông tin cá nhân */}
+          {/* Nút đăng xuất */}
           <div className="flex justify-center">
             <button
               onClick={handleLogout}
@@ -328,11 +320,8 @@ export default function Profile() {
                   <img
                     src={
                       avatarPreview ||
-                      (employee?.avatarUrl
-                        ? employee.avatarUrl.startsWith("/uploads")
-                          ? `http://localhost:5000${employee.avatarUrl}`
-                          : employee.avatarUrl
-                        : DEFAULT_AVATAR)
+                      fileUrl(employee.avatarUrl) ||
+                      "/img/default/default-avt.png"
                     }
                     alt="avatar"
                     className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"

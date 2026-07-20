@@ -1,6 +1,6 @@
 import { FaSearch } from "react-icons/fa";
 import { FaPlus, FaPenToSquare, FaTrashCan, FaEye } from "react-icons/fa6";
-import { alertSuccess, alertError, alertWarning, alertConfirm } from "../../utils/SwalAlert";
+import { alertWarning} from "../../utils/SwalAlert";
 
 export function Topbar({
   title,

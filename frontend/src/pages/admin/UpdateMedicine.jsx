@@ -1,15 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosClient from "../../api/axiosClient";
-import {
-  FiArrowRight,
-  FiArrowLeft,
-  FiSearch,
-  FiCheckCircle,
-  FiUploadCloud,
-  FiFileText,
-  FiLoader,
-} from "react-icons/fi";
+import { FiArrowRight, FiArrowLeft, FiSearch, FiCheckCircle, FiUploadCloud, FiFileText, FiLoader} from "react-icons/fi";
 import SearchMultiSelect from "../../components/admin/search";
 import { alertWarning, alertError, alertSuccess } from "../../utils/SwalAlert";
 import { fileUrl } from "../../utils/FileUrl";

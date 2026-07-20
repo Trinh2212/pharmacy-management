@@ -106,6 +106,14 @@ const medicineGroupControllers = {
         message: "không tìm thấy nhóm thuốc",
       });
     }
+    const usageCount = await medicineGroup.countMedicineInfo();
+
+    if (usageCount > 0) {
+      return res.status(409).json({
+        message: `Không thể xóa nhóm, đang có ${usageCount} thuốc nằm trong nhóm này`,
+      });
+    }
+
     await medicineGroup.destroy();
     return res.status(200).json({
       message: "xóa nhóm thuốc thành công",

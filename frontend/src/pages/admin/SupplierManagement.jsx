@@ -32,23 +32,20 @@ function Field({
 function Modal({ title, onClose, children }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm px-4 animate-[fadeIn_0.15s_ease-out]"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col max-h-[90vh]"
+        className="bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden animate-[scaleIn_0.15s_ease-out]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
-          <div className="w-5"></div>{" "}
-          <h3 className="text-xl font-bold text-slate-800 text-center">
-            {title}
-          </h3>
+        <div className="relative px-6 py-5 bg-gradient-to-r from-blue-600 to-blue-500 shrink-0">
+          <h3 className="text-xl font-bold text-white text-center pr-8">{title}</h3>
           <button
             onClick={onClose}
-            className="p-1 text-gray-400 hover:text-gray-600 transition"
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-white/80 hover:text-white hover:bg-white/15 transition"
           >
-            <FaXmark className="h-5 w-5" />
+            <FaXmark className="h-4 w-4" />
           </button>
         </div>
         <div className="flex flex-col overflow-y-auto">{children}</div>
@@ -253,7 +250,7 @@ export default function SupplierManagement() {
                         className={`cursor-pointer transition-colors duration-200 select-none border-b border-gray-100
                           ${isSelected ? "bg-blue-100 ring-1 ring-inset ring-blue-50" : "hover:bg-gray-100"}`}
                       >
-                        {/* Cột 1: Tên nhà cung cấp */}
+                        {/* Tên nhà cung cấp */}
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
@@ -265,7 +262,7 @@ export default function SupplierManagement() {
                           </div>
                         </td>
 
-                        {/* Cột 2: Địa chỉ */}
+                        {/* Địa chỉ */}
                         <td className="px-6 py-4 text-sm text-gray-600">
                           <div className="flex items-center gap-1.5">
                             <FaLocationDot className="text-gray-400 shrink-0" />
@@ -273,7 +270,7 @@ export default function SupplierManagement() {
                           </div>
                         </td>
 
-                        {/* Cột 3: Liên hệ */}
+                        {/* Liên hệ */}
                         <td className="px-6 py-4 text-sm text-gray-600">
                           <div className="flex items-center gap-1.5 mb-1">
                             <FaEnvelope className="text-gray-400 shrink-0" />
@@ -320,7 +317,7 @@ export default function SupplierManagement() {
         </div>
       </div>
 
-      {/* ── Modal Thêm nhà cung cấp ── */}
+      {/*  Modal Thêm nhà cung cấp  */}
       {showCreate && (
         <Modal
           title="THÊM NHÀ CUNG CẤP MỚI"
@@ -391,7 +388,7 @@ export default function SupplierManagement() {
         </Modal>
       )}
 
-      {/* ── Modal Sửa nhà cung cấp ── */}
+      {/* Modal Sửa nhà cung cấp */}
       {showEdit && editTarget && (
         <Modal title="CẬP NHẬT NHÀ CUNG CẤP" onClose={() => setShowEdit(false)}>
           <form onSubmit={handleSubmitEdit} className="flex flex-col">

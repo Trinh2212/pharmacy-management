@@ -75,7 +75,7 @@ function DesktopHeader() {
                 <FaUser className="h-4 w-4" />
               </div>
               <span className="max-w-[120px] truncate">
-                {user.fullName || "Ẩn danh"}
+                {user.fullName || "Người Bí Ẩn"}
               </span>
             </Link>
           ) : (

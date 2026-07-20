@@ -187,10 +187,7 @@ const employeeControllers = {
       }
     }
 
-    if (
-      updateData.phoneNumber &&
-      updateData.phoneNumber !== employee.phoneNumber
-    ) {
+    if ( updateData.phoneNumber && updateData.phoneNumber !== employee.phoneNumber) {
       const existed = await db.Employee.findOne({
         where: {
           phoneNumber: updateData.phoneNumber,
@@ -210,11 +207,7 @@ const employeeControllers = {
     if (updateData.dob === "") updateData.dob = null;
     if (updateData.hireDate === "") updateData.hireDate = null;
 
-    if (
-      employee.role === "admin" &&
-      updateData.role &&
-      updateData.role !== "admin"
-    ) {
+    if ( employee.role === "admin" && updateData.role && updateData.role !== "admin") {
       return res.status(403).json({
         message: "Không thể hạ quyền tài khoản admin",
       });
@@ -244,6 +237,17 @@ const employeeControllers = {
       return res.status(403).json({
         message: "không thể xóa tài khoản admin được",
       });
+
+    // nv đã tạo phiếu kho
+    const receiptCount = await db.WarehouseReceipt.count({
+      where: { employeeId: id },
+    });
+
+    if (receiptCount > 0) {
+      return res.status(409).json({
+        message: `Không thể xóa, nhân viên này đã tạo ${receiptCount} phiếu nhập kho`,
+      });
+    }
 
     await employee.destroy();
 

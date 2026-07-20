@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FiMapPin, FiPhone, FiMail, FiClock } from "react-icons/fi";
 import Swal from "sweetalert2";
+import { alertSuccess, alertError } from "../utils/SwalAlert";
 import emailjs from "@emailjs/browser";
 
 export default function Contact() {
@@ -33,27 +34,17 @@ export default function Contact() {
         formData,
         "PqBOpr5y6on47_IeT",
       );
-
-      Swal.fire({
-        icon: "success",
-        title: "Đã gửi lời nhắn thành công!",
-        buttonsStyling: false,
-        text: "Nhà thuốc đã nhận được thông tin của bạn. Chúng tui sẽ phản hồi sớm, xin cảm ơn",
-        customClass: {
-          confirmButton: "btn-swal-ok", 
-          icon: "icon-swal-success", 
-        },
-      });
+      alertSuccess(
+        "Nhà thuốc đã nhận được thông tin của bạn. Chúng tui sẽ phản hồi sớm, xin cảm ơn",
+        "Đã gửi lời nhắn thành công!",
+      );
 
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
       console.error("Lỗi gửi mail:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Gửi thất bại!",
-        text: "Đã có lỗi xảy ra trong quá trình gửi mail. Vui lòng thử lại sau.",
-        confirmButtonColor: "#ef4444",
-      });
+      alertError(
+        "Đã có lỗi xảy ra trong quá trình gửi mail. Vui lòng thử lại sau.",
+      );
     }
   };
 
@@ -71,8 +62,7 @@ export default function Contact() {
               Liên Hệ Với Chúng Tôi
             </h1>
             <p className="text-lg md:text-xl font-medium drop-shadow-md text-blue-50">
-              Đội ngũ dược sĩ luôn sẵn sàng lắng nghe và hỗ trợ tư vấn sức khỏe
-              24/7
+              Đội ngũ dược sĩ luôn sẵn sàng lắng nghe và hỗ trợ tư vấn sức khoẻ 24/7
             </p>
           </div>
         </div>

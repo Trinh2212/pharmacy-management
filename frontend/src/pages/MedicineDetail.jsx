@@ -3,12 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import axiosClient from "../api/axiosClient";
 import { fileUrl } from "../utils/FileUrl";
 import { FaLocationDot, FaBarcode, FaBoxesStacked, FaFlask, FaFileLines, FaCircleInfo, FaTriangleExclamation, FaCapsules, FaBoxOpen, FaShieldHalved, FaSnowflake, FaCircleExclamation, FaLayerGroup} from "react-icons/fa6";
-
-function formatCurrency(value) {
-  const n = Number(value);
-  if (value == null || Number.isNaN(n)) return "Liên hệ";
-  return n.toLocaleString("vi-VN") + "đ";
-}
+import {formatCurrency} from "../utils/Format";
 
 const STATUS_STYLE = {
   "đang cung cấp": "bg-green-50 text-green-600 border-green-200",
@@ -222,7 +217,7 @@ export default function MedicineDetail() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Nội dung các mục — chỉ hiện mục có dữ liệu */}
+            {/* chỉ hiện nd của các mục có dữ liệu */}
             <div className="lg:col-span-2 flex flex-col gap-5">
               {USAGE_SECTIONS.filter(({ key }) => usage[key]).map(
                 ({ key, label, icon: Icon }) => (
