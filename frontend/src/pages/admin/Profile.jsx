@@ -5,7 +5,7 @@ import axiosClient from "../../api/axiosClient";
 import { useAuth } from "../../contexts/AuthContext";
 import { alertSuccess, alertError, alertWarning } from "../../utils/SwalAlert";
 import { FiCamera, FiLoader, FiUser, FiEdit2, FiLock, FiLogOut } from "react-icons/fi";
-import { FaXmark } from "react-icons/fa6";
+import { Modal } from "../../components/admin/Modal";
 import { formatDate } from "../../utils/Format";
 import { fileUrl } from "../../utils/FileUrl";
 
@@ -59,34 +59,6 @@ function InfoRow({ label, value }) {
 function extractEmployee(res) {
   const payload = res?.data !== undefined ? res.data : res;
   return payload?.employee || payload;
-}
-
-function Modal({ title, onClose, children }) {
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col max-h-[90vh]"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
-          <div className="w-5"></div>{" "}
-          <h3 className="text-xl font-bold text-slate-800 text-center">
-            {title}
-          </h3>
-          <button
-            onClick={onClose}
-            className="p-1 text-gray-400 hover:text-gray-600 transition"
-          >
-            <FaXmark className="h-5 w-5" />
-          </button>
-        </div>
-        <div className="flex flex-col overflow-y-auto">{children}</div>
-      </div>
-    </div>
-  );
 }
 
 export default function Profile() {

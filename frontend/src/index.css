@@ -91,6 +91,15 @@
     @apply focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500;
     
     @apply disabled:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed;
-}
+  }
 
+  /* animation modal */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.85) translateY(12px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
 }
