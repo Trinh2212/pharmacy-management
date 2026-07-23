@@ -138,9 +138,7 @@ const warehouseReceiptControllers = {
         return receipt.receiptId;
       });
     } catch (err) {
-      return res
-        .status(400)
-        .json({ message: err.message || "Lỗi khi tạo phiếu nhập" });
+      return res.status(400).json({ message: err.message || "Lỗi khi tạo phiếu nhập" });
     }
 
     const fullReceipt = await db.WarehouseReceipt.findByPk(createdReceiptId, {
@@ -161,9 +159,7 @@ const warehouseReceiptControllers = {
       ],
     });
 
-    return res
-      .status(201)
-      .json({ message: "Tạo phiếu nhập thành công", data: fullReceipt });
+    return res.status(201).json({ message: "Tạo phiếu nhập thành công", data: fullReceipt });
   },
 
   updateReceipt: async (req, res) => {
@@ -267,6 +263,15 @@ const warehouseReceiptControllers = {
           });
           continue;
         }
+      } else if (line.productionDate && line.expiryDate) {
+        // Lô đã tồn tại nhưng người dùng vẫn gửi kèm NSX/HSD (sửa lại lô cũ)
+        // -> validate luôn thứ tự ngày ở đây, tránh throw muộn bên trong transaction
+        if (new Date(line.expiryDate) <= new Date(line.productionDate)) {
+          lineResolutions.push({
+            error: `Dòng ${lineNo}: lô "${line.batchNumber}": hạn sử dụng phải sau ngày sản xuất`,
+          });
+          continue;
+        }
       }
 
       lineResolutions.push({ line, targetBatch });
@@ -286,26 +291,27 @@ const warehouseReceiptControllers = {
 
     try {
       await sequelize.transaction(async (t) => {
-        // batchId nào vẫn còn được dùng lại sau khi sửa 
+        // batchId nào vẫn còn được dùng lại sau khi sửa
         const keptBatchIds = new Set();
 
-        //giữ nguyên lô cũ (chỉnh SL/giá) hoặc là dòng mới
+        // giữ nguyên lô cũ (chỉnh SL/giá/NSX/HSD) hoặc là dòng mới
         for (const { line, targetBatch } of lineResolutions) {
           const existingDetail = targetBatch
             ? existingByBatchId.get(targetBatch.batchId)
             : null;
 
           if (existingDetail) {
-            // Dòng vẫn dùng đúng lô đã có chỉ chỉnh chênh lệch SL/giá
+            // Dòng vẫn dùng đúng lô đã có -> chỉnh chênh lệch SL/giá, và NSX/HSD nếu có sửa
             keptBatchIds.add(targetBatch.batchId);
             const qtyDelta =
               line.importQuantity - existingDetail.importQuantity;
 
+            const batch = await db.Batch.findByPk(targetBatch.batchId, {
+              transaction: t,
+              lock: t.LOCK.UPDATE,
+            });
+
             if (qtyDelta !== 0) {
-              const batch = await db.Batch.findByPk(targetBatch.batchId, {
-                transaction: t,
-                lock: t.LOCK.UPDATE,
-              });
               if (batch.stockQuantity + qtyDelta < 0) {
                 throw new Error(
                   `Tồn kho lô "${batch.batchNumber}" sẽ bị âm, vui lòng kiểm tra lại số lượng`,
@@ -315,6 +321,16 @@ const warehouseReceiptControllers = {
                 by: qtyDelta,
                 transaction: t,
               });
+            }
+
+            if (line.productionDate && line.expiryDate) {
+              await batch.update(
+                {
+                  productionDate: line.productionDate,
+                  expiryDate: line.expiryDate,
+                },
+                { transaction: t },
+              );
             }
 
             await existingDetail.update(
@@ -338,6 +354,16 @@ const warehouseReceiptControllers = {
               by: line.importQuantity,
               transaction: t,
             });
+
+            if (line.productionDate && line.expiryDate) {
+              await destBatch.update(
+                {
+                  productionDate: line.productionDate,
+                  expiryDate: line.expiryDate,
+                },
+                { transaction: t },
+              );
+            }
           } else {
             destBatch = await db.Batch.create(
               {
@@ -384,7 +410,7 @@ const warehouseReceiptControllers = {
           await oldDetail.destroy({ transaction: t });
         }
 
-        //update thông tin 
+        // update thông tin phiếu
         await receipt.update(
           {
             receiptCode,
@@ -515,6 +541,53 @@ const warehouseReceiptControllers = {
       message: "Lấy dữ liệu chi phí nhập thuốc theo thời gian thành công",
       data: results,
     });
+  },
+
+  cancelReceipt: async (req, res) => {
+    const receiptId = req.params.id;
+
+    const receipt = await db.WarehouseReceipt.findByPk(receiptId, {
+      include: [
+        {
+          model: db.WarehouseReceiptDetail,
+          as: "detailInfo",
+          include: [{ model: db.Batch, as: "batchInfo" }],
+        },
+      ],
+    });
+
+    if (!receipt) {
+      return res.status(404).json({ message: "Không tìm thấy phiếu nhập" });
+    }
+
+    try {
+      await sequelize.transaction(async (t) => {
+        for (const detail of receipt.detailInfo) {
+          const batch = await db.Batch.findByPk(detail.batchId, {
+            transaction: t,
+            lock: t.LOCK.UPDATE,
+          });
+          if (batch) {
+            if (batch.stockQuantity - detail.importQuantity < 0) {
+              throw new Error(
+                `Dữ liệu tồn kho của lô "${batch.batchNumber}" không khớp, không thể hủy phiếu. Vui lòng kiểm tra lại các phiếu nhập liên quan tới lô này`,
+              );
+            }
+            await batch.decrement("stockQuantity", {
+              by: detail.importQuantity,
+              transaction: t,
+            });
+          }
+          await detail.destroy({ transaction: t });
+        }
+
+        await receipt.destroy({ transaction: t });
+      });
+    } catch (err) {
+      return res.status(400).json({ message: err.message});
+    }
+
+    return res.status(200).json({ message: "Đã hủy phiếu nhập thành công" });
   },
 };
 

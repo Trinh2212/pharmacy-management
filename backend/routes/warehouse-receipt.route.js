@@ -32,4 +32,10 @@ router.put(
   asyncHandler(warehouseReceiptControllers.updateReceipt),
 );
 
+router.delete(
+  "/:id",
+  verifyToken,
+  asyncHandler(warehouseReceiptControllers.cancelReceipt),
+);
+
 module.exports = router;

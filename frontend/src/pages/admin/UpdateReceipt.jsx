@@ -316,8 +316,9 @@ export default function UpdateReceipt() {
       if (productionDate > todayISO())
         return alertWarning("Ngày sản xuất không được lớn hơn ngày hiện tại");
       if (!expiryDate) return alertWarning("Lô mới cần nhập HSD");
-      if (new Date(expiryDate) <= new Date(productionDate))
-        return alertWarning("HSD phải sau NSX");
+    }
+    if ( productionDate && expiryDate && new Date(expiryDate) <= new Date(productionDate)) {
+      return alertWarning("HSD phải sau NSX");
     }
 
     const dup = items.find(
@@ -535,7 +536,9 @@ export default function UpdateReceipt() {
             <InlineInput
               label="Số lượng *"
               value={row.quantity}
-              onChange={(e) => setRow((p) => ({ ...p, quantity: e.target.value }))}
+              onChange={(e) =>
+                setRow((p) => ({ ...p, quantity: e.target.value }))
+              }
               placeholder="1"
               type="number"
               noSpinner
@@ -545,7 +548,9 @@ export default function UpdateReceipt() {
             <InlineInput
               label="Giá nhập *"
               value={row.importPrice}
-              onChange={(e) => setRow((p) => ({ ...p, importPrice: e.target.value }))}
+              onChange={(e) =>
+                setRow((p) => ({ ...p, importPrice: e.target.value }))
+              }
               placeholder="0"
               type="number"
               noSpinner
@@ -577,21 +582,24 @@ export default function UpdateReceipt() {
             />
 
             <InlineInput
-              label={row.isOldBatch ? "Ngày SX (lô cũ)" : "NSX *"}
+              label={ row.isOldBatch ? "NSX (lô cũ)" : "NSX *"}
               value={row.productionDate}
-              onChange={(e) => setRow((p) => ({ ...p, productionDate: e.target.value }))}
+              onChange={(e) =>
+                setRow((p) => ({ ...p, productionDate: e.target.value }))
+              }
               placeholder="YYYY-MM-DD"
               type="date"
-              readOnly={row.isOldBatch}
             />
 
             <InlineInput
-              label={row.isOldBatch ? "Hạn sử dụng (lô cũ)" : "HSD *"}
+              label={ row.isOldBatch ? "HSD (lô cũ)" : "HSD *"
+              }
               value={row.expiryDate}
-              onChange={(e) => setRow((p) => ({ ...p, expiryDate: e.target.value }))}
+              onChange={(e) =>
+                setRow((p) => ({ ...p, expiryDate: e.target.value }))
+              }
               placeholder="YYYY-MM-DD"
               type="date"
-              readOnly={row.isOldBatch}
             />
           </div>
 
@@ -622,16 +630,25 @@ export default function UpdateReceipt() {
                   <th className="px-4 py-3 font-semibold">Số lô</th>
                   <th className="px-4 py-3 font-semibold">NSX</th>
                   <th className="px-4 py-3 font-semibold">HSD</th>
-                  <th className="px-4 py-3 font-semibold text-right">SL Nhập</th>
-                  <th className="px-4 py-3 font-semibold text-right">Giá nhập</th>
-                  <th className="px-4 py-3 font-semibold text-right">Thành tiền</th>
+                  <th className="px-4 py-3 font-semibold text-right">
+                    SL Nhập
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-right">
+                    Giá nhập
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-right">
+                    Thành tiền
+                  </th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan="10" className="px-6 py-16 text-center text-gray-400 text-sm">
+                    <td
+                      colSpan="10"
+                      className="px-6 py-16 text-center text-gray-400 text-sm"
+                    >
                       Chưa có sản phẩm nào trong phiếu nhập
                     </td>
                   </tr>
@@ -706,7 +723,10 @@ export default function UpdateReceipt() {
               {items.length > 0 && (
                 <tfoot>
                   <tr className="bg-gray-50 border-t-2 border-gray-200">
-                    <td colSpan="8" className="px-4 py-3 text-right font-bold text-gray-700">
+                    <td
+                      colSpan="8"
+                      className="px-4 py-3 text-right font-bold text-gray-700"
+                    >
                       Tổng hóa đơn:
                     </td>
                     <td className="px-4 py-3 text-right font-bold text-red-600 text-base">

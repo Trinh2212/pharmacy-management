@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Topbar } from "../../components/admin/TopBar";
 import axiosClient from "../../api/axiosClient";
-import { alertError } from "../../utils/SwalAlert";
-import { formatCurrency, formatDate} from "../../utils/Format";
+import { alertError, alertSuccess, alertConfirm } from "../../utils/SwalAlert";
+import { formatCurrency, formatDate } from "../../utils/Format";
 import { FaBoxesStacked, FaFlask, FaUser, FaTruck, FaCalendarDays, FaPen } from "react-icons/fa6";
 import { Modal } from "../../components/admin/Modal";
 
@@ -39,11 +39,7 @@ export default function WarehouseManagement() {
         setSearching(true);
       }
       const res = await axiosClient.get("/warehouse-receipts", {
-        params: {
-          page,
-          limit: LIMIT,
-          ...(search ? { search } : {}),
-        },
+        params: { page, limit: LIMIT, ...(search ? { search } : {}) },
       });
       setReceipts(res.data.data);
       setTotalPages(res.data.totalPages || 1);
@@ -62,12 +58,9 @@ export default function WarehouseManagement() {
     fetchReceipts(1, "");
   }, []);
 
-  useEffect(
-    () => () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    },
-    [],
-  );
+  useEffect(() => () => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+  }, []);
 
   const handleSearch = (value) => {
     setKeyword(value);
@@ -85,9 +78,7 @@ export default function WarehouseManagement() {
   };
 
   const toggleSelect = (receipt) => {
-    setSelectedId((prev) =>
-      prev === receipt.receiptId ? null : receipt.receiptId,
-    );
+    setSelectedId((prev) => (prev === receipt.receiptId ? null : receipt.receiptId));
   };
 
   const openCreate = () => navigate("/admin/warehouse/add-receipt");
@@ -101,10 +92,8 @@ export default function WarehouseManagement() {
     if (!selectedReceipt) return;
     try {
       setDetailLoading(true);
-      const res = await axiosClient.get(
-        `/warehouse-receipts/${selectedReceipt.receiptId}`,
-      );
-      setDetailReceipt(res.data.data || res.data);
+      const res = await axiosClient.get(`/warehouse-receipts/${selectedReceipt.receiptId}`);
+      setDetailReceipt(res.data.data);
     } catch {
       alertError("Không thể tải chi tiết phiếu nhập");
     } finally {
@@ -112,13 +101,30 @@ export default function WarehouseManagement() {
     }
   };
 
+  const handleCancelSelected = async () => {
+    if (!selectedReceipt) return;
+    const result = await alertConfirm(
+      `Phiếu "${selectedReceipt.receiptCode}" sẽ bị hủy, số lượng tồn của lô trong phiếu sẽ bị trừ ra`,
+      "Xác nhận hủy phiếu nhập",
+      "btn-swal-danger",
+    );
+    if (!result.isConfirmed) return;
+    try {
+      await axiosClient.delete(`/warehouse-receipts/${selectedReceipt.receiptId}`);
+      alertSuccess("Đã hủy phiếu nhập thành công");
+      setSelectedId(null);
+      setDetailReceipt(null);
+      fetchReceipts(currentPage, keyword.trim());
+    } catch (err) {
+      alertError(err?.response?.data?.message || "Không thể hủy phiếu nhập");
+    }
+  };
+
   if (initialLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-        <span className="ml-2 text-teal-600 font-medium">
-          Đang tải dữ liệu...
-        </span>
+        <span className="ml-2 text-teal-600 font-medium">Đang tải dữ liệu...</span>
       </div>
     );
   }
@@ -136,6 +142,7 @@ export default function WarehouseManagement() {
           onCreate: openCreate,
           onView: openViewSelected,
           onEdit: openEditSelected,
+          onDelete: handleCancelSelected,
         }}
       />
 
@@ -155,12 +162,7 @@ export default function WarehouseManagement() {
               <tbody className="divide-y divide-gray-100">
                 {receipts.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan="5"
-                      className="px-6 py-12 text-center text-gray-400"
-                    >
-                      Không tìm thấy phiếu nhập phù hợp!
-                    </td>
+                    <td colSpan="5" className="px-6 py-12 text-center text-gray-400">Không tìm thấy phiếu nhập phù hợp!</td>
                   </tr>
                 ) : (
                   receipts.map((r) => {
@@ -170,29 +172,17 @@ export default function WarehouseManagement() {
                         key={r.receiptId}
                         onClick={() => toggleSelect(r)}
                         className={`cursor-pointer transition-colors duration-200 select-none border-b border-gray-100
-                        ${
-                          isSelected
-                            ? "bg-blue-100 ring-1 ring-inset ring-blue-50"
-                            : "hover:bg-gray-100"
-                        }`}
+                        ${isSelected ? "bg-blue-100 ring-1 ring-inset ring-blue-50" : "hover:bg-gray-100"}`}
                       >
                         <td className="px-6 py-4">
                           <span className="text-xs text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
                             {r.receiptCode}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-sm text-black">
-                          {formatDate(r.receiptDate)}
-                        </td>
-                        <td className="px-6 py-4 font-medium text-black">
-                          {r.supplierInfo?.supplierName || "đang cập nhật"}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-black">
-                          {r.employeeInfo?.fullName || "đang cập nhật"}
-                        </td>
-                        <td className="px-6 py-4 text-sm font-semibold text-black">
-                          {formatCurrency(r.totalPrice)}
-                        </td>
+                        <td className="px-6 py-4 text-sm text-black">{formatDate(r.receiptDate)}</td>
+                        <td className="px-6 py-4 font-medium text-black">{r.supplierInfo?.supplierName || "đang cập nhật"}</td>
+                        <td className="px-6 py-4 text-sm text-black">{r.employeeInfo?.fullName || "đang cập nhật"}</td>
+                        <td className="px-6 py-4 text-sm font-semibold text-black">{formatCurrency(r.totalPrice)}</td>
                       </tr>
                     );
                   })
@@ -205,18 +195,11 @@ export default function WarehouseManagement() {
             <div className="px-6 py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <span>
-                  Tổng:{" "}
-                  <span className="font-semibold text-gray-700">
-                    {totalReceipts}
-                  </span>{" "}
-                  phiếu
+                  Tổng: <span className="font-semibold text-gray-700">{totalReceipts}</span> phiếu
                 </span>
                 {selectedReceipt && (
                   <span className="text-blue-600">
-                    Đang chọn:{" "}
-                    <span className="font-semibold">
-                      {selectedReceipt.receiptCode}
-                    </span>
+                    Đang chọn: <span className="font-semibold">{selectedReceipt.receiptCode}</span>
                   </span>
                 )}
                 {searching && (
@@ -237,21 +220,19 @@ export default function WarehouseManagement() {
                     Trước
                   </button>
 
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (p) => (
-                      <button
-                        key={p}
-                        onClick={() => handleChangePage(p)}
-                        className={`w-8 h-8 text-sm rounded-md border transition ${
-                          p === currentPage
-                            ? "bg-gradient-to-br from-blue-600 to-blue-400 text-white border-transparent"
-                            : "bg-white text-gray-600 border-gray-200 hover:text-blue-600 hover:border-blue-300"
-                        }`}
-                      >
-                        {p}
-                      </button>
-                    ),
-                  )}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => handleChangePage(p)}
+                      className={`w-8 h-8 text-sm rounded-md border transition ${
+                        p === currentPage
+                          ? "bg-gradient-to-br from-blue-600 to-blue-400 text-white border-transparent"
+                          : "bg-white text-gray-600 border-gray-200 hover:text-blue-600 hover:border-blue-300"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
 
                   <button
                     onClick={() => handleChangePage(currentPage + 1)}
@@ -269,10 +250,7 @@ export default function WarehouseManagement() {
 
       {/*  Detail Modal  */}
       {(detailReceipt || detailLoading) && (
-        <Modal
-          title="CHI TIẾT PHIẾU NHẬP KHO"
-          onClose={() => setDetailReceipt(null)}
-        >
+        <Modal title="CHI TIẾT PHIẾU NHẬP KHO" onClose={() => setDetailReceipt(null)}>
           {detailLoading ? (
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
@@ -280,9 +258,7 @@ export default function WarehouseManagement() {
           ) : (
             <div className="px-6 py-5 flex flex-col gap-4">
               <div>
-                <div className="text-black font-bold text-xl leading-tight">
-                  {detailReceipt.receiptCode}
-                </div>
+                <div className="text-black font-bold text-xl leading-tight">{detailReceipt.receiptCode}</div>
                 <div className="text-black text-sm mt-0.5 flex items-center gap-1.5">
                   <FaCalendarDays />
                   {formatDate(detailReceipt.receiptDate)}
@@ -294,26 +270,18 @@ export default function WarehouseManagement() {
                   <div className="text-gray-700 text-xs mb-0.5 flex items-center gap-1.5">
                     <FaTruck /> Nhà cung cấp
                   </div>
-                  <div className="text-black font-medium">
-                    {detailReceipt.supplierInfo?.supplierName || "đang cập nhật"}
-                  </div>
+                  <div className="text-black font-medium">{detailReceipt.supplierInfo?.supplierName || "đang cập nhật"}</div>
                 </div>
                 <div>
                   <div className="text-gray-700 text-xs mb-0.5 flex items-center gap-1.5">
                     <FaUser /> Người lập phiếu
                   </div>
-                  <div className="text-black font-medium">
-                    {detailReceipt.employeeInfo?.fullName || "đang cập nhật"}
-                  </div>
+                  <div className="text-black font-medium">{detailReceipt.employeeInfo?.fullName || "đang cập nhật"}</div>
                 </div>
 
                 <div>
-                  <div className="text-gray-700 text-xs mb-0.5">
-                    Tổng tiền phiếu
-                  </div>
-                  <div className="text-black font-medium">
-                    {formatCurrency(detailReceipt.totalPrice)}
-                  </div>
+                  <div className="text-gray-700 text-xs mb-0.5">Tổng tiền phiếu</div>
+                  <div className="text-black font-medium">{formatCurrency(detailReceipt.totalPrice)}</div>
                 </div>
               </div>
 
@@ -325,18 +293,11 @@ export default function WarehouseManagement() {
                   </div>
                   <ul className="flex flex-col gap-1.5">
                     {detailReceipt.detailInfo.map((d, idx) => (
-                      <li
-                        key={idx}
-                        className="text-sm text-gray-700 flex items-center justify-between bg-gray-50 rounded-md px-3 py-2"
-                      >
+                      <li key={idx} className="text-sm text-gray-700 flex items-center justify-between bg-gray-50 rounded-md px-3 py-2">
                         <div className="flex flex-col">
-                          <span className="font-medium text-black">
-                            {d.batchInfo?.medicineInfo?.brandName || "đang cập nhật"}
-                          </span>
+                          <span className="font-medium text-black">{d.batchInfo?.medicineInfo?.brandName || "đang cập nhật"}</span>
                           <span className="text-gray-400 text-xs">
-                            Lô thuốc: {d.batchInfo?.batchNumber || "đang cập nhật"} - NSX:{" "}
-                            {formatDate(d.batchInfo?.productionDate)} - HSD:{" "}
-                            {formatDate(d.batchInfo?.expiryDate)}
+                            Lô thuốc: {d.batchInfo?.batchNumber || "đang cập nhật"} - NSX: {formatDate(d.batchInfo?.productionDate)} - HSD: {formatDate(d.batchInfo?.expiryDate)}
                           </span>
                         </div>
                         <div className="flex flex-col items-end">
@@ -344,9 +305,7 @@ export default function WarehouseManagement() {
                             <FaBoxesStacked className="shrink-0 text-gray-400" />
                             {d.importQuantity}
                           </span>
-                          <span className="text-gray-500 text-xs">
-                            {formatCurrency(d.importPrice)}
-                          </span>
+                          <span className="text-gray-500 text-xs">{formatCurrency(d.importPrice)}</span>
                         </div>
                       </li>
                     ))}
@@ -357,10 +316,10 @@ export default function WarehouseManagement() {
           )}
 
           <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-2">
-            <button
-              onClick={() => setDetailReceipt(null)}
-              className="btn-cancel px-4 py-2 text-sm font-medium"
-            >
+            <button onClick={handleCancelSelected} className="btn-danger-outline px-4 py-2 text-sm font-medium">
+              Hủy phiếu
+            </button>
+            <button onClick={() => setDetailReceipt(null)} className="btn-cancel px-4 py-2 text-sm font-medium">
               Đóng
             </button>
             <button
