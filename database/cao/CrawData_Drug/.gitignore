@@ -1,9 +1,0 @@
-data/
-data_test*/
-__pycache__/
-*.pyc
-*.sqlite
-*.db
-*.csv
-*.jsonl
-*.log
