@@ -1,15 +1,6 @@
 # CareMind Pharma — Web Quản Lý Nhà Thuốc Trực Tuyến Tích Hợp Chatbot AI
 
-**Niên luận cơ sở ngành Khoa học Máy tính — Trường Công nghệ Thông tin & Truyền thông, Đại học Cần Thơ**
-
-| | |
-|---|---|
-| **Đề tài** | Web quản lý nhà thuốc trực tuyến tích hợp chatbot hỗ trợ tra cứu thông tin sử dụng thuốc |
-| **Sinh viên thực hiện** | Ung Ngọc Diễm Trinh — MSSV: B2308397 |
-| **Khóa** | 49 |
-| **GVHD** | TS. Trần Nguyễn Minh Thư |
-
----
+**Đề tài - Web quản lý nhà thuốc trực tuyến tích hợp chatbot hỗ trợ tra cứu thông tin sử dụng thuốc**
 
 ## 1. Giới thiệu
 
