@@ -120,7 +120,7 @@ Trước khi cài đặt, đảm bảo đã có:
 ### 7.1. Clone repository
 
 ```bash
-git clone <đường_dẫn_repository_của_bạn>
+git clone https://github.com/Trinh2212/pharmacy-management.git
 cd Pharmacy-Management
 ```
 
