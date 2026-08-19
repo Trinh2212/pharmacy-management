@@ -1,4 +1,4 @@
-# CareMind Pharma — Web Quản Lý Nhà Thuốc Trực Tuyến Tích Hợp Chatbot AI
+# CareMind Pharma - Web Quản Lý Nhà Thuốc Trực Tuyến Tích Hợp Chatbot AI
 
 **Đề tài - Web quản lý nhà thuốc trực tuyến tích hợp chatbot hỗ trợ tra cứu thông tin sử dụng thuốc**
 
@@ -16,7 +16,7 @@ Trong bối cảnh chuyển đổi số ngày càng mạnh mẽ trong lĩnh vự
 
 ### Mục tiêu đề tài
 
-Xây dựng một website quản lý nhà thuốc trực tuyến đáp ứng các nghiệp vụ cơ bản (danh mục thuốc, nhập kho, lô thuốc, nhà cung cấp, hoạt chất, nhóm thuốc, nhân viên), đồng thời tích hợp trợ lý ảo hỗ trợ tìm kiếm — tra cứu thông tin thuốc và ứng dụng công nghệ OCR để tự động nhận dạng, trích xuất thông tin hướng dẫn sử dụng thuốc từ hình ảnh.
+Xây dựng một website quản lý nhà thuốc trực tuyến đáp ứng các nghiệp vụ cơ bản (danh mục thuốc, nhập kho, lô thuốc, nhà cung cấp, hoạt chất, nhóm thuốc, nhân viên), đồng thời tích hợp trợ lý ảo hỗ trợ tìm kiếm - tra cứu thông tin thuốc và ứng dụng công nghệ OCR để tự động nhận dạng, trích xuất thông tin hướng dẫn sử dụng thuốc từ hình ảnh.
 
 ### Kết quả đạt được (dữ liệu thử nghiệm)
 
@@ -47,7 +47,7 @@ Xây dựng một website quản lý nhà thuốc trực tuyến đáp ứng cá
 
 ---
 
-## 3. Chatbot AI — CareMind
+## 3. Chatbot AI - CareMind
 
 Chatbot ứng dụng kỹ thuật **RAG** kết hợp **Function Calling** để trả lời dựa trên dữ liệu thực tế của hệ thống thay vì tự sinh thông tin:
 
@@ -78,28 +78,28 @@ Quy trình: người dùng đặt câu hỏi → AI phân tích ý định → n
 Hệ thống được thiết kế theo mô hình **Client – Server**.
 
 ### Frontend
-- **React (Vite)** — kiến trúc component-based, Virtual DOM tối ưu re-render.
-- **React Router DOM** — điều hướng.
-- **Axios** — giao tiếp API.
-- **Tailwind CSS** — utility-first, hỗ trợ responsive.
-- **Recharts** — biểu đồ thống kê.
+- **React (Vite)** - kiến trúc component-based, Virtual DOM tối ưu re-render.
+- **React Router DOM** - điều hướng.
+- **Axios** - giao tiếp API.
+- **Tailwind CSS** - utility-first, hỗ trợ responsive.
+- **Recharts** - biểu đồ thống kê.
 - **SweetAlert2**, **React Icons**, **@emailjs/browser**.
 
 ### Backend
-- **Node.js + Express.js** — RESTful API, xử lý bất đồng bộ.
-- **Sequelize (ORM)** — ánh xạ và quản lý quan hệ dữ liệu MySQL.
-- **JWT** — xác thực, phân quyền.
-- **bcrypt** — băm mật khẩu.
-- **Joi** — kiểm duyệt dữ liệu đầu vào.
-- **Multer** — xử lý upload file (ảnh sản phẩm, ảnh HDSD).
+- **Node.js + Express.js** - RESTful API, xử lý bất đồng bộ.
+- **Sequelize (ORM)** - ánh xạ và quản lý quan hệ dữ liệu MySQL.
+- **JWT** - xác thực, phân quyền.
+- **bcrypt** - băm mật khẩu.
+- **Joi** - kiểm duyệt dữ liệu đầu vào.
+- **Multer** - xử lý upload file (ảnh sản phẩm, ảnh HDSD).
 
 ### Cơ sở dữ liệu
-- **MySQL** — đảm bảo tính chất ACID; các bảng chính: `medicines`, `medicine_groups`, `active_ingredients`, `medicine_ingredient_details`, `usage_instructions`, `suppliers`, `employees`, `batches`, `warehouse_receipts`, `warehouse_receipt_details`.
+- **MySQL** - đảm bảo tính chất ACID; các bảng chính: `medicines`, `medicine_groups`, `active_ingredients`, `medicine_ingredient_details`, `usage_instructions`, `suppliers`, `employees`, `batches`, `warehouse_receipts`, `warehouse_receipt_details`.
 
 ### AI / Machine Learning
-- **Groq SDK** — gọi mô hình OpenAI GPT-OSS-120B.
-- **@xenova/transformers** — sinh embedding cục bộ (không cần gọi API ngoài).
-- **Vintern-1B-v3_5** — mô hình OCR đa phương thức, triển khai qua Google Colab + Ngrok.
+- **Groq SDK** - gọi mô hình OpenAI GPT-OSS-120B.
+- **@xenova/transformers** - sinh embedding cục bộ (không cần gọi API ngoài).
+- **Vintern-1B-v3_5** - mô hình OCR đa phương thức, triển khai qua Google Colab + Ngrok.
 
 ### Công cụ hỗ trợ phát triển
 Visual Studio Code, Nodemon, Git, Postman, MySQL Workbench.
