@@ -41,7 +41,7 @@ const AddMedicine = () => {
   const [loading, setLoading] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(false);
 
-  const [selectedGroups, setSelectedGroups] = useState([]); 
+  const [selectedGroups, setSelectedGroups] = useState([]);
   const [selectedIngredients, setSelectedIngredients] = useState([]);
   const [documentPath, setDocumentPath] = useState(null);
 
@@ -87,14 +87,14 @@ const AddMedicine = () => {
       setDocumentPath(res.data.documentPath);
 
       setOcrForm({
-        dosageForm: res.data.dosage_form || "",
-        packaging: res.data.packaging || "",
-        uses: res.data.uses || "",
-        contraindications: res.data.contraindications || "",
-        sideEffects: res.data.side_effects || "",
-        dosageAdministration: res.data.dosage_administration || "",
-        storageCondition: res.data.storage_condition || "",
-        warning: res.data.warning || "",
+        dosageForm: res.data.dosage_form || "Không tìm thấy thông tin",
+        packaging: res.data.packaging || "Không tìm thấy thông tin",
+        uses: res.data.uses || "Không tìm thấy thông tin",
+        contraindications: res.data.contraindications || "Không tìm thấy thông tin",
+        sideEffects: res.data.side_effects || "Không tìm thấy thông tin",
+        dosageAdministration: res.data.dosage_administration || "Không tìm thấy thông tin",
+        storageCondition: res.data.storage_condition || "Không tìm thấy thông tin",
+        warning: res.data.warning || "Không tìm thấy thông tin",
       });
     } catch (error) {
       alertError("OCR thất bại, vui lòng thử lại!");
@@ -133,9 +133,9 @@ const AddMedicine = () => {
       if (medicineImageFile) formData.append("medicine", medicineImageFile);
 
       if (documentPath) {
-        formData.append("documentPath", documentPath); 
+        formData.append("documentPath", documentPath);
       } else if (documentFile) {
-        formData.append("document", documentFile); 
+        formData.append("document", documentFile);
       }
 
       await axiosClient.post("/medicines", formData, {
@@ -154,7 +154,7 @@ const AddMedicine = () => {
       setDocumentPreview(null);
     } catch (error) {
       console.error("Lưu thuốc lỗi:", error.response?.data);
-      alertError( error || "Lưu thất bại!");
+      alertError(error || "Lưu thất bại!");
     } finally {
       setLoading(false);
     }
@@ -410,9 +410,8 @@ const AddMedicine = () => {
                 <button
                   onClick={handleOCR}
                   disabled={ocrLoading || !documentFile}
-                  className={`mt-4 flex items-center gap-2 mx-auto px-6 py-2.5 font-bold transition-all ${
-                    ocrLoading || !documentFile ? "btn-cancel" : "btn-gradient"
-                  }`}
+                  className={`mt-4 flex items-center gap-2 mx-auto px-6 py-2.5 font-bold transition-all ${ocrLoading || !documentFile ? "btn-cancel" : "btn-gradient"
+                    }`}
                 >
                   {ocrLoading ? (
                     <span className="flex items-center gap-2">

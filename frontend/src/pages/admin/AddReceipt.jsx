@@ -332,11 +332,7 @@ export default function ImportReceiptCreate() {
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-6 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
             <InlineInput
-              label={
-                <>
-                  Mã phiếu nhập *
-                </>
-              }
+              label={<>Mã phiếu nhập *</>}
               value={receiptCode}
               onChange={(e) => setReceiptCode(e.target.value.slice(0, 20))}
               placeholder="VD: PN0001"
@@ -353,17 +349,22 @@ export default function ImportReceiptCreate() {
 
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-6 py-4">
           {/* Nhà cung cấp + Tìm kiếm thuốc */}
-          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-3 items-end">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(220px,340px)_1fr] gap-3 items-end">
             {/* Nhà cung cấp */}
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 min-w-0">
               <span className="text-xs text-gray-500 font-medium">
                 Nhà cung cấp *
               </span>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 min-w-0">
                 <select
                   value={supplierId}
                   onChange={(e) => setSupplierId(e.target.value)}
-                  className="flex-1 px-3 py-2 h-10 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  title={
+                    suppliers.find(
+                      (s) => String(s.supplierId) === String(supplierId),
+                    )?.supplierName || ""
+                  }
+                  className="flex-1 w-full min-w-0 px-3 py-2 h-10 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white truncate"
                 >
                   <option value=""> Chọn NCC </option>
                   {suppliers.map((s) => (
@@ -375,7 +376,7 @@ export default function ImportReceiptCreate() {
               </div>
             </div>
 
-            {/* Tìm kiếm thuốc */}
+            {/* Tìm kiếm thuốc  */}
             <div className="flex flex-col gap-1">
               <span className="text-xs text-gray-500 font-medium">
                 Tìm kiếm thuốc *
@@ -446,15 +447,7 @@ export default function ImportReceiptCreate() {
 
             {/* Ngày sản xuất */}
             <InlineInput
-              label={
-                row.isOldBatch ? (
-                  "Ngày SX (lô cũ)"
-                ) : (
-                  <>
-                    NSX *
-                  </>
-                )
-              }
+              label={row.isOldBatch ? "Ngày SX (lô cũ)" : <>NSX *</>}
               value={row.productionDate}
               onChange={(e) =>
                 setRow((p) => ({ ...p, productionDate: e.target.value }))
@@ -466,15 +459,7 @@ export default function ImportReceiptCreate() {
 
             {/* Hạn sử dụng */}
             <InlineInput
-              label={
-                row.isOldBatch ? (
-                  "Hạn sử dụng (lô cũ)"
-                ) : (
-                  <>
-                    HSD *
-                  </>
-                )
-              }
+              label={row.isOldBatch ? "Hạn sử dụng (lô cũ)" : <>HSD *</>}
               value={row.expiryDate}
               onChange={(e) =>
                 setRow((p) => ({ ...p, expiryDate: e.target.value }))
@@ -513,9 +498,15 @@ export default function ImportReceiptCreate() {
                   <th className="px-4 py-3 font-semibold">Số lô</th>
                   <th className="px-4 py-3 font-semibold">NSX</th>
                   <th className="px-4 py-3 font-semibold">HSD</th>
-                  <th className="px-4 py-3 font-semibold text-right">SL Nhập</th>
-                  <th className="px-4 py-3 font-semibold text-right">Giá nhập</th>
-                  <th className="px-4 py-3 font-semibold text-right">Thành tiền</th>
+                  <th className="px-4 py-3 font-semibold text-right">
+                    SL Nhập
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-right">
+                    Giá nhập
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-right">
+                    Thành tiền
+                  </th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>

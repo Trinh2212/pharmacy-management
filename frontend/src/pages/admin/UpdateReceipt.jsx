@@ -490,16 +490,21 @@ export default function UpdateReceipt() {
           )}
 
           {/* Hàng 1: Nhà cung cấp + Tìm kiếm thuốc */}
-          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-3 items-end">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(220px,340px)_1fr] gap-3 items-end">
             {/* Nhà cung cấp */}
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 min-w-0">
               <span className="text-xs text-gray-500 font-medium">
                 Nhà cung cấp *
               </span>
               <select
                 value={supplierId}
                 onChange={(e) => setSupplierId(e.target.value)}
-                className="flex-1 px-3 py-2 h-10 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                title={
+                  suppliers.find(
+                    (s) => String(s.supplierId) === String(supplierId),
+                  )?.supplierName || ""
+                }
+                className="flex-1 w-full min-w-0 px-3 py-2 h-10 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white truncate"
               >
                 <option value=""> Chọn NCC </option>
                 {suppliers.map((s) => (
@@ -582,7 +587,7 @@ export default function UpdateReceipt() {
             />
 
             <InlineInput
-              label={ row.isOldBatch ? "NSX (lô cũ)" : "NSX *"}
+              label={row.isOldBatch ? "NSX (lô cũ)" : "NSX *"}
               value={row.productionDate}
               onChange={(e) =>
                 setRow((p) => ({ ...p, productionDate: e.target.value }))
@@ -592,8 +597,7 @@ export default function UpdateReceipt() {
             />
 
             <InlineInput
-              label={ row.isOldBatch ? "HSD (lô cũ)" : "HSD *"
-              }
+              label={row.isOldBatch ? "HSD (lô cũ)" : "HSD *"}
               value={row.expiryDate}
               onChange={(e) =>
                 setRow((p) => ({ ...p, expiryDate: e.target.value }))

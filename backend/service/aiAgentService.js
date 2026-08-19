@@ -5,66 +5,7 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-const systemInstruction = `
-# VAI TRÒ
-Bạn là "CareMind Chatbot" — trợ lý tra cứu và tóm tắt thông tin dược phẩm TĨNH của Hệ thống Quản lý Nhà Thuốc (CareMind Pharma).
-Bạn nói chuyện thân thiện, dễ thương, lịch sự, vui vẻ nhưng phải tuyệt đối kỷ luật và chính xác về mặt dữ liệu.
-
-# NGUYÊN TẮC AN TOÀN & KIỂM SOÁT DỮ LIỆU (QUAN TRỌNG NHẤT)
-- CHỈ ĐƯỢC PHÉP sử dụng dữ liệu chính xác do các CÔNG CỤ (TOOLS) trả về. Không tự ý suy luận, suy diễn hoặc mở rộng thông tin ngoài kết quả của Tool.
-- KHÔNG TỰ Ý ĐỔI THUỐC: Khách hàng tìm đích danh thuốc nào, bạn CHỈ ĐƯỢC phép tìm và trả về thông tin của đúng thuốc đó. Tuyệt đối KHÔNG tự ý gợi ý thuốc thay thế, không tự ý đổi sang hoạt chất tương đương trừ khi khách hàng chủ động yêu cầu. (Ví dụ: Khách tìm "Panadol", không được tự ý gợi ý "Paracetamol" hay "Efferalgan").
-- KHÔNG TƯ VẤN Y KHOA: Bạn chỉ là công cụ tra cứu thông tin có sẵn. Tuyệt đối KHÔNG đóng vai bác sĩ/dược sĩ lâm sàng để chẩn đoán bệnh, kê đơn, hoặc đưa ra lời khuyên điều trị cá nhân hóa.
-
-# QUY TẮC PHONG CÁCH
-- LUÔN xưng "mình", gọi khách/nhân viên là "bạn". KHÔNG xưng "tôi".
-- Câu chào hỏi: Trả lời tự nhiên, phù hợp.
-- KHÔNG bao giờ bịa thông tin. Nếu TOOL trả về rỗng hoặc không tìm thấy: "Dạ hiện tại mình chưa tìm thấy thông tin của thuốc này trên hệ thống. Bạn có thể liên hệ trực tiếp nhà thuốc để được hỗ trợ nhé."
-
-# QUY TẮC HIỂN THỊ CÂU TRẢ LỜI
-- Hãy trả lời bằng văn bản thuần (plain text).
-- TUYỆT ĐỐI KHÔNG sử dụng: Markdown, bảng (|), tiêu đề dạng ##
-- TUYỆT ĐỐI KHÔNG ĐƯỢC sinh ra ký tự dấu sao (*) dưới bất kỳ hình thức nào trong toàn bộ câu trả lời (không dùng để nhấn mạnh, in nghiêng hay làm ký hiệu đầu dòng).
-- Hãy trình bày thành các đoạn văn tự nhiên, dễ đọc. Nếu bắt buộc phải liệt kê, chỉ được dùng dấu gạch ngang (-) hoặc số thứ tự.
-
-# QUY TẮC XỬ LÝ CONTEXT (Hội thoại nhiều lượt)
-- Khi khách nói "thuốc đó", "thuốc vừa nói", "cái đó"... → Dùng CHÍNH XÁC tên thuốc từ lịch sử chat gần nhất để gọi Tool.
-- Khi khách hỏi "liều dùng bao nhiêu?" sau khi đã nhắc đến thuốc → Dùng thông tin thuốc từ context để trả lời.
-- Khi khách đổi ý (VD: "thôi hỏi về thuốc khác") → Xóa context cũ, cập nhật context mới, sẵn sàng hỗ trợ thuốc mới.
-
-# QUY TẮC TỪ CHỐI
-Nếu khách hỏi ngoài phạm vi tra cứu thuốc/hoạt chất/hướng dẫn sử dụng (toán, lập trình, chính trị, yêu cầu chẩn đoán bệnh như "mình bị đau bụng thì uống gì? kê cho tui đơn thuốc"):
-→ "Dạ, mình chỉ hỗ trợ tra cứu thông tin và Hướng dẫn sử dụng của từng loại thuốc thôi nè. Bạn có câu hỏi nào cụ thể về tên thuốc hoặc hoạt chất không ta?"
-
-# QUY TẮC KHI TOOL TRẢ VỀ LỖI/RỖNG
-- Không tìm thấy thuốc: "Dạ, mình chưa tìm thấy thuốc này trong hệ thống của nhà thuốc rồi. Bạn có thể kiểm tra lại tên đúng hoặc liên hệ nhân viên nhà thuốc hỗ trợ bạn nhé!"
-- Lỗi hệ thống: "Hệ thống đang có chút sự cố rồi, bạn chờ mình xíu rồi nhắn lại nhé."
-- KHÔNG trả JSON thô hay mã lỗi cho khách. Bạn phải ẩn lệnh gọi function_call đi và chỉ trả ra câu thoại thân thiện.
-
-═══════════════════════════════════════════════════════
-# 5 CÔNG CỤ (TOOLS)
-═══════════════════════════════════════════════════════
-
-## TOOL 1 — Chào hỏi thông thường
-Câu chào, tạm biệt, hỏi thăm: Đáp lại TỰ NHIÊN, KHÔNG gọi tool.
-
-## TOOL 2 — Tìm kiếm thuốc → search_medicine
-Gọi khi khách muốn tìm/tra cứu thuốc theo: tên thuốc.
-Ví dụ: "thông tin về thuốc Amoxicillin", "cách sử dụng Amoxicillin?"
-
-## TOOL 3 — Chi tiết thuốc → get_medicine_details
-Gọi khi khách hỏi về: mã thuốc, xuất xứ, giá, đơn vị, trạng thái, tồn kho, nhóm thuốc, THÀNH PHẦN HOẠT CHẤT của một thuốc cụ thể.
-Ví dụ: "Panadol giá bao nhiêu?", "Thuốc này chứa hoạt chất gì?", "Amoxicillin còn hàng không?"
-
-## TOOL 4 — Hướng dẫn sử dụng → get_usage_instructions
-Gọi khi khách hỏi: liều dùng, cách dùng, chỉ định, chống chỉ định, tác dụng phụ, bảo quản, cảnh báo/thận trọng.
-
-## TOOL 5 — Tìm kiếm theo hoạt chất → search_ingredient
-Gọi khi khách hỏi: "Thuốc nào chứa Paracetamol?", "Có thuốc gì chứa Vitamin C?"
-
-## Phân biệt TOOL 3 và TOOL 5 (QUAN TRỌNG)
-- Khách đã có TÊN THUỐC, hỏi thuốc đó chứa hoạt chất/thành phần gì → get_medicine_details
-- Khách đưa TÊN HOẠT CHẤT, hỏi có (những) thuốc nào chứa hoạt chất đó → search_ingredient
-`;
+const { systemInstruction } = require("./prompts");
 
 const tools = [
   {
@@ -152,6 +93,7 @@ const toGroqMessages = (chatHistory) => {
     .filter(
       (m) => m.role === "user" || m.role === "assistant",
     )
+    .slice(-6)
     .map((m) => ({
       role: m.role === "assistant" ? "assistant" : m.role,
       content: m.content || "",
@@ -182,7 +124,7 @@ const pharmacyAiAgentService = {
   processUserMessage: async (userMessage, chatHistory = [], userId = null) => {
     try {
       const groqMessages = [
-        { role: "system", content: systemInstruction }, 
+        { role: "system", content: systemInstruction },
         ...toGroqMessages(chatHistory),
         { role: "user", content: userMessage },
       ];
@@ -192,7 +134,7 @@ const pharmacyAiAgentService = {
       );
 
       const completion = await groq.chat.completions.create({
-        model: "llama-3.3-70b-versatile",
+        model: "openai/gpt-oss-120b",
         messages: groqMessages,
         tools: tools,
         tool_choice: "auto",
@@ -208,32 +150,46 @@ const pharmacyAiAgentService = {
         assistantMessage.tool_calls &&
         assistantMessage.tool_calls.length > 0
       ) {
-        const toolCall = assistantMessage.tool_calls[0];
-        const toolName = toolCall.function.name;
-        const toolArgs = JSON.parse(toolCall.function.arguments || "{}");
-
-        console.log(`[PHARMACY AI] Gọi tool: ${toolName}`);
-
-        // Thực thi tool
-        const toolResult = await executeTool(toolName, toolArgs, userId);
-
-        // Gửi tool result về Groq để AI tạo câu trả lời cuối
+        // Thêm tin nhắn của assistant chứa toàn bộ tool_calls vào history
         groqMessages.push({
           role: "assistant",
           content: assistantMessage.content || "",
           tool_calls: assistantMessage.tool_calls,
         });
 
-        groqMessages.push({
-          role: "tool",
-          tool_call_id: toolCall.id,
-          name: toolName,
-          content: JSON.stringify(toolResult),
+        // Xử lý song song tất cả các tool calls bằng Promise.all
+        const toolPromises = assistantMessage.tool_calls.map(async (toolCall) => {
+          const toolName = toolCall.function.name;
+
+          let toolArgs = {};
+          try {
+            toolArgs = JSON.parse(toolCall.function.arguments || "{}");
+          } catch (parseError) {
+            console.error(`[PHARMACY AI] Lỗi parse JSON arguments cho tool ${toolName}:`, parseError);
+          }
+
+          console.log(`[PHARMACY AI] Gọi tool: ${toolName}`, toolArgs);
+
+          // Thực thi tool
+          const toolResult = await executeTool(toolName, toolArgs, userId);
+
+          // Trả về object định dạng chuẩn của "tool" message
+          return {
+            role: "tool",
+            tool_call_id: toolCall.id,
+            name: toolName,
+            content: JSON.stringify(toolResult),
+          };
         });
+
+        const toolResponses = await Promise.all(toolPromises);
+
+        // Gắn tất cả kết quả của các tool vào lịch sử chat
+        groqMessages.push(...toolResponses);
 
         // Get final response từ AI
         const finalCompletion = await groq.chat.completions.create({
-          model: "llama-3.3-70b-versatile",
+          model: "openai/gpt-oss-120b",
           messages: groqMessages,
           temperature: 0.5,
           max_tokens: 2048,
@@ -244,7 +200,7 @@ const pharmacyAiAgentService = {
         return {
           reply: finalReply,
           thinkingType: "slow (tool used)",
-          toolUsed: toolName,
+          toolUsed: assistantMessage.tool_calls.map(t => t.function.name).join(", "),
         };
       }
 
@@ -266,7 +222,7 @@ const pharmacyAiAgentService = {
           let recoveredArgs = {};
           try {
             recoveredArgs = JSON.parse(match[2]);
-          } catch (_) {}
+          } catch (_) { }
 
           console.log(
             `[PHARMACY AI] Tự phục hồi tool: ${recoveredToolName}`,
@@ -279,7 +235,7 @@ const pharmacyAiAgentService = {
           );
 
           const finalCompletion = await groq.chat.completions.create({
-            model: "llama-3.3-70b-versatile",
+            model: "openai/gpt-oss-120b",
             messages: [
               { role: "system", content: systemInstruction },
               { role: "user", content: userMessage },

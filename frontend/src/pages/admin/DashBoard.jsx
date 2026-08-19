@@ -178,7 +178,11 @@ export default function Dashboard() {
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis
                   tick={{ fontSize: 12 }}
-                  tickFormatter={(v) => `${(v / 1000000).toFixed(0)}tr`}
+                  tickFormatter={(v) => {
+                    if (v === 0) return "0";
+                    if (v < 1000000) return `${Math.round(v / 1000)}k`;
+                    return `${(v / 1000000).toFixed(1)}tr`;
+                  }}
                 />
                 <Tooltip
                   formatter={(value) => [formatCurrency(value), "Chi phí nhập"]}

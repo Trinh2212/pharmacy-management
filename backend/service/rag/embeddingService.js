@@ -1,5 +1,6 @@
 let pipelinePromise = null;
 
+// chỉ load 1 lần
 const getPipeline = () => {
   if (!pipelinePromise) {
     pipelinePromise = import("@xenova/transformers")
